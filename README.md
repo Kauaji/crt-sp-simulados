@@ -1,69 +1,106 @@
-# Simulados CRT-SP — Técnico Administrativo
+# CRT-SP Simulados
 
-Site estático e responsivo com 40 itens inéditos no formato Certo/Errado, correção automática, pontuação líquida, desempenho por bloco, gabarito comentado e indicação de temas para revisão.
+Plataforma estática, diária e gamificada de preparação para o concurso CRT-SP 2026, cargo Técnico Administrativo da Baixada Santista. Os itens autorais seguem o formato Certo/Errado e a regra de pontuação líquida associada à banca Quadrix: `+1` por acerto, `−1` por erro e `0` em branco.
 
-O projeto usa apenas HTML, CSS e JavaScript. Não há backend, banco de dados ou etapa de build.
+**Site público:** [https://crt-sp-simulados.vercel.app/](https://crt-sp-simulados.vercel.app/)
+
+O projeto usa somente HTML, CSS e JavaScript, sem dependências, backend ou etapa de build.
+
+## Perfis Kauã e Vitória
+
+A tela inicial oferece dois perfis sem senha. O perfil escolhido fica salvo no `localStorage`, e o botão **Trocar usuário** retorna à seleção sem apagar os dados.
+
+Cada perfil possui estatísticas independentes:
+
+- pontos totais;
+- acessos em dias distintos;
+- simulados finalizados;
+- melhor, última e média das pontuações líquidas;
+- streak atual e maior streak;
+- histórico dos dez resultados mais recentes.
+
+O dashboard apresenta essas métricas e uma frase motivacional diária. O ranking compara pontos, acessos, streak e simulados dos dois perfis no navegador atual.
+
+## Foguinho e pontos
+
+No primeiro acesso do dia, o sistema atualiza o streak:
+
+- dia consecutivo: soma um;
+- mesmo dia: não altera;
+- um ou mais dias sem acesso: reinicia em um.
+
+Ao finalizar um simulado:
+
+```text
+pontos ganhos = max(0, pontuação líquida) + acertos + min(streak atual, 10)
+```
+
+A pontuação gamificada não substitui a pontuação líquida da prova; as duas aparecem separadamente no resultado.
+
+## Simulado diário
+
+`getDailyQuestions()` usa a data local no formato `AAAA-MM-DD` como semente de um gerador pseudoaleatório determinístico. Assim:
+
+- a mesma data gera a mesma prova para Kauã e Vitória;
+- a seleção e a ordem mudam automaticamente no dia seguinte;
+- cada prova tem exatamente 40 itens;
+- são 12 básicos, 8 complementares e 20 específicos.
+
+O banco possui 80 itens autorais, permitindo rotação diária. Conhecimentos específicos e legislação do Sistema CFT/CRTs ocupam metade de cada prova.
 
 ## Arquivos
 
-- `index.html`: estrutura e conteúdo fixo da página.
-- `styles.css`: identidade visual e responsividade.
+- `index.html`: login, dashboard, ranking, prova e resultados.
+- `styles.css`: identidade visual e layout responsivo.
 - `simulados.js`: banco de questões, gabaritos e comentários.
-- `app.js`: renderização, correção, métricas e reinício.
-- `vercel.json`: configuração mínima do site estático.
+- `app.js`: perfis, persistência, streak, ranking, sorteio e correção.
+- `vercel.json`: configuração mínima do deploy estático.
 
 ## Rodar localmente
 
-É possível abrir `index.html` diretamente no navegador. Para simular melhor um servidor web, abra o terminal nesta pasta e use uma das opções:
-
-```bash
-npx serve .
-```
-
-ou, se o Python estiver instalado:
+Abra `index.html` diretamente ou inicie um servidor local:
 
 ```bash
 python -m http.server 8080
 ```
 
-Depois acesse `http://localhost:3000` (serve) ou `http://localhost:8080` (Python).
+Depois acesse `http://localhost:8080`.
 
-## Publicar automaticamente no Vercel via GitHub
+## Adicionar ou atualizar questões
 
-1. Crie um repositório no GitHub.
-2. Na raiz do repositório atual, envie os arquivos para a branch `main`.
-3. Entre em [vercel.com](https://vercel.com), clique em **Add New > Project** e importe o repositório.
-4. Em **Root Directory**, escolha `crt-sp-simulados`.
-5. Em **Framework Preset**, selecione **Other**.
-6. Deixe **Build Command** vazio e **Output Directory** como `.`.
-7. Clique em **Deploy**.
+Edite o array `BANCO_QUESTOES` em `simulados.js`. Cada objeto deve ter:
 
-O Vercel passa a observar a branch de produção (`main`). Cada `git push origin main` cria um novo deploy de produção automaticamente, sem mudar o endereço público.
+```js
+{
+  id: 81,
+  bloco: "Conhecimentos específicos",
+  assunto: "Resolução CFT nº 288/2025",
+  enunciado: "Texto autoral do item.",
+  gabarito: "C",
+  comentario: "Justificativa exibida após a finalização."
+}
+```
 
-Para tentar usar `https://crt-sp-simulados.vercel.app`, defina o nome do projeto como `crt-sp-simulados`. O nome precisa estar disponível. Depois de criado, o domínio permanece o mesmo em todos os deploys. Também é possível configurar um domínio próprio em **Settings > Domains**.
+Regras importantes:
 
-## Atualizar as questões diariamente
+1. use um `id` único;
+2. use somente `"C"` ou `"E"` no gabarito;
+3. mantenha pelo menos 12 itens básicos, 8 complementares e 20 específicos;
+4. confira legislação e resoluções em fontes oficiais;
+5. não copie questões de provas ou materiais protegidos.
 
-Abra `simulados.js` e altere o objeto `SIMULADO`:
-
-- `atualizadoEm`: data da nova versão;
-- `enunciado`: texto do item;
-- `gabarito`: use `"C"` ou `"E"`;
-- `comentario`: justificativa exibida após finalizar;
-- `bloco` e `assunto`: usados nos resultados e na lista de revisão.
-
-Mantenha identificadores (`id`) únicos e sequenciais. Para adicionar ou remover itens, basta editar o array `questoes`; a página calcula o total automaticamente.
-
-Depois teste localmente, faça commit e push:
+Depois envie a atualização:
 
 ```bash
-git add crt-sp-simulados
-git commit -m "Atualiza simulado do dia"
+git add .
+git commit -m "Atualiza banco de questões"
 git push origin main
 ```
 
-O Vercel detectará o push e publicará a nova versão no mesmo domínio.
+O Vercel publica automaticamente a nova versão no mesmo domínio.
 
-## Observação editorial
+## Limitação do armazenamento local
 
-As questões são autorais e não reproduzem itens de provas. Antes de publicar uma atualização, confira normas que possam ter sido alteradas e compare o conteúdo com as fontes oficiais: Portal da Legislação, CFT e CRT-SP.
+O `localStorage` salva os dados apenas no navegador e dispositivo atuais. Kauã e Vitória só compartilham o placar quando usam esse mesmo navegador. Limpar os dados do site também apaga os perfis e resultados.
+
+Para sincronizar um ranking real entre celulares e computadores diferentes, uma versão futura precisará de autenticação e backend, como Supabase, Vercel KV ou banco equivalente. As operações de perfil e estatísticas já estão separadas em funções (`getCurrentUser`, `setCurrentUser`, `loadStats`, `saveStats`, `registerAccess`, `updateStreak` e `updateStatsAfterExam`) para facilitar essa migração.

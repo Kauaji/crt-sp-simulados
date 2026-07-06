@@ -1,9 +1,6 @@
-// Edite este arquivo para trocar ou acrescentar questões.
+// Banco autoral usado pelo sorteio determinístico diário.
 // gabarito: "C" para Certo ou "E" para Errado.
-const SIMULADO = {
-  titulo: "Simulado 01 — Preparação 2026",
-  atualizadoEm: "2026-07-06",
-  questoes: [
+const BANCO_QUESTOES = [
     {
       id: 1,
       bloco: "Conhecimentos básicos",
@@ -323,6 +320,325 @@ const SIMULADO = {
       enunciado: "As resoluções do CFT podem disciplinar atribuições profissionais e o funcionamento do Sistema CFT/CRTs, desde que observados os limites da legislação aplicável.",
       gabarito: "C",
       comentario: "O poder normativo do CFT permite detalhar matérias do sistema, mas os atos infralegais permanecem subordinados às leis e aos demais atos superiores."
+    },
+    {
+      id: 41,
+      bloco: "Conhecimentos básicos",
+      assunto: "Português",
+      enunciado: "Na comunicação “Seguem anexos os comprovantes solicitados”, a forma “anexos” concorda corretamente com “comprovantes”.",
+      gabarito: "C",
+      comentario: "Quando empregado como adjetivo, “anexo” varia em gênero e número para concordar com o substantivo a que se refere."
+    },
+    {
+      id: 42,
+      bloco: "Conhecimentos básicos",
+      assunto: "Português",
+      enunciado: "Em “Faz dois meses que o setor adotou o novo procedimento”, substituir “Faz” por “Fazem” manteria a correção gramatical.",
+      gabarito: "E",
+      comentario: "Ao indicar tempo decorrido, o verbo fazer é impessoal e permanece na terceira pessoa do singular."
+    },
+    {
+      id: 43,
+      bloco: "Conhecimentos básicos",
+      assunto: "Português",
+      enunciado: "No período “Embora o sistema estivesse lento, a equipe concluiu os registros”, a oração iniciada por “Embora” expressa concessão.",
+      gabarito: "C",
+      comentario: "A lentidão poderia impedir a conclusão, mas não a impediu; por isso, a relação semântica é concessiva."
+    },
+    {
+      id: 44,
+      bloco: "Conhecimentos básicos",
+      assunto: "Português",
+      enunciado: "Na frase “É necessária a conferência dos dados”, a concordância de “necessária” com o substantivo determinado por artigo está adequada.",
+      gabarito: "C",
+      comentario: "Com o substantivo determinado por artigo, a expressão adjetiva concorda com ele: “é necessária a conferência”."
+    },
+    {
+      id: 45,
+      bloco: "Conhecimentos básicos",
+      assunto: "Português",
+      enunciado: "Em “O processo cujo o prazo venceu será revisado”, o emprego simultâneo de “cujo” e do artigo “o” segue a norma-padrão.",
+      gabarito: "E",
+      comentario: "O pronome relativo “cujo” não admite artigo depois dele. A forma adequada é “cujo prazo venceu”."
+    },
+    {
+      id: 46,
+      bloco: "Conhecimentos básicos",
+      assunto: "Raciocínio Lógico e Matemática",
+      enunciado: "Se a afirmação “O protocolo está aberto e o sistema está disponível” é verdadeira, então cada uma das duas proposições simples também é verdadeira.",
+      gabarito: "C",
+      comentario: "Uma conjunção só é verdadeira quando ambas as proposições que a compõem são verdadeiras."
+    },
+    {
+      id: 47,
+      bloco: "Conhecimentos básicos",
+      assunto: "Raciocínio Lógico e Matemática",
+      enunciado: "Um material que custava R$ 200 recebeu desconto de 10% e, depois, acréscimo de 10% sobre o novo valor, retornando a R$ 200.",
+      gabarito: "E",
+      comentario: "Após o desconto, o valor é R$ 180; o acréscimo de 10% resulta em R$ 198, pois as bases percentuais são diferentes."
+    },
+    {
+      id: 48,
+      bloco: "Conhecimentos básicos",
+      assunto: "Raciocínio Lógico e Matemática",
+      enunciado: "Em um grupo com 24 processos, dos quais 6 são urgentes, a probabilidade de escolher ao acaso um processo urgente é de 25%.",
+      gabarito: "C",
+      comentario: "A razão é 6/24, equivalente a 1/4 ou 25%."
+    },
+    {
+      id: 49,
+      bloco: "Conhecimentos básicos",
+      assunto: "Raciocínio Lógico e Matemática",
+      enunciado: "A proposição “Se o cadastro está correto, então o pedido será analisado” é logicamente equivalente a “Se o pedido não será analisado, então o cadastro não está correto”.",
+      gabarito: "C",
+      comentario: "A segunda proposição é a contrapositiva da primeira, e ambas são logicamente equivalentes."
+    },
+    {
+      id: 50,
+      bloco: "Conhecimentos básicos",
+      assunto: "Informática",
+      enunciado: "Uma mensagem que imita a identidade visual do CRT-SP e solicita credenciais por link urgente apresenta característica típica de phishing.",
+      gabarito: "C",
+      comentario: "Phishing usa engenharia social e aparência legítima para induzir a vítima a fornecer dados ou acessar conteúdo malicioso."
+    },
+    {
+      id: 51,
+      bloco: "Conhecimentos básicos",
+      assunto: "Informática",
+      enunciado: "No correio eletrônico, o campo Cco permite enviar uma cópia sem revelar aos demais destinatários os endereços inseridos nesse campo.",
+      gabarito: "C",
+      comentario: "Cco significa cópia oculta; seus destinatários não ficam visíveis aos demais receptores."
+    },
+    {
+      id: 52,
+      bloco: "Conhecimentos básicos",
+      assunto: "Informática",
+      enunciado: "A extensão PDF garante, por si só, que um arquivo recebido esteja livre de código malicioso.",
+      gabarito: "E",
+      comentario: "A extensão não garante segurança. Arquivos PDF também podem explorar falhas ou conter links e elementos maliciosos."
+    },
+    {
+      id: 53,
+      bloco: "Conhecimentos complementares",
+      assunto: "Ética no setor público",
+      enunciado: "Comunicar conflito de interesses à autoridade competente é conduta compatível com a integridade no exercício da função pública.",
+      gabarito: "C",
+      comentario: "A transparência sobre situações conflitantes permite prevenção, tratamento adequado e preservação da imparcialidade."
+    },
+    {
+      id: 54,
+      bloco: "Conhecimentos complementares",
+      assunto: "Princípios da Administração Pública",
+      enunciado: "O princípio da eficiência autoriza o agente público a afastar exigência legal quando isso tornar o atendimento mais rápido.",
+      gabarito: "E",
+      comentario: "A eficiência deve ser buscada dentro da legalidade; ela não permite descumprir exigências previstas em lei."
+    },
+    {
+      id: 55,
+      bloco: "Conhecimentos complementares",
+      assunto: "Lei nº 8.429/1992",
+      enunciado: "O mero exercício da função pública, sem comprovação de ato doloso com fim ilícito, afasta a responsabilidade por improbidade administrativa.",
+      gabarito: "C",
+      comentario: "A redação vigente da Lei de Improbidade exige dolo e afirma que o mero exercício da função, sem ato doloso com fim ilícito, não basta."
+    },
+    {
+      id: 56,
+      bloco: "Conhecimentos complementares",
+      assunto: "Lei nº 9.784/1999",
+      enunciado: "A Administração deve anular seus atos ilegais e pode revogar atos válidos por conveniência ou oportunidade, respeitados os direitos adquiridos.",
+      gabarito: "C",
+      comentario: "A Lei nº 9.784/1999 diferencia anulação por ilegalidade e revogação por mérito administrativo."
+    },
+    {
+      id: 57,
+      bloco: "Conhecimentos complementares",
+      assunto: "Lei de Acesso à Informação (LAI)",
+      enunciado: "O pedido de acesso à informação precisa conter os motivos pelos quais o requerente deseja obter os dados.",
+      gabarito: "E",
+      comentario: "A LAI veda exigências relativas aos motivos determinantes da solicitação de informação de interesse público."
+    },
+    {
+      id: 58,
+      bloco: "Conhecimentos complementares",
+      assunto: "Lei Geral de Proteção de Dados (LGPD)",
+      enunciado: "O princípio da necessidade limita o tratamento ao mínimo necessário para a realização de suas finalidades.",
+      gabarito: "C",
+      comentario: "A necessidade exige dados pertinentes, proporcionais e não excessivos em relação às finalidades informadas."
+    },
+    {
+      id: 59,
+      bloco: "Conhecimentos complementares",
+      assunto: "Lei Geral de Proteção de Dados (LGPD)",
+      enunciado: "O poder público somente pode tratar dados pessoais mediante consentimento expresso do titular.",
+      gabarito: "E",
+      comentario: "A LGPD prevê diversas bases legais além do consentimento, inclusive execução de políticas públicas e cumprimento de obrigação legal."
+    },
+    {
+      id: 60,
+      bloco: "Conhecimentos complementares",
+      assunto: "Lei de Acesso à Informação (LAI)",
+      enunciado: "A transparência ativa ocorre quando o órgão divulga informações de interesse coletivo independentemente de solicitação.",
+      gabarito: "C",
+      comentario: "Transparência ativa é a divulgação espontânea; a passiva responde a pedidos de acesso."
+    },
+    {
+      id: 61,
+      bloco: "Conhecimentos específicos",
+      assunto: "Gestão da qualidade",
+      enunciado: "No ciclo PDCA, a etapa Check envolve verificar resultados e compará-los com objetivos e padrões definidos.",
+      gabarito: "C",
+      comentario: "Check é a etapa de checagem, medição e análise do desempenho obtido após a execução."
+    },
+    {
+      id: 62,
+      bloco: "Conhecimentos específicos",
+      assunto: "Processos e projetos",
+      enunciado: "Um projeto caracteriza-se por esforço temporário voltado à criação de resultado único, ao passo que um processo tende a ser contínuo e repetível.",
+      gabarito: "C",
+      comentario: "Temporalidade e singularidade distinguem projetos de operações e processos recorrentes."
+    },
+    {
+      id: 63,
+      bloco: "Conhecimentos específicos",
+      assunto: "Trabalho em equipe",
+      enunciado: "A existência de divergências em uma equipe implica, necessariamente, queda de desempenho e deve ser suprimida pela chefia.",
+      gabarito: "E",
+      comentario: "Divergências bem administradas podem ampliar perspectivas e melhorar decisões; o efeito depende da forma de gestão do conflito."
+    },
+    {
+      id: 64,
+      bloco: "Conhecimentos específicos",
+      assunto: "Administração Pública",
+      enunciado: "A desconcentração distribui competências dentro da mesma pessoa jurídica, criando órgãos sem personalidade jurídica própria.",
+      gabarito: "C",
+      comentario: "Na desconcentração há repartição interna de competências; a descentralização transfere execução a outra pessoa."
+    },
+    {
+      id: 65,
+      bloco: "Conhecimentos específicos",
+      assunto: "Rotinas administrativas",
+      enunciado: "Um checklist de conferência substitui integralmente a capacitação dos responsáveis e elimina a possibilidade de erro humano.",
+      gabarito: "E",
+      comentario: "Checklists reduzem esquecimentos e padronizam verificações, mas não eliminam erros nem substituem competência técnica."
+    },
+    {
+      id: 66,
+      bloco: "Conhecimentos específicos",
+      assunto: "Materiais e estoques",
+      enunciado: "Na curva ABC, itens da classe A costumam representar menor quantidade de itens e maior parcela do valor movimentado.",
+      gabarito: "C",
+      comentario: "A classificação ABC prioriza controle conforme relevância econômica; poucos itens A concentram grande valor."
+    },
+    {
+      id: 67,
+      bloco: "Conhecimentos específicos",
+      assunto: "Logística",
+      enunciado: "A unitização de cargas pode facilitar movimentação e armazenagem ao agrupar volumes menores em uma unidade maior.",
+      gabarito: "C",
+      comentario: "Paletes e contêineres são exemplos de unitização que racionalizam manuseio, transporte e armazenagem."
+    },
+    {
+      id: 68,
+      bloco: "Conhecimentos específicos",
+      assunto: "Licitações e contratos",
+      enunciado: "O planejamento da contratação na Lei nº 14.133/2021 antecede a seleção do fornecedor e busca definir a necessidade e a solução mais adequada.",
+      gabarito: "C",
+      comentario: "A fase preparatória é marcada pelo planejamento e pela compatibilização com necessidades, orçamento e aspectos técnicos."
+    },
+    {
+      id: 69,
+      bloco: "Conhecimentos específicos",
+      assunto: "Licitações e contratos",
+      enunciado: "Dispensa e inexigibilidade são expressões sinônimas, ambas caracterizadas sempre pela inviabilidade de competição.",
+      gabarito: "E",
+      comentario: "Na inexigibilidade a competição é inviável; na dispensa, a competição pode ser possível, mas a lei autoriza não licitar."
+    },
+    {
+      id: 70,
+      bloco: "Conhecimentos específicos",
+      assunto: "Protocolo e arquivo",
+      enunciado: "A tabela de temporalidade define prazos de guarda e destinação dos documentos, apoiando sua eliminação ou recolhimento.",
+      gabarito: "C",
+      comentario: "O instrumento estabelece prazos nas fases documentais e a destinação final conforme avaliação arquivística."
+    },
+    {
+      id: 71,
+      bloco: "Conhecimentos específicos",
+      assunto: "Atendimento ao público",
+      enunciado: "Quando não souber responder a uma demanda, o atendente deve inventar uma solução provável para evitar espera do usuário.",
+      gabarito: "E",
+      comentario: "O correto é buscar informação confiável ou encaminhar ao setor competente, comunicando com clareza o próximo passo."
+    },
+    {
+      id: 72,
+      bloco: "Conhecimentos específicos",
+      assunto: "Redação oficial",
+      enunciado: "A concisão na redação oficial consiste em transmitir o máximo de informações com o mínimo de palavras, sem sacrificar clareza.",
+      gabarito: "C",
+      comentario: "Ser conciso é eliminar excessos, não omitir informações necessárias à compreensão."
+    },
+    {
+      id: 73,
+      bloco: "Conhecimentos específicos",
+      assunto: "Lei nº 13.639/2018",
+      enunciado: "Os conselhos regionais são compostos pela Diretoria Executiva e pelo Plenário deliberativo.",
+      gabarito: "C",
+      comentario: "Essa composição está expressamente prevista no artigo 9º da Lei nº 13.639/2018."
+    },
+    {
+      id: 74,
+      bloco: "Conhecimentos específicos",
+      assunto: "Lei nº 5.524/1968",
+      enunciado: "A elaboração e a execução de projetos compatíveis com a formação profissional integram o campo de atuação do técnico industrial de nível médio.",
+      gabarito: "C",
+      comentario: "A previsão consta do artigo 2º, inciso V, da Lei nº 5.524/1968."
+    },
+    {
+      id: 75,
+      bloco: "Conhecimentos específicos",
+      assunto: "Decreto nº 90.922/1985",
+      enunciado: "O Decreto nº 90.922/1985 veda ao técnico industrial ministrar disciplinas técnicas de sua especialidade.",
+      gabarito: "E",
+      comentario: "O decreto admite ministrar disciplinas técnicas da especialidade, atendidas as exigências específicas do exercício do magistério."
+    },
+    {
+      id: 76,
+      bloco: "Conhecimentos específicos",
+      assunto: "Regimento Interno do CRT-SP",
+      enunciado: "O Regimento Interno organiza competências e funcionamento do CRT-SP, devendo ser interpretado em harmonia com a Lei nº 13.639/2018 e atos do CFT.",
+      gabarito: "C",
+      comentario: "O regimento disciplina a organização interna sem afastar as normas legais e federais superiores do Sistema CFT/CRTs."
+    },
+    {
+      id: 77,
+      bloco: "Conhecimentos específicos",
+      assunto: "Resolução CFT nº 206/2022",
+      enunciado: "A Resolução CFT nº 206/2022 adota o Código de Ética e Disciplina do Técnico Industrial.",
+      gabarito: "C",
+      comentario: "A resolução reformulou e adotou o código que orienta deveres, direitos e condutas dos técnicos industriais."
+    },
+    {
+      id: 78,
+      bloco: "Conhecimentos específicos",
+      assunto: "Resolução CFT nº 207/2022",
+      enunciado: "Segundo o Código de Processo Ético, a instrução e o julgamento disciplinar no Sistema CFT/CRTs se resumem a uma única instância federal.",
+      gabarito: "E",
+      comentario: "O sistema possui instâncias regional e federal: Comissão de Ética Regional, Plenário do CRT e Plenário do CFT."
+    },
+    {
+      id: 79,
+      bloco: "Conhecimentos específicos",
+      assunto: "Resolução CFT nº 208/2023",
+      enunciado: "A Resolução CFT nº 208/2023 estabelece Código de Conduta Ética aplicável aos diretores e conselheiros do Sistema CFT/CRTs.",
+      gabarito: "C",
+      comentario: "A norma se dirige aos membros eleitos das diretorias e aos conselheiros do sistema."
+    },
+    {
+      id: 80,
+      bloco: "Conhecimentos específicos",
+      assunto: "Resolução CFT nº 288/2025",
+      enunciado: "A Resolução CFT nº 288/2025 orienta que a fiscalização profissional priorize natureza educativa e prevenção, sem excluir as medidas cabíveis diante de infrações.",
+      gabarito: "C",
+      comentario: "A resolução prioriza fiscalização inteligente, preventiva e educativa, preservando a atuação fiscalizatória e sancionatória quando necessária."
     }
-  ]
-};
+];

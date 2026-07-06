@@ -3,93 +3,137 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Simulado gratuito Certo ou Errado para Técnico Administrativo do CRT-SP.">
+  <meta name="description" content="Simulado diário e gamificado para Técnico Administrativo do CRT-SP.">
   <meta name="theme-color" content="#12372a">
   <title>Simulado CRT-SP — Técnico Administrativo</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="hero">
-    <div class="hero__inner">
-      <p class="eyebrow">Baixada Santista · preparação 2026</p>
-      <h1>Simulado CRT-SP<br><span>Técnico Administrativo</span></h1>
-      <p class="hero__copy">Treino autoral para o concurso do Conselho Regional dos Técnicos Industriais do Estado de São Paulo, no formato Certo/Errado inspirado no estilo da banca Quadrix.</p>
-      <div class="score-rule" aria-label="Regra de pontuação">
-        <span><strong>+1</strong> acerto</span>
-        <span><strong>−1</strong> erro</span>
-        <span><strong>0</strong> em branco</span>
+  <section id="login-screen" class="login-screen" aria-labelledby="login-title">
+    <div class="login-card">
+      <p class="eyebrow">CRT-SP · jornada de estudos</p>
+      <h1 id="login-title">Quem vai encarar<br><span>o simulado de hoje?</span></h1>
+      <p>Escolha seu perfil. Nesta versão, os resultados ficam guardados somente neste navegador.</p>
+      <div class="profile-options">
+        <button class="profile-card" type="button" data-user="kaua">
+          <span class="profile-card__avatar">K</span>
+          <span><strong>Kauã</strong><small>Entrar no perfil</small></span>
+          <span aria-hidden="true">→</span>
+        </button>
+        <button class="profile-card" type="button" data-user="vitoria">
+          <span class="profile-card__avatar profile-card__avatar--coral">V</span>
+          <span><strong>Vitória</strong><small>Entrar no perfil</small></span>
+          <span aria-hidden="true">→</span>
+        </button>
       </div>
+      <p class="login-note">Sem senha · sem cadastro · dados locais</p>
     </div>
-  </header>
+  </section>
 
-  <main>
-    <section class="exam-intro" aria-labelledby="orientacoes">
-      <div>
-        <p class="section-kicker">Antes de começar</p>
-        <h2 id="orientacoes">Leia, julgue e marque.</h2>
+  <div id="app-shell" hidden>
+    <header class="hero">
+      <div class="hero__inner">
+        <nav class="topbar" aria-label="Sessão">
+          <span class="brand-mark">CRT<span>/</span>40</span>
+          <div>
+            <span id="top-user-name"></span>
+            <button id="switch-user" class="text-button" type="button">Trocar usuário</button>
+          </div>
+        </nav>
+        <p class="eyebrow">Baixada Santista · preparação 2026</p>
+        <h1>Simulado CRT-SP<br><span>Técnico Administrativo</span></h1>
+        <p class="hero__copy">Treino autoral no formato Certo/Errado, com uma seleção nova e compartilhada a cada dia.</p>
+        <div class="daily-stamp">
+          <span>Simulado do dia</span>
+          <strong id="daily-date"></strong>
+          <small>40 itens · mesma prova para os dois perfis</small>
+        </div>
       </div>
-      <p>Analise cada afirmação e escolha Certo, Errado ou Em branco. Você pode alterar as respostas até finalizar. O gabarito comentado e os temas para revisão só aparecem ao término.</p>
-    </section>
+    </header>
 
-    <div class="progress-shell">
-      <div class="progress-info">
-        <span id="progress-label">0 de 40 respondidas</span>
-        <span id="progress-percent">0%</span>
-      </div>
-      <div class="progress-track" aria-hidden="true"><span id="progress-bar"></span></div>
-    </div>
+    <main>
+      <section class="dashboard" aria-labelledby="dashboard-title">
+        <div class="dashboard__intro">
+          <p class="section-kicker">Painel de bordo</p>
+          <h2 id="dashboard-title">Olá, <span id="dashboard-name"></span>.</h2>
+          <p id="motivation"></p>
+          <div class="dashboard__actions">
+            <button id="switch-user-dashboard" class="button button--small button--ghost" type="button">Trocar usuário</button>
+            <button id="clear-data" class="button button--small button--danger" type="button">Zerar dados locais</button>
+          </div>
+        </div>
+        <div class="stat-grid">
+          <article class="stat-card stat-card--featured">
+            <span>Pontos totais</span><strong id="stat-points">0</strong><small>pontos de jornada</small>
+          </article>
+          <article class="stat-card"><span>Foguinho atual</span><strong id="stat-streak">🔥 1</strong><small id="stat-best-streak">Recorde: 1 dia</small></article>
+          <article class="stat-card"><span>Acessos</span><strong id="stat-accesses">1</strong><small>dias de treino</small></article>
+          <article class="stat-card"><span>Simulados</span><strong id="stat-exams">0</strong><small>finalizados</small></article>
+          <article class="stat-card"><span>Melhor líquida</span><strong id="stat-best">—</strong><small>recorde pessoal</small></article>
+          <article class="stat-card"><span>Última líquida</span><strong id="stat-last">—</strong><small>resultado recente</small></article>
+          <article class="stat-card"><span>Média líquida</span><strong id="stat-average">—</strong><small>todos os simulados</small></article>
+        </div>
+      </section>
 
-    <form id="quiz-form">
-      <div id="questions"></div>
-      <div class="exam-actions">
-        <p id="form-message" class="form-message" role="status" aria-live="polite"></p>
-        <button class="button button--primary" id="finish-button" type="submit">Finalizar simulado</button>
-        <button class="button button--ghost" id="reset-button" type="button">Reiniciar</button>
-      </div>
-    </form>
+      <section class="ranking" aria-labelledby="ranking-title">
+        <div class="ranking__header">
+          <div><p class="section-kicker">Duelo amistoso</p><h2 id="ranking-title">Kauã × Vitória</h2></div>
+          <p id="ranking-status" class="ranking-status"></p>
+        </div>
+        <div class="ranking-table" id="ranking-table"></div>
+      </section>
 
-    <section id="results" class="results" hidden aria-labelledby="resultado-titulo">
-      <div class="results__heading">
+      <section class="exam-intro" aria-labelledby="orientacoes">
+        <div><p class="section-kicker">Prova de hoje</p><h2 id="orientacoes">Leia, julgue e marque.</h2></div>
         <div>
-          <p class="section-kicker">Seu resultado</p>
-          <h2 id="resultado-titulo">Raio-X do simulado</h2>
+          <p>Analise cada afirmação e escolha Certo, Errado ou Em branco. Você pode alterar as respostas até finalizar.</p>
+          <div class="score-rule" aria-label="Regra de pontuação">
+            <span><strong>+1</strong> acerto</span><span><strong>−1</strong> erro</span><span><strong>0</strong> em branco</span>
+          </div>
         </div>
-        <div class="net-score">
-          <span>Pontuação líquida</span>
-          <strong id="net-score">0</strong>
-          <small>de 40 pontos possíveis</small>
+      </section>
+
+      <div class="progress-shell">
+        <div class="progress-info"><span id="progress-label">0 de 40 respondidas</span><span id="progress-percent">0%</span></div>
+        <div class="progress-track" aria-hidden="true"><span id="progress-bar"></span></div>
+      </div>
+
+      <form id="quiz-form">
+        <div id="questions"></div>
+        <div class="exam-actions">
+          <p id="form-message" class="form-message" role="status" aria-live="polite"></p>
+          <button class="button button--primary" id="finish-button" type="submit">Finalizar simulado</button>
+          <button class="button button--ghost" id="reset-button" type="button">Reiniciar respostas</button>
         </div>
-      </div>
+      </form>
 
-      <div class="metric-grid">
-        <article class="metric metric--correct"><span>Acertos</span><strong id="correct-count">0</strong></article>
-        <article class="metric metric--wrong"><span>Erros</span><strong id="wrong-count">0</strong></article>
-        <article class="metric metric--blank"><span>Em branco</span><strong id="blank-count">0</strong></article>
-      </div>
-
-      <h3>Desempenho por bloco</h3>
-      <div id="block-results" class="block-results"></div>
-
-      <div class="review-panel">
-        <div>
-          <p class="section-kicker">Próximo passo</p>
-          <h3>Assuntos para revisar</h3>
-          <p>Priorizamos os temas em que você errou ou deixou a resposta em branco.</p>
+      <section id="results" class="results" hidden aria-labelledby="resultado-titulo">
+        <div class="results__heading">
+          <div><p class="section-kicker">Seu resultado</p><h2 id="resultado-titulo">Raio-X do simulado</h2></div>
+          <div class="net-score"><span>Pontuação líquida</span><strong id="net-score">0</strong><small>de 40 pontos possíveis</small></div>
         </div>
-        <ul id="review-topics"></ul>
-      </div>
+        <div class="metric-grid">
+          <article class="metric metric--correct"><span>Acertos</span><strong id="correct-count">0</strong></article>
+          <article class="metric metric--wrong"><span>Erros</span><strong id="wrong-count">0</strong></article>
+          <article class="metric metric--blank"><span>Em branco</span><strong id="blank-count">0</strong></article>
+        </div>
+        <div class="points-earned">
+          <div><span>Pontos ganhos hoje</span><strong id="earned-points">+0</strong></div>
+          <p id="points-formula"></p>
+          <div><span>Total acumulado</span><strong id="accumulated-points">0</strong></div>
+        </div>
+        <h3>Desempenho por bloco</h3>
+        <div id="block-results" class="block-results"></div>
+        <div class="review-panel">
+          <div><p class="section-kicker">Próximo passo</p><h3>Assuntos para revisar</h3><p>Priorizamos os temas em que você errou ou deixou a resposta em branco.</p></div>
+          <ul id="review-topics"></ul>
+        </div>
+        <div class="answer-key"><p class="section-kicker">Correção detalhada</p><h3>Gabarito comentado</h3><div id="answer-key"></div></div>
+      </section>
+    </main>
 
-      <div class="answer-key">
-        <p class="section-kicker">Correção detalhada</p>
-        <h3>Gabarito comentado</h3>
-        <div id="answer-key"></div>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    <p>Material independente, gratuito e autoral. Não representa nem possui vínculo oficial com o CRT-SP ou com a banca organizadora.</p>
-  </footer>
+    <footer><p>Material independente, gratuito e autoral. Sem vínculo oficial com o CRT-SP ou com a banca organizadora. Os dados ficam neste dispositivo.</p></footer>
+  </div>
 
   <script src="simulados.js"></script>
   <script src="app.js"></script>
