@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Simulado gratuito Certo ou Errado para Técnico Administrativo do CRT-SP.">
+  <meta name="theme-color" content="#12372a">
+  <title>Simulado CRT-SP — Técnico Administrativo</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="hero">
+    <div class="hero__inner">
+      <p class="eyebrow">Baixada Santista · preparação 2026</p>
+      <h1>Simulado CRT-SP<br><span>Técnico Administrativo</span></h1>
+      <p class="hero__copy">Treino autoral para o concurso do Conselho Regional dos Técnicos Industriais do Estado de São Paulo, no formato Certo/Errado inspirado no estilo da banca Quadrix.</p>
+      <div class="score-rule" aria-label="Regra de pontuação">
+        <span><strong>+1</strong> acerto</span>
+        <span><strong>−1</strong> erro</span>
+        <span><strong>0</strong> em branco</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="exam-intro" aria-labelledby="orientacoes">
+      <div>
+        <p class="section-kicker">Antes de começar</p>
+        <h2 id="orientacoes">Leia, julgue e marque.</h2>
+      </div>
+      <p>Analise cada afirmação e escolha Certo, Errado ou Em branco. Você pode alterar as respostas até finalizar. O gabarito comentado e os temas para revisão só aparecem ao término.</p>
+    </section>
+
+    <div class="progress-shell">
+      <div class="progress-info">
+        <span id="progress-label">0 de 40 respondidas</span>
+        <span id="progress-percent">0%</span>
+      </div>
+      <div class="progress-track" aria-hidden="true"><span id="progress-bar"></span></div>
+    </div>
+
+    <form id="quiz-form">
+      <div id="questions"></div>
+      <div class="exam-actions">
+        <p id="form-message" class="form-message" role="status" aria-live="polite"></p>
+        <button class="button button--primary" id="finish-button" type="submit">Finalizar simulado</button>
+        <button class="button button--ghost" id="reset-button" type="button">Reiniciar</button>
+      </div>
+    </form>
+
+    <section id="results" class="results" hidden aria-labelledby="resultado-titulo">
+      <div class="results__heading">
+        <div>
+          <p class="section-kicker">Seu resultado</p>
+          <h2 id="resultado-titulo">Raio-X do simulado</h2>
+        </div>
+        <div class="net-score">
+          <span>Pontuação líquida</span>
+          <strong id="net-score">0</strong>
+          <small>de 40 pontos possíveis</small>
+        </div>
+      </div>
+
+      <div class="metric-grid">
+        <article class="metric metric--correct"><span>Acertos</span><strong id="correct-count">0</strong></article>
+        <article class="metric metric--wrong"><span>Erros</span><strong id="wrong-count">0</strong></article>
+        <article class="metric metric--blank"><span>Em branco</span><strong id="blank-count">0</strong></article>
+      </div>
+
+      <h3>Desempenho por bloco</h3>
+      <div id="block-results" class="block-results"></div>
+
+      <div class="review-panel">
+        <div>
+          <p class="section-kicker">Próximo passo</p>
+          <h3>Assuntos para revisar</h3>
+          <p>Priorizamos os temas em que você errou ou deixou a resposta em branco.</p>
+        </div>
+        <ul id="review-topics"></ul>
+      </div>
+
+      <div class="answer-key">
+        <p class="section-kicker">Correção detalhada</p>
+        <h3>Gabarito comentado</h3>
+        <div id="answer-key"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Material independente, gratuito e autoral. Não representa nem possui vínculo oficial com o CRT-SP ou com a banca organizadora.</p>
+  </footer>
+
+  <script src="simulados.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
