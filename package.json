@@ -1,0 +1,10 @@
+{
+  "name": "crt-sp-simulados",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "start": "python -m http.server 8080"
+  }
+}

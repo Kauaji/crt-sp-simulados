@@ -99,6 +99,31 @@ git push origin main
 
 O Vercel publica automaticamente a nova versão no mesmo domínio.
 
+## Configuração do Supabase no Vercel
+
+O projeto agora tem uma etapa de build estática mínima. O Vercel executa `npm run build`, copia os arquivos para `dist/` e gera `dist/supabase-config.js` com as variáveis do Supabase.
+
+No projeto `crt-sp-simulados` da Vercel, configure em **Settings > Environment Variables**:
+
+```text
+SUPABASE_URL=https://yzgmpjkuimzkerumsxls.supabase.co
+SUPABASE_PUBLISHABLE_KEY=sua_chave_publishable_do_supabase
+```
+
+Marque as três environments: **Production**, **Preview** e **Development**.
+
+Importante: use somente a chave pública/publishable do Supabase. Nunca coloque `service_role`, `secret key` ou senha do banco em site estático.
+
+Para testar localmente o build:
+
+```bash
+npm run build
+cd dist
+python -m http.server 8080
+```
+
+Depois acesse `http://localhost:8080`.
+
 ## Limitação do armazenamento local
 
 O `localStorage` salva os dados apenas no navegador e dispositivo atuais. Kauã e Vitória só compartilham o placar quando usam esse mesmo navegador. Limpar os dados do site também apaga os perfis e resultados.
