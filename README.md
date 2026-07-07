@@ -1,120 +1,72 @@
 # CRT-SP Simulados
 
-Plataforma estática, diária e gamificada de preparação para o concurso CRT-SP 2026, cargo Técnico Administrativo da Baixada Santista. Os itens autorais seguem o formato Certo/Errado e a regra de pontuação líquida associada à banca Quadrix: `+1` por acerto, `−1` por erro e `0` em branco.
+Site estático e gamificado para estudo do concurso CRT-SP 2026, cargo Técnico Administrativo da Baixada Santista.
 
 **Site público:** [https://crt-sp-simulados.vercel.app/](https://crt-sp-simulados.vercel.app/)
 
-O projeto usa somente HTML, CSS e JavaScript, sem dependências, backend ou etapa de build.
+O projeto usa HTML, CSS e JavaScript puro. A etapa `npm run build` apenas copia os arquivos para `dist/` e gera `supabase-config.js` quando existirem variáveis de ambiente do Supabase.
 
-## Perfis Kauã e Vitória
+## O que existe no site
 
-A tela inicial oferece dois perfis sem senha. O perfil escolhido fica salvo no `localStorage`, e o botão **Trocar usuário** retorna à seleção sem apagar os dados.
+- tela inicial obrigatória “Quem vai estudar hoje?”;
+- perfis locais separados para Kauã e Vitória;
+- foguinho/streak individual por usuário;
+- dashboard com pontos, acessos, histórico, taxa de acerto e médias;
+- ranking Kauã × Vitória;
+- abas: Simulado diário, Questionário extra, Prova real, Estudos e Dashboard;
+- simulado diário com 40 itens Certo/Errado/Em branco;
+- questionário extra com 10, 20 ou 40 itens e seletor de dificuldade;
+- prova real com 120 itens e cronômetro sugerido de 3 horas;
+- relatório com acertos, erros, brancos, líquida, desempenho por bloco/disciplina e revisão;
+- gabarito comentado somente depois de finalizar;
+- aba Estudos com prioridades, resumos, links oficiais, buscas de videoaulas e revisão personalizada.
 
-Cada perfil possui estatísticas independentes:
+## Pontuação
 
-- pontos totais;
-- acessos em dias distintos;
-- simulados finalizados;
-- melhor, última e média das pontuações líquidas;
-- streak atual e maior streak;
-- histórico dos dez resultados mais recentes.
+Todos os modos usam a regra:
 
-O dashboard apresenta essas métricas e uma frase motivacional diária. O ranking compara pontos, acessos, streak e simulados dos dois perfis no navegador atual.
+```text
++1 por acerto
+-1 por erro
+0 em branco
+```
 
-## Foguinho e pontos
-
-No primeiro acesso do dia, o sistema atualiza o streak:
-
-- dia consecutivo: soma um;
-- mesmo dia: não altera;
-- um ou mais dias sem acesso: reinicia em um.
-
-Ao finalizar um simulado:
+Os pontos gamificados são calculados assim:
 
 ```text
 pontos ganhos = max(0, pontuação líquida) + acertos + min(streak atual, 10)
 ```
 
-A pontuação gamificada não substitui a pontuação líquida da prova; as duas aparecem separadamente no resultado.
+## Foguinho
 
-## Simulado diário
+Ao selecionar um usuário:
 
-`getDailyQuestions()` usa a data local no formato `AAAA-MM-DD` como semente de um gerador pseudoaleatório determinístico. Assim:
+- primeiro acesso: streak = 1;
+- acesso no dia seguinte: streak +1;
+- novo acesso no mesmo dia: não aumenta;
+- se pular um ou mais dias: streak volta para 1;
+- cada usuário tem streak separado.
 
-- a mesma data gera a mesma prova para Kauã e Vitória;
-- a seleção e a ordem mudam automaticamente no dia seguinte;
-- cada prova tem exatamente 40 itens;
-- são 12 básicos, 8 complementares e 20 específicos.
+## Banco de questões
 
-O banco possui 80 itens autorais, permitindo rotação diária. Conhecimentos específicos e legislação do Sistema CFT/CRTs ocupam metade de cada prova.
+O arquivo [simulados.js](</C:/Users/Kauã Marques/Documents/New project/crt-sp-simulados/simulados.js>) contém 142 itens autorais com:
 
-## Arquivos
+- `id`;
+- `bloco`;
+- `disciplina`;
+- `assunto`;
+- `dificuldade`;
+- `enunciado`;
+- `gabarito`;
+- `comentario`;
+- `tags`.
 
-- `index.html`: login, dashboard, ranking, prova e resultados.
-- `styles.css`: identidade visual e layout responsivo.
-- `simulados.js`: banco de questões, gabaritos e comentários.
-- `app.js`: perfis, persistência, streak, ranking, sorteio e correção.
-- `vercel.json`: configuração mínima do deploy estático.
+As cotas atuais permitem:
 
-## Rodar localmente
+- Simulado diário: 12 Básicos, 8 Complementares e 20 Específicos;
+- Prova real: 40 Básicos, 30 Complementares e 50 Específicos.
 
-Abra `index.html` diretamente ou inicie um servidor local:
-
-```bash
-python -m http.server 8080
-```
-
-Depois acesse `http://localhost:8080`.
-
-## Adicionar ou atualizar questões
-
-Edite o array `BANCO_QUESTOES` em `simulados.js`. Cada objeto deve ter:
-
-```js
-{
-  id: 81,
-  bloco: "Conhecimentos específicos",
-  assunto: "Resolução CFT nº 288/2025",
-  enunciado: "Texto autoral do item.",
-  gabarito: "C",
-  comentario: "Justificativa exibida após a finalização."
-}
-```
-
-Regras importantes:
-
-1. use um `id` único;
-2. use somente `"C"` ou `"E"` no gabarito;
-3. mantenha pelo menos 12 itens básicos, 8 complementares e 20 específicos;
-4. confira legislação e resoluções em fontes oficiais;
-5. não copie questões de provas ou materiais protegidos.
-
-Depois envie a atualização:
-
-```bash
-git add .
-git commit -m "Atualiza banco de questões"
-git push origin main
-```
-
-O Vercel publica automaticamente a nova versão no mesmo domínio.
-
-## Configuração do Supabase no Vercel
-
-O projeto agora tem uma etapa de build estática mínima. O Vercel executa `npm run build`, copia os arquivos para `dist/` e gera `dist/supabase-config.js` com as variáveis do Supabase.
-
-No projeto `crt-sp-simulados` da Vercel, configure em **Settings > Environment Variables**:
-
-```text
-SUPABASE_URL=https://yzgmpjkuimzkerumsxls.supabase.co
-SUPABASE_PUBLISHABLE_KEY=sua_chave_publishable_do_supabase
-```
-
-Marque as três environments: **Production**, **Preview** e **Development**.
-
-Importante: use somente a chave pública/publishable do Supabase. Nunca coloque `service_role`, `secret key` ou senha do banco em site estático.
-
-Para testar localmente o build:
+## Como rodar localmente
 
 ```bash
 npm run build
@@ -122,10 +74,69 @@ cd dist
 python -m http.server 8080
 ```
 
-Depois acesse `http://localhost:8080`.
+Depois acesse:
 
-## Limitação do armazenamento local
+```text
+http://localhost:8080
+```
 
-O `localStorage` salva os dados apenas no navegador e dispositivo atuais. Kauã e Vitória só compartilham o placar quando usam esse mesmo navegador. Limpar os dados do site também apaga os perfis e resultados.
+## Como adicionar questões
 
-Para sincronizar um ranking real entre celulares e computadores diferentes, uma versão futura precisará de autenticação e backend, como Supabase, Vercel KV ou banco equivalente. As operações de perfil e estatísticas já estão separadas em funções (`getCurrentUser`, `setCurrentUser`, `loadStats`, `saveStats`, `registerAccess`, `updateStreak` e `updateStatsAfterExam`) para facilitar essa migração.
+Edite [simulados.js](</C:/Users/Kauã Marques/Documents/New project/crt-sp-simulados/simulados.js>) e adicione novos itens usando a função `q(...)`.
+
+Exemplo:
+
+```js
+q(
+  "ESP-CFT-999",
+  BLOCOS.ESPECIFICOS,
+  "Sistema CFT/CRTs",
+  "Lei 13.639/2018",
+  "medio",
+  "C",
+  "Enunciado autoral em formato Certo/Errado.",
+  "Comentário objetivo do gabarito.",
+  ["cft", "crt"]
+)
+```
+
+Regras:
+
+1. use `id` único;
+2. use `gabarito` como `"C"` ou `"E"`;
+3. use dificuldade `"facil"`, `"medio"` ou `"dificil"`;
+4. não copie questões reais protegidas;
+5. confira legislação em fonte oficial antes de criar itens legais.
+
+## Supabase / Vercel
+
+Nesta versão, o site não depende de backend. Os dados ficam no `localStorage`.
+
+O build já aceita variáveis futuras:
+
+```text
+SUPABASE_URL=https://yzgmpjkuimzkerumsxls.supabase.co
+SUPABASE_PUBLISHABLE_KEY=sua_chave_publishable_do_supabase
+```
+
+Use somente chave pública/publishable no frontend. Nunca coloque `service_role`, secret key ou senha do banco.
+
+## Limitação do localStorage
+
+Os dados de pontos, acessos, histórico e foguinho ficam salvos apenas neste navegador. Se Kauã ou Vitória abrirem em outro celular/computador, o ranking local não sincroniza.
+
+Para ranking real entre dispositivos, a próxima evolução pode usar Supabase ou Vercel KV.
+
+## Deploy
+
+O projeto está conectado ao GitHub/Vercel. Para publicar:
+
+```bash
+git add .
+git commit -m "Atualiza plataforma de simulados"
+git push origin main
+```
+
+O Vercel atualiza automaticamente o mesmo domínio:
+
+[https://crt-sp-simulados.vercel.app/](https://crt-sp-simulados.vercel.app/)

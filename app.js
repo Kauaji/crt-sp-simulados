@@ -1,112 +1,109 @@
-/* global BANCO_QUESTOES */
+/* global BANCO_QUESTOES, MINIMOS_PROVA_REAL */
 "use strict";
 
 const USERS = {
   kaua: { id: "kaua", name: "Kauã", initial: "K" },
-  vitoria: { id: "vitoria", name: "Vitória", initial: "V" }
+  vitoria: { id: "vitoria", name: "Vitória", initial: "V" },
 };
-const STORAGE_KEYS = { currentUser: "crtsp.currentUser", stats: "crtsp.stats.v1" };
-const BLOCK_QUOTAS = {
-  "Conhecimentos básicos": 12,
-  "Conhecimentos complementares": 8,
-  "Conhecimentos específicos": 20
+
+const STORAGE_KEYS = {
+  currentUser: "crtsp.currentUser",
+  stats: "crtsp.stats.v2",
 };
-const MOTIVATIONS = [
-  "Constância ganha da pressa. Hoje são só 40 decisões bem pensadas.",
-  "Um item por vez — até a legislação começar a pedir arrego.",
-  "Seu eu do dia da prova agradece este treino silencioso.",
-  "Marque com calma, revise com honestidade e deixe o foguinho trabalhar.",
-  "Não precisa saber tudo hoje. Precisa descobrir o que revisar amanhã."
+
+const TAB_LABELS = {
+  daily: "Simulado diário",
+  extra: "Questionário extra",
+  real: "Prova real",
+  studies: "Estudos",
+  dashboard: "Dashboard",
+};
+
+const QUOTAS = {
+  daily: {
+    "Conhecimentos Básicos": 12,
+    "Conhecimentos Complementares": 8,
+    "Conhecimentos Específicos": 20,
+  },
+  real: {
+    "Conhecimentos Básicos": 40,
+    "Conhecimentos Complementares": 30,
+    "Conhecimentos Específicos": 50,
+  },
+};
+
+const DIFFICULTY_LABELS = {
+  facil: "Fácil",
+  medio: "Médio",
+  dificil: "Difícil",
+  misto: "Misto",
+};
+
+const OFFICIAL_LINKS = [
+  ["Lei 13.639/2018", "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13639.htm"],
+  ["Lei 5.524/1968", "https://www.planalto.gov.br/ccivil_03/leis/l5524.htm"],
+  ["Decreto 90.922/1985", "https://www.planalto.gov.br/ccivil_03/decreto/antigos/d90922.htm"],
+  ["Decreto 4.560/2002", "https://www.planalto.gov.br/ccivil_03/decreto/2002/D4560.htm"],
+  ["Lei 9.784/1999", "https://www.planalto.gov.br/ccivil_03/leis/l9784.htm"],
+  ["Lei 12.527/2011 — LAI", "https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2011/lei/l12527.htm"],
+  ["Lei 13.709/2018 — LGPD", "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm"],
+  ["Lei 8.429/1992 — Improbidade", "https://www.planalto.gov.br/ccivil_03/leis/l8429.htm"],
+  ["CFT", "https://www.cft.org.br/"],
+  ["CRT-SP", "https://crtsp.gov.br/"],
+  ["Regimento Interno CRT-SP", "https://crtsp.gov.br/regimento-interno-crt-sp/"],
+  ["Resoluções CFT", "https://cft.org.br/category/resolucoes/"],
 ];
 
-let dailyQuestions = [];
-let examFinished = false;
+const YOUTUBE_SEARCHES = [
+  "Português para concursos Quadrix",
+  "Raciocínio lógico Quadrix",
+  "Informática para concursos",
+  "LAI para concursos",
+  "LGPD para concursos",
+  "Lei 9.784 para concursos",
+  "Administração Pública para concursos",
+  "Redação oficial para concursos",
+  "Lei 13.639/2018 CFT CRT",
+  "Sistema CFT CRT",
+];
+
+let activeUserId = null;
+let activeTab = "daily";
+let quizStates = {};
+let realTimer = null;
 
 const $ = (selector) => document.querySelector(selector);
-const escapeHtml = (value) => String(value)
-  .replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
-  .replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+const $$ = (selector) => [...document.querySelectorAll(selector)];
+const escapeHtml = (value) => String(value ?? "")
+  .replaceAll("&", "&amp;")
+  .replaceAll("<", "&lt;")
+  .replaceAll(">", "&gt;")
+  .replaceAll('"', "&quot;")
+  .replaceAll("'", "&#039;");
 
-function getLocalDateKey(date = new Date()) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
+function getTodayKey(date = new Date()) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
 }
 
-function daysBetween(fromKey, toKey) {
+function daysBetweenSafe(fromKey, toKey) {
   const [fy, fm, fd] = fromKey.split("-").map(Number);
   const [ty, tm, td] = toKey.split("-").map(Number);
   return Math.round((Date.UTC(ty, tm - 1, td) - Date.UTC(fy, fm - 1, fd)) / 86400000);
 }
 
-function createDefaultStats() {
-  return {
-    accesses: 0, lastAccessDate: null, currentStreak: 0, bestStreak: 0,
-    totalPoints: 0, examsFinished: 0, bestNetScore: null, lastNetScore: null,
-    netScoreSum: 0, history: []
-  };
-}
-
-function getCurrentUser() {
-  const id = localStorage.getItem(STORAGE_KEYS.currentUser);
-  return USERS[id] || null;
-}
-
-function setCurrentUser(userId) {
-  if (!USERS[userId]) return;
-  localStorage.setItem(STORAGE_KEYS.currentUser, userId);
-}
-
-function loadAllStats() {
-  try {
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEYS.stats) || "{}");
-    return Object.fromEntries(Object.keys(USERS).map((id) => [id, { ...createDefaultStats(), ...(saved[id] || {}) }]));
-  } catch {
-    return Object.fromEntries(Object.keys(USERS).map((id) => [id, createDefaultStats()]));
-  }
-}
-
-function loadStats(userId = getCurrentUser()?.id) {
-  return loadAllStats()[userId] || createDefaultStats();
-}
-
-function saveStats(userId, stats) {
-  const allStats = loadAllStats();
-  allStats[userId] = stats;
-  localStorage.setItem(STORAGE_KEYS.stats, JSON.stringify(allStats));
-}
-
-function updateStreak(stats, today = getLocalDateKey()) {
-  if (stats.lastAccessDate === today) return stats;
-  const difference = stats.lastAccessDate ? daysBetween(stats.lastAccessDate, today) : null;
-  stats.currentStreak = difference === 1 ? stats.currentStreak + 1 : 1;
-  stats.bestStreak = Math.max(stats.bestStreak, stats.currentStreak);
-  stats.lastAccessDate = today;
-  return stats;
-}
-
-function registerAccess(userId) {
-  const stats = loadStats(userId);
-  const today = getLocalDateKey();
-  if (stats.lastAccessDate !== today) {
-    stats.accesses += 1;
-    updateStreak(stats, today);
-    saveStats(userId, stats);
-  }
-  return stats;
-}
-
 function hashSeed(text) {
   let hash = 2166136261;
-  for (let index = 0; index < text.length; index += 1) {
-    hash ^= text.charCodeAt(index);
+  for (let i = 0; i < text.length; i += 1) {
+    hash ^= text.charCodeAt(i);
     hash = Math.imul(hash, 16777619);
   }
   return hash >>> 0;
 }
 
-function seedRandom(seed) {
+function seededRandom(seed) {
   let state = seed >>> 0;
   return () => {
     state += 0x6D2B79F5;
@@ -117,210 +114,746 @@ function seedRandom(seed) {
   };
 }
 
-function deterministicShuffle(items, seedText) {
+function shuffleWithSeed(items, seedText) {
   const output = [...items];
-  const random = seedRandom(hashSeed(seedText));
-  for (let index = output.length - 1; index > 0; index -= 1) {
-    const target = Math.floor(random() * (index + 1));
-    [output[index], output[target]] = [output[target], output[index]];
+  const random = seededRandom(hashSeed(seedText));
+  for (let i = output.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(random() * (i + 1));
+    [output[i], output[j]] = [output[j], output[i]];
   }
   return output;
 }
 
-function getDailyQuestions(dateKey = getLocalDateKey()) {
-  const selected = [];
-  Object.entries(BLOCK_QUOTAS).forEach(([block, quota]) => {
-    const pool = BANCO_QUESTOES.filter((question) => question.bloco === block);
-    if (pool.length < quota) throw new Error(`Banco insuficiente em ${block}: ${pool.length}/${quota}`);
-    selected.push(...deterministicShuffle(pool, `${dateKey}:${block}`).slice(0, quota));
-  });
-  return selected;
+function createDefaultStats() {
+  return {
+    name: "",
+    totalAccesses: 0,
+    lastAccessDate: null,
+    currentStreak: 0,
+    bestStreak: 0,
+    totalPoints: 0,
+    examsFinished: 0,
+    realExamsFinished: 0,
+    bestNetScore: null,
+    lastNetScore: null,
+    netScoreSum: 0,
+    history: [],
+    questionsAnswered: 0,
+    correctCount: 0,
+    wrongCount: 0,
+    blankCount: 0,
+    extraAttempts: 0,
+  };
 }
 
-function updateStatsAfterExam(result) {
-  const user = getCurrentUser();
-  const stats = loadStats(user.id);
-  const streakBonus = Math.min(stats.currentStreak, 10);
-  const earnedPoints = Math.max(0, result.netScore) + result.correct + streakBonus;
-  stats.totalPoints += earnedPoints;
-  stats.examsFinished += 1;
-  stats.lastNetScore = result.netScore;
-  stats.bestNetScore = stats.bestNetScore === null ? result.netScore : Math.max(stats.bestNetScore, result.netScore);
-  stats.netScoreSum += result.netScore;
-  stats.history.unshift({ date: getLocalDateKey(), netScore: result.netScore, correct: result.correct, earnedPoints });
-  stats.history = stats.history.slice(0, 10);
-  saveStats(user.id, stats);
-  return { stats, earnedPoints, streakBonus };
+function loadAllStats() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEYS.stats) || "{}");
+    return Object.fromEntries(Object.keys(USERS).map((id) => [
+      id,
+      { ...createDefaultStats(), name: USERS[id].name, ...(saved[id] || {}) },
+    ]));
+  } catch {
+    return Object.fromEntries(Object.keys(USERS).map((id) => [id, { ...createDefaultStats(), name: USERS[id].name }]));
+  }
+}
+
+function loadUserStats(userId = activeUserId) {
+  return loadAllStats()[userId] || { ...createDefaultStats(), name: USERS[userId]?.name || "" };
+}
+
+function saveUserStats(userId, stats) {
+  const all = loadAllStats();
+  all[userId] = { ...stats, name: USERS[userId].name };
+  localStorage.setItem(STORAGE_KEYS.stats, JSON.stringify(all));
+}
+
+function getCurrentUser() {
+  return activeUserId ? USERS[activeUserId] : null;
+}
+
+function setCurrentUser(userId) {
+  activeUserId = userId;
+  localStorage.setItem(STORAGE_KEYS.currentUser, userId);
+}
+
+function updateUserStreak(stats, today = getTodayKey()) {
+  if (stats.lastAccessDate === today) return stats;
+  const diff = stats.lastAccessDate ? daysBetweenSafe(stats.lastAccessDate, today) : null;
+  stats.currentStreak = diff === 1 ? stats.currentStreak + 1 : 1;
+  stats.bestStreak = Math.max(stats.bestStreak, stats.currentStreak);
+  stats.lastAccessDate = today;
+  return stats;
+}
+
+function registerUserAccess(userId) {
+  const stats = loadUserStats(userId);
+  const today = getTodayKey();
+  if (stats.lastAccessDate !== today) {
+    stats.totalAccesses += 1;
+    updateUserStreak(stats, today);
+    saveUserStats(userId, stats);
+  }
+  return stats;
+}
+
+function streakPhrase(streak) {
+  if (streak >= 30) return "Monstro do CRT-SP.";
+  if (streak >= 15) return "Agora virou disciplina.";
+  if (streak >= 7) return "Uma semana no modo concurseiro.";
+  if (streak >= 3) return "Tá criando ritmo.";
+  return "Começou a sequência.";
 }
 
 function formatScore(value) {
-  return value === null ? "—" : String(Math.round(value * 10) / 10);
+  return value === null || value === undefined ? "—" : String(Math.round(value * 10) / 10);
+}
+
+function normalizeDifficulty(difficulty) {
+  return ["facil", "medio", "dificil"].includes(difficulty) ? difficulty : "misto";
+}
+
+function filterByDifficulty(pool, difficulty) {
+  const normalized = normalizeDifficulty(difficulty);
+  if (normalized === "misto") return pool;
+  const exact = pool.filter((q) => q.dificuldade === normalized);
+  return exact.length ? exact : pool;
+}
+
+function selectFromPool(pool, count, seedText, avoidIds = new Set(), difficulty = "misto") {
+  const filtered = filterByDifficulty(pool, difficulty);
+  const preferred = filtered.filter((question) => !avoidIds.has(question.id));
+  const fallback = filtered.filter((question) => avoidIds.has(question.id));
+  const ordered = shuffleWithSeed([...preferred, ...fallback], seedText);
+  if (ordered.length >= count) return ordered.slice(0, count);
+
+  const expanded = [...ordered];
+  let round = 1;
+  while (expanded.length < count) {
+    expanded.push(...shuffleWithSeed(filtered, `${seedText}:fill:${round}`));
+    round += 1;
+  }
+  return expanded.slice(0, count).map((question, index) => (
+    index < ordered.length ? question : { ...question, id: `${question.id}-R${index}` }
+  ));
+}
+
+function selectByQuotas(quotas, seedText, difficulty = "misto", avoidIds = new Set()) {
+  return Object.entries(quotas).flatMap(([block, quota]) => {
+    const pool = BANCO_QUESTOES.filter((question) => question.bloco === block);
+    return selectFromPool(pool, quota, `${seedText}:${block}`, avoidIds, difficulty);
+  });
+}
+
+function selectDailyQuestions(difficulty = "misto") {
+  return shuffleWithSeed(selectByQuotas(QUOTAS.daily, `daily:${getTodayKey()}`, difficulty), `daily-order:${getTodayKey()}:${difficulty}`);
+}
+
+function selectExtraQuestions(quantity = 40, difficulty = "misto") {
+  const stats = loadUserStats();
+  const dailyIds = new Set((quizStates.daily?.questions || selectDailyQuestions()).map((question) => question.id));
+  const seed = `extra:${getTodayKey()}:${stats.extraAttempts}:${difficulty}:${quantity}`;
+  const selected = selectFromPool(BANCO_QUESTOES, quantity, seed, dailyIds, difficulty);
+  return shuffleWithSeed(selected, `${seed}:order`);
+}
+
+function selectRealExamQuestions() {
+  return shuffleWithSeed(selectByQuotas(QUOTAS.real, `real:${getTodayKey()}`, "misto"), `real-order:${getTodayKey()}`);
+}
+
+function answerLabel(value) {
+  if (value === "C") return "Certo";
+  if (value === "E") return "Errado";
+  return "Em branco";
+}
+
+function calculateResult(state) {
+  const result = {
+    correct: 0,
+    wrong: 0,
+    blank: 0,
+    netScore: 0,
+    blocks: {},
+    disciplines: {},
+    weakTopics: new Map(),
+    answers: { ...state.answers },
+  };
+
+  state.questions.forEach((question) => {
+    const answer = result.answers[question.id] || "B";
+    const status = answer === "B" ? "blank" : answer === question.gabarito ? "correct" : "wrong";
+    result[status] += 1;
+    for (const [bucket, key] of [["blocks", question.bloco], ["disciplines", question.disciplina]]) {
+      result[bucket][key] ||= { correct: 0, wrong: 0, blank: 0, total: 0, net: 0 };
+      result[bucket][key].total += 1;
+      result[bucket][key][status] += 1;
+      result[bucket][key].net = result[bucket][key].correct - result[bucket][key].wrong;
+    }
+    if (status !== "correct") {
+      const key = question.assunto;
+      const current = result.weakTopics.get(key) || { count: 0, discipline: question.disciplina };
+      current.count += 1;
+      result.weakTopics.set(key, current);
+    }
+  });
+
+  result.netScore = result.correct - result.wrong;
+  result.securityPercent = Math.round((result.correct / state.questions.length) * 100);
+  return result;
+}
+
+function updateStatsAfterExam(state, result) {
+  const stats = loadUserStats();
+  const streakBonus = Math.min(stats.currentStreak, 10);
+  const earnedPoints = Math.max(0, result.netScore) + result.correct + streakBonus;
+  const weakSubjects = [...result.weakTopics.entries()]
+    .sort((a, b) => b[1].count - a[1].count)
+    .slice(0, 8)
+    .map(([assunto, data]) => ({ assunto, disciplina: data.discipline, count: data.count }));
+
+  stats.totalPoints += earnedPoints;
+  stats.examsFinished += 1;
+  if (state.type === "real") stats.realExamsFinished += 1;
+  stats.lastNetScore = result.netScore;
+  stats.bestNetScore = stats.bestNetScore === null ? result.netScore : Math.max(stats.bestNetScore, result.netScore);
+  stats.netScoreSum += result.netScore;
+  stats.questionsAnswered += state.questions.length;
+  stats.correctCount += result.correct;
+  stats.wrongCount += result.wrong;
+  stats.blankCount += result.blank;
+  stats.history.unshift({
+    date: getTodayKey(),
+    type: state.type,
+    label: state.title,
+    difficulty: state.difficulty,
+    correct: result.correct,
+    wrong: result.wrong,
+    blank: result.blank,
+    netScore: result.netScore,
+    earnedPoints,
+    weakSubjects,
+  });
+  stats.history = stats.history.slice(0, 12);
+  saveUserStats(activeUserId, stats);
+  return { stats, earnedPoints, streakBonus };
+}
+
+function renderUserSelection() {
+  $("#app-shell").hidden = true;
+  $("#login-screen").hidden = false;
+  activeUserId = null;
+  if (realTimer) clearInterval(realTimer);
 }
 
 function renderDashboard() {
   const user = getCurrentUser();
-  const stats = loadStats(user.id);
+  const stats = loadUserStats();
   const average = stats.examsFinished ? stats.netScoreSum / stats.examsFinished : null;
+  const accuracy = stats.correctCount + stats.wrongCount ? Math.round((stats.correctCount / (stats.correctCount + stats.wrongCount)) * 100) : 0;
   $("#top-user-name").textContent = user.name;
-  $("#dashboard-name").textContent = user.name;
-  $("#motivation").textContent = MOTIVATIONS[hashSeed(`${getLocalDateKey()}:${user.id}`) % MOTIVATIONS.length];
-  $("#stat-points").textContent = stats.totalPoints;
-  $("#stat-streak").textContent = `🔥 ${stats.currentStreak}`;
-  $("#stat-best-streak").textContent = `Recorde: ${stats.bestStreak} ${stats.bestStreak === 1 ? "dia" : "dias"}`;
-  $("#stat-accesses").textContent = stats.accesses;
-  $("#stat-exams").textContent = stats.examsFinished;
-  $("#stat-best").textContent = formatScore(stats.bestNetScore);
-  $("#stat-last").textContent = formatScore(stats.lastNetScore);
-  $("#stat-average").textContent = formatScore(average);
+  $("#dashboard").innerHTML = `
+    <div class="dashboard__intro">
+      <p class="section-kicker">Painel de bordo</p>
+      <h2>Olá, <span>${escapeHtml(user.name)}</span>.</h2>
+      <p class="streak-callout">🔥 ${stats.currentStreak} ${stats.currentStreak === 1 ? "dia" : "dias"} — ${streakPhrase(stats.currentStreak)}</p>
+      <div class="dashboard__actions">
+        <button class="button button--small button--ghost" data-action="switch-user" type="button">Trocar usuário</button>
+        <button class="button button--small button--danger" data-action="clear-user" type="button">Zerar meus dados locais</button>
+      </div>
+    </div>
+    <div class="stat-grid">
+      ${statCard("🏆 Pontos totais", stats.totalPoints, "pontos de jornada", true)}
+      ${statCard("🔥 Foguinho atual", stats.currentStreak, `Recorde: ${stats.bestStreak}`)}
+      ${statCard("🚀 Acessos", stats.totalAccesses, "dias registrados")}
+      ${statCard("📚 Simulados", stats.examsFinished, "inclui extras")}
+      ${statCard("🎯 Provas reais", stats.realExamsFinished, "120 itens")}
+      ${statCard("Melhor líquida", formatScore(stats.bestNetScore), "recorde pessoal")}
+      ${statCard("Última líquida", formatScore(stats.lastNetScore), "resultado recente")}
+      ${statCard("Média líquida", formatScore(average), "todos os modos")}
+      ${statCard("Taxa geral", `${accuracy}%`, `${stats.questionsAnswered} questões`)}
+    </div>
+  `;
+}
+
+function statCard(label, value, detail, featured = false) {
+  return `<article class="stat-card ${featured ? "stat-card--featured" : ""}"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong><small>${escapeHtml(detail)}</small></article>`;
 }
 
 function renderRanking() {
-  const allStats = loadAllStats();
+  const all = loadAllStats();
   const rows = [
-    ["Pontos", allStats.kaua.totalPoints, allStats.vitoria.totalPoints],
-    ["Acessos", allStats.kaua.accesses, allStats.vitoria.accesses],
-    ["Foguinho", allStats.kaua.currentStreak, allStats.vitoria.currentStreak],
-    ["Simulados", allStats.kaua.examsFinished, allStats.vitoria.examsFinished]
+    ["Pontos", all.kaua.totalPoints, all.vitoria.totalPoints],
+    ["Acessos", all.kaua.totalAccesses, all.vitoria.totalAccesses],
+    ["Maior foguinho", all.kaua.bestStreak, all.vitoria.bestStreak],
+    ["Simulados", all.kaua.examsFinished, all.vitoria.examsFinished],
+    ["Provas reais", all.kaua.realExamsFinished, all.vitoria.realExamsFinished],
   ];
-  $("#ranking-table").innerHTML = `
-    <div class="ranking-row ranking-row--head"><span>Métrica</span><strong>Kauã</strong><strong>Vitória</strong></div>
-    ${rows.map(([label, kaua, vitoria]) => {
-      const max = Math.max(kaua, vitoria);
-      return `<div class="ranking-row"><span>${label}</span><strong class="${kaua === max && max > 0 ? "is-leading" : ""}">${kaua}</strong><strong class="${vitoria === max && max > 0 ? "is-leading" : ""}">${vitoria}</strong></div>`;
-    }).join("")}`;
-  const kaua = allStats.kaua.totalPoints;
-  const vitoria = allStats.vitoria.totalPoints;
-  $("#ranking-status").textContent = kaua === vitoria
-    ? "Empate na jornada — a próxima prova desempata."
-    : `${kaua > vitoria ? "Kauã" : "Vitória"} está na frente por ${Math.abs(kaua - vitoria)} ${Math.abs(kaua - vitoria) === 1 ? "ponto" : "pontos"}.`;
+  const scoreKaua = rows.reduce((sum, [, k, v]) => sum + (k > v ? 1 : 0), 0);
+  const scoreVitoria = rows.reduce((sum, [, k, v]) => sum + (v > k ? 1 : 0), 0);
+  const winner = scoreKaua === scoreVitoria ? "Empate técnico" : scoreKaua > scoreVitoria ? "Kauã lidera" : "Vitória lidera";
+  $("#ranking").innerHTML = `
+    <div class="ranking__header">
+      <div><p class="section-kicker">Duelo amistoso</p><h2>Kauã × Vitória</h2></div>
+      <p class="ranking-status">${winner}</p>
+    </div>
+    <div class="ranking-table">
+      <div class="ranking-row ranking-row--head"><span>Métrica</span><strong>Kauã</strong><strong>Vitória</strong></div>
+      ${rows.map(([label, kaua, vitoria]) => {
+        const max = Math.max(kaua, vitoria);
+        return `<div class="ranking-row"><span>${label}</span><strong class="${kaua === max && max > 0 ? "is-leading" : ""}">${kaua}</strong><strong class="${vitoria === max && max > 0 ? "is-leading" : ""}">${vitoria}</strong></div>`;
+      }).join("")}
+    </div>
+  `;
 }
 
-function renderQuestions() {
-  const groups = dailyQuestions.reduce((acc, question, index) => {
+function renderTabs() {
+  $("#tabs").innerHTML = Object.entries(TAB_LABELS).map(([id, label]) => (
+    `<button class="tab-button ${activeTab === id ? "is-active" : ""}" type="button" data-tab="${id}">${label}</button>`
+  )).join("");
+  Object.keys(TAB_LABELS).forEach((id) => {
+    const panel = $(`#${id}-tab`);
+    if (panel) panel.hidden = activeTab !== id;
+  });
+}
+
+function ensureDailyState() {
+  if (!quizStates.daily || quizStates.daily.date !== getTodayKey()) {
+    quizStates.daily = {
+      type: "daily",
+      title: "Simulado diário",
+      date: getTodayKey(),
+      difficulty: "misto",
+      questions: selectDailyQuestions("misto"),
+      answers: {},
+      finished: false,
+      result: null,
+      reward: null,
+    };
+  }
+  return quizStates.daily;
+}
+
+function createExtraState(quantity = 40, difficulty = "misto") {
+  const stats = loadUserStats();
+  stats.extraAttempts += 1;
+  saveUserStats(activeUserId, stats);
+  quizStates.extra = {
+    type: "extra",
+    title: "Questionário extra",
+    date: getTodayKey(),
+    difficulty,
+    questions: selectExtraQuestions(quantity, difficulty),
+    answers: {},
+    finished: false,
+    result: null,
+    reward: null,
+  };
+}
+
+function createRealState() {
+  quizStates.real = {
+    type: "real",
+    title: "Prova real",
+    date: getTodayKey(),
+    difficulty: "misto",
+    questions: selectRealExamQuestions(),
+    answers: {},
+    finished: false,
+    started: true,
+    durationSeconds: 3 * 60 * 60,
+    startedAt: Date.now(),
+    result: null,
+    reward: null,
+  };
+  startRealTimer();
+}
+
+function renderDailyTab() {
+  const state = ensureDailyState();
+  const subjects = [...new Set(state.questions.map((question) => question.assunto))].slice(0, 12);
+  $("#daily-tab").innerHTML = `
+    <section class="mode-card">
+      <div>
+        <p class="section-kicker">Simulado do dia · ${new Intl.DateTimeFormat("pt-BR", { dateStyle: "long" }).format(new Date())}</p>
+        <h2>40 itens para manter o ritmo.</h2>
+        <p>Mesma prova para Kauã e Vitória. A seleção muda automaticamente amanhã com sorteio determinístico pela data.</p>
+      </div>
+      <div class="chip-list">${subjects.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>
+    </section>
+    ${renderQuiz(state)}
+  `;
+}
+
+function renderExtraTab() {
+  if (!quizStates.extra) createExtraState(20, "misto");
+  $("#extra-tab").innerHTML = `
+    <section class="mode-card mode-card--controls">
+      <div>
+        <p class="section-kicker">Treino livre</p>
+        <h2>Gere perguntas diferentes.</h2>
+        <p>O sorteio evita repetir exatamente o simulado diário e usa data, tentativa, quantidade e dificuldade como seed.</p>
+      </div>
+      <div class="control-grid">
+        <label>Quantidade<select id="extra-quantity"><option value="10">10 questões</option><option value="20" selected>20 questões</option><option value="40">40 questões</option></select></label>
+        <label>Dificuldade<select id="extra-difficulty">${difficultyOptions("misto")}</select></label>
+        <button class="button button--primary" data-action="new-extra" type="button">Gerar novo questionário</button>
+      </div>
+    </section>
+    ${renderQuiz(quizStates.extra)}
+  `;
+}
+
+function renderRealTab() {
+  const state = quizStates.real;
+  if (!state) {
+    $("#real-tab").innerHTML = `
+      <section class="mode-card mode-card--real">
+        <div>
+          <p class="section-kicker">Modo prova real</p>
+          <h2>120 itens · 3 horas sugeridas.</h2>
+          <p>Distribuição: 40 básicos, 30 complementares e 50 específicos. Ao iniciar, o cronômetro opcional começa a contar.</p>
+          <div class="score-rule"><span>+1 acerto</span><span>−1 erro</span><span>0 em branco</span></div>
+        </div>
+        <button class="button button--primary button--large" data-action="start-real" type="button">Iniciar prova real</button>
+      </section>
+    `;
+    return;
+  }
+  $("#real-tab").innerHTML = `
+    <section class="mode-card mode-card--real">
+      <div><p class="section-kicker">Cronômetro opcional</p><h2 id="real-timer">${formatTimer(getRemainingSeconds(state))}</h2><p>Finalize quando quiser. O relatório calcula mínimos configuráveis e risco de eliminação.</p></div>
+      <button class="button button--ghost" data-action="restart-real" type="button">Recomeçar prova real</button>
+    </section>
+    ${renderQuiz(state)}
+  `;
+}
+
+function difficultyOptions(selected) {
+  return Object.entries(DIFFICULTY_LABELS).map(([value, label]) => `<option value="${value}" ${selected === value ? "selected" : ""}>${label}</option>`).join("");
+}
+
+function renderQuiz(state) {
+  const answered = Object.keys(state.answers).length;
+  const percent = Math.round((answered / state.questions.length) * 100);
+  const groups = state.questions.reduce((acc, question, index) => {
     (acc[question.bloco] ||= []).push({ ...question, displayNumber: index + 1 });
     return acc;
   }, {});
-  $("#questions").innerHTML = Object.entries(groups).map(([block, questions]) => `
-    <section class="question-block" aria-labelledby="block-${questions[0].displayNumber}">
-      <div class="block-heading"><h2 id="block-${questions[0].displayNumber}">${escapeHtml(block)}</h2><span>${questions.length} itens</span></div>
-      ${questions.map((question) => `
-        <article class="question" id="questao-${question.displayNumber}">
-          <div class="question__meta"><span class="question__number">${question.displayNumber}</span><span>${escapeHtml(question.assunto)}</span></div>
-          <p class="question__text">${escapeHtml(question.enunciado)}</p>
-          <div class="choices" role="radiogroup" aria-label="Resposta da questão ${question.displayNumber}">
-            ${[["C", "Certo"], ["E", "Errado"], ["B", "Em branco"]].map(([value, label]) => `
-              <input type="radio" id="q${question.displayNumber}-${value}" name="q${question.displayNumber}" value="${value}">
-              <label for="q${question.displayNumber}-${value}">${label}</label>`).join("")}
-          </div>
-        </article>`).join("")}
-    </section>`).join("");
+
+  return `
+    <form class="quiz-form" data-quiz="${state.type}">
+      <div class="progress-shell">
+        <div class="progress-info"><span>${answered} de ${state.questions.length} respondidas</span><span>${percent}%</span></div>
+        <div class="progress-track"><span style="width:${percent}%"></span></div>
+      </div>
+      ${Object.entries(groups).map(([block, questions]) => `
+        <section class="question-block">
+          <div class="block-heading"><h2>${escapeHtml(block)}</h2><span>${questions.length} itens</span></div>
+          ${questions.map((question) => renderQuestion(question, state)).join("")}
+        </section>
+      `).join("")}
+      <div class="exam-actions">
+        <button class="button button--primary" type="submit" ${state.finished ? "disabled" : ""}>Finalizar ${state.type === "real" ? "prova" : "simulado"}</button>
+        <button class="button button--ghost" data-action="reset-answers" data-quiz="${state.type}" type="button">Reiniciar respostas</button>
+        ${state.type === "extra" ? `<button class="button button--ghost" data-action="new-extra" type="button">Recomeçar com outras perguntas</button>` : ""}
+      </div>
+    </form>
+    ${state.finished ? renderResults(state) : ""}
+  `;
 }
 
-function updateProgress() {
-  const count = [...new FormData($("#quiz-form")).keys()].filter((key) => key.startsWith("q")).length;
-  const percent = Math.round((count / dailyQuestions.length) * 100);
-  $("#progress-label").textContent = `${count} de ${dailyQuestions.length} respondidas`;
-  $("#progress-percent").textContent = `${percent}%`;
-  $("#progress-bar").style.width = `${percent}%`;
+function renderQuestion(question, state) {
+  const name = `${state.type}-${question.id}`;
+  const current = state.answers[question.id] || "";
+  return `
+    <article class="question">
+      <div class="question__meta"><span class="question__number">${question.displayNumber}</span><span>${escapeHtml(question.disciplina)} · ${escapeHtml(question.assunto)} · ${escapeHtml(DIFFICULTY_LABELS[question.dificuldade])}</span></div>
+      <p class="question__text">${escapeHtml(question.enunciado)}</p>
+      <div class="choices" role="radiogroup" aria-label="Resposta do item ${question.displayNumber}">
+        ${[["C", "Certo"], ["E", "Errado"], ["B", "Em branco"]].map(([value, label]) => `
+          <input type="radio" id="${name}-${value}" name="${name}" value="${value}" ${current === value ? "checked" : ""} ${state.finished ? "disabled" : ""}>
+          <label for="${name}-${value}">${label}</label>
+        `).join("")}
+      </div>
+    </article>
+  `;
 }
 
-function finishExam(event) {
+function renderResults(state) {
+  const { result, reward } = state;
+  const weak = [...result.weakTopics.entries()].sort((a, b) => b[1].count - a[1].count).slice(0, 10);
+  return `
+    <section class="results">
+      <div class="results__heading">
+        <div><p class="section-kicker">Relatório final</p><h2>${escapeHtml(state.title)}</h2></div>
+        <div class="net-score"><span>Pontuação líquida</span><strong>${result.netScore}</strong><small>${result.securityPercent}% de segurança</small></div>
+      </div>
+      <div class="metric-grid">
+        ${metric("Acertos", result.correct, "correct")}
+        ${metric("Erros", result.wrong, "wrong")}
+        ${metric("Em branco", result.blank, "blank")}
+      </div>
+      <div class="points-earned">
+        <div><span>Pontos ganhos</span><strong>+${reward.earnedPoints}</strong></div>
+        <p>${Math.max(0, result.netScore)} pela líquida + ${result.correct} pelos acertos + ${reward.streakBonus} pelo foguinho</p>
+        <div><span>Total acumulado</span><strong>${reward.stats.totalPoints}</strong></div>
+      </div>
+      ${state.type === "real" ? renderEliminationRisk(result) : ""}
+      <h3>Desempenho por bloco</h3>
+      ${renderPerformance(result.blocks)}
+      <h3>Desempenho por disciplina</h3>
+      ${renderPerformance(result.disciplines)}
+      <div class="review-panel">
+        <div><p class="section-kicker">Revisão inteligente</p><h3>Assuntos para revisar</h3><p>Prioridade baseada em erros e respostas em branco.</p></div>
+        <ul>${weak.length ? weak.map(([topic, data]) => `<li><strong>${escapeHtml(topic)}</strong> — ${data.count} item(ns)</li>`).join("") : "<li>Nenhum tema pendente. Excelente.</li>"}</ul>
+      </div>
+      <div class="result-actions">
+        <button class="button button--primary" data-action="go-studies" type="button">Ir para Estudos</button>
+        <button class="button button--ghost" data-action="new-extra" type="button">Fazer outro questionário</button>
+      </div>
+      <div class="answer-key">
+        <p class="section-kicker">Correção detalhada</p>
+        <h3>Gabarito comentado</h3>
+        ${state.questions.map((question, index) => renderAnswerItem(question, index + 1, result.answers[question.id])).join("")}
+      </div>
+    </section>
+  `;
+}
+
+function metric(label, value, kind) {
+  return `<article class="metric metric--${kind}"><span>${label}</span><strong>${value}</strong></article>`;
+}
+
+function renderPerformance(performance) {
+  return `<div class="block-results">${Object.entries(performance).map(([name, data]) => {
+    const percent = Math.round((data.correct / data.total) * 100);
+    return `<div class="block-result"><strong>${escapeHtml(name)}</strong><div class="block-result__track"><span style="width:${percent}%"></span></div><span>${percent}%</span><small>Líquida ${data.net}/${data.total}</small></div>`;
+  }).join("")}</div>`;
+}
+
+function renderEliminationRisk(result) {
+  const blockMap = {
+    basicos: result.blocks["Conhecimentos Básicos"]?.net || 0,
+    complementares: result.blocks["Conhecimentos Complementares"]?.net || 0,
+    especificos: result.blocks["Conhecimentos Específicos"]?.net || 0,
+    total: result.netScore,
+  };
+  const checks = Object.entries(MINIMOS_PROVA_REAL).map(([key, min]) => ({ key, min, value: blockMap[key], ok: blockMap[key] >= min }));
+  const failed = checks.filter((item) => !item.ok).length;
+  const status = failed === 0 ? "Dentro da zona segura" : failed <= 1 ? "Atenção" : "Risco de eliminação";
+  return `
+    <div class="risk-panel risk-panel--${failed === 0 ? "safe" : failed <= 1 ? "warn" : "danger"}">
+      <div><p class="section-kicker">Mínimos eliminatórios configuráveis</p><h3>${status}</h3></div>
+      <ul>${checks.map((item) => `<li>${escapeHtml(item.key)}: <strong>${item.value}</strong> / mínimo ${item.min} ${item.ok ? "✅" : "⚠️"}</li>`).join("")}</ul>
+    </div>
+  `;
+}
+
+function renderAnswerItem(question, number, answer) {
+  const status = answer === "B" ? "blank" : answer === question.gabarito ? "correct" : "wrong";
+  return `
+    <article class="answer-item answer-item--${status}">
+      <p class="answer-item__meta">ITEM ${number} · ${escapeHtml(question.disciplina)} · ${escapeHtml(question.assunto)}</p>
+      <p><strong>Sua resposta:</strong> ${answerLabel(answer)} · <strong>Gabarito:</strong> ${answerLabel(question.gabarito)}</p>
+      <p class="answer-item__comment">${escapeHtml(question.comentario)}</p>
+    </article>
+  `;
+}
+
+function renderStudyTab() {
+  const recs = getPersonalizedStudyRecommendations();
+  $("#studies-tab").innerHTML = `
+    <section class="mode-card">
+      <div><p class="section-kicker">Central de estudos</p><h2>Revisão com peso de edital.</h2><p>Use esta aba entre simulados: primeiro legislação do Sistema CFT/CRTs, depois rotinas, protocolo, atendimento e leis complementares.</p></div>
+      <div class="study-plan"><strong>Plano sugerido</strong><span>40 min teoria · 30 min questões · 15 min revisão dos erros</span></div>
+    </section>
+    <section class="study-grid">
+      ${studyCard("A) Maior prioridade", ["Sistema CFT/CRT", "Lei 13.639/2018", "Lei 5.524/1968", "Decreto 90.922/1985", "Decreto 4.560/2002", "Regimento Interno CRT-SP", "Resoluções CFT", "rotinas administrativas", "protocolo", "atendimento", "redação oficial", "LAI", "LGPD", "Lei 9.784/1999", "improbidade administrativa"])}
+      ${studyCard("B) Resumo rápido", [
+        "Português: leia comando, procure generalizações e cuide de crase, concordância e pontuação.",
+        "RLM: treine porcentagem, lógica proposicional, negações e proporcionalidade.",
+        "Informática: segurança, planilhas, e-mail, nuvem e boas práticas.",
+        "Ética/Administração Pública: LIMPE, finalidade, moralidade, conflito de interesses e atendimento.",
+        "LAI/LGPD: publicidade como regra, proteção de dados e bases legais.",
+        "Processo Administrativo/Improbidade: motivação, competência, contraditório e dolo.",
+        "Administração Geral: planejamento, controle, qualidade, processos e projetos.",
+        "Materiais/estoques/logística: ABC, PEPS, lead time, ponto de pedido e inventário.",
+        "Licitações: planejamento, pregão, contratação direta, fiscalização e competitividade.",
+        "Redação/protocolo: clareza, autuação, tramitação, temporalidade e arquivo.",
+        "Sistema CFT/CRTs: leis, decretos, regimento e resoluções."
+      ])}
+      <article class="study-card"><h3>C) Links oficiais</h3><ul>${OFFICIAL_LINKS.map(([label, url]) => `<li><a href="${url}" target="_blank" rel="noreferrer">${escapeHtml(label)}</a></li>`).join("")}</ul></article>
+      <article class="study-card"><h3>D) Videoaulas gratuitas</h3><ul>${YOUTUBE_SEARCHES.map((term) => `<li><a href="https://www.youtube.com/results?search_query=${encodeURIComponent(term)}" target="_blank" rel="noreferrer">${escapeHtml(term)}</a></li>`).join("")}</ul></article>
+      <article class="study-card study-card--wide"><h3>E) Revisão personalizada</h3>${recs}</article>
+      <article class="study-card study-card--wide"><h3>Dicas Quadrix</h3><p>Desconfie de “sempre”, “nunca”, “apenas” e “obrigatoriamente”. Em legislação, compare competência, prazo, finalidade e hierarquia normativa. Em administração, cuidado com troca entre descentralização/desconcentração, dispensa/inexigibilidade e processo/projeto.</p></article>
+    </section>
+  `;
+}
+
+function studyCard(title, items) {
+  return `<article class="study-card"><h3>${escapeHtml(title)}</h3><ul>${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul></article>`;
+}
+
+function getPersonalizedStudyRecommendations() {
+  const stats = loadUserStats();
+  if (!stats.history.length) return `<p>Faça pelo menos um simulado para liberar recomendações personalizadas.</p>`;
+  const weak = new Map();
+  stats.history.forEach((item) => (item.weakSubjects || []).forEach((subject) => {
+    weak.set(subject.assunto, (weak.get(subject.assunto) || 0) + subject.count);
+  }));
+  const top = [...weak.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8);
+  const accuracy = stats.correctCount + stats.wrongCount ? stats.correctCount / (stats.correctCount + stats.wrongCount) : 0;
+  const recommended = accuracy < 0.45 ? "fácil" : accuracy < 0.68 ? "médio" : "difícil";
+  return `
+    <p><strong>Treino recomendado hoje:</strong> ${recommended}.</p>
+    <p><strong>Matérias/assuntos com mais erros ou brancos:</strong></p>
+    <ul>${top.map(([topic, count]) => `<li>${escapeHtml(topic)} — ${count} ocorrência(s)</li>`).join("")}</ul>
+  `;
+}
+
+function renderDashboardTab() {
+  const stats = loadUserStats();
+  $("#dashboard-tab").innerHTML = `
+    <section class="mode-card">
+      <div><p class="section-kicker">Histórico local</p><h2>Últimos resultados.</h2><p>Dados salvos somente neste navegador para ${escapeHtml(USERS[activeUserId].name)}.</p></div>
+    </section>
+    <div class="history-list">
+      ${stats.history.slice(0, 5).length ? stats.history.slice(0, 5).map((item) => `
+        <article class="history-item">
+          <strong>${escapeHtml(item.label)} · ${escapeHtml(DIFFICULTY_LABELS[item.difficulty] || "Misto")}</strong>
+          <span>${item.date} · líquida ${item.netScore} · ${item.correct} C / ${item.wrong} E / ${item.blank} B · +${item.earnedPoints} pts</span>
+        </article>
+      `).join("") : `<p class="empty-state">Nenhum resultado ainda. Faça o simulado diário para começar o histórico.</p>`}
+    </div>
+  `;
+}
+
+function renderActiveTab() {
+  renderTabs();
+  if (activeTab === "daily") renderDailyTab();
+  if (activeTab === "extra") renderExtraTab();
+  if (activeTab === "real") renderRealTab();
+  if (activeTab === "studies") renderStudyTab();
+  if (activeTab === "dashboard") renderDashboardTab();
+}
+
+function renderApp() {
+  renderDashboard();
+  renderRanking();
+  renderActiveTab();
+}
+
+function handleAnswerChange(event) {
+  const input = event.target;
+  if (!input.matches("input[type='radio']")) return;
+  const form = input.closest(".quiz-form");
+  const type = form?.dataset.quiz;
+  const state = quizStates[type];
+  if (!state || state.finished) return;
+  const questionId = input.name.replace(`${type}-`, "");
+  state.answers[questionId] = input.value;
+  renderActiveTab();
+}
+
+function finishQuiz(event) {
   event.preventDefault();
-  if (examFinished) return;
-  const data = new FormData($("#quiz-form"));
-  const answers = {};
-  dailyQuestions.forEach((question, index) => { answers[question.id] = data.get(`q${index + 1}`) || "B"; });
-  const result = { correct: 0, wrong: 0, blank: 0, netScore: 0 };
-  const blocks = {};
-  const reviewTopics = new Map();
-
-  dailyQuestions.forEach((question) => {
-    const answer = answers[question.id];
-    const status = answer === "B" ? "blank" : answer === question.gabarito ? "correct" : "wrong";
-    result[status] += 1;
-    blocks[question.bloco] ||= { correct: 0, total: 0 };
-    blocks[question.bloco].total += 1;
-    if (status === "correct") blocks[question.bloco].correct += 1;
-    if (status !== "correct") reviewTopics.set(question.assunto, (reviewTopics.get(question.assunto) || 0) + 1);
-  });
-  result.netScore = result.correct - result.wrong;
-  const reward = updateStatsAfterExam(result);
-  examFinished = true;
-
-  $("#correct-count").textContent = result.correct;
-  $("#wrong-count").textContent = result.wrong;
-  $("#blank-count").textContent = result.blank;
-  $("#net-score").textContent = result.netScore;
-  $("#earned-points").textContent = `+${reward.earnedPoints}`;
-  $("#accumulated-points").textContent = reward.stats.totalPoints;
-  $("#points-formula").textContent = `${Math.max(0, result.netScore)} pela nota + ${result.correct} pelos acertos + ${reward.streakBonus} pelo foguinho`;
-  $("#block-results").innerHTML = Object.entries(blocks).map(([name, block]) => {
-    const percent = Math.round((block.correct / block.total) * 100);
-    return `<div class="block-result"><strong>${escapeHtml(name)}</strong><div class="block-result__track" aria-label="${percent}% de acertos"><span style="width:${percent}%"></span></div><span>${percent}%</span></div>`;
-  }).join("");
-  const sortedTopics = [...reviewTopics.entries()].sort((a, b) => b[1] - a[1]);
-  $("#review-topics").innerHTML = sortedTopics.length
-    ? sortedTopics.map(([topic, count]) => `<li><strong>${escapeHtml(topic)}</strong> — ${count} ${count === 1 ? "item" : "itens"}</li>`).join("")
-    : "<li>Nenhum tema pendente. Excelente resultado!</li>";
-  $("#answer-key").innerHTML = dailyQuestions.map((question, index) => {
-    const answer = answers[question.id];
-    const status = answer === "B" ? "blank" : answer === question.gabarito ? "correct" : "wrong";
-    const statusLabel = { correct: "Acertou", wrong: "Errou", blank: "Em branco" }[status];
-    const answerLabel = answer === "B" ? "Em branco" : answer === "C" ? "Certo" : "Errado";
-    const keyLabel = question.gabarito === "C" ? "Certo" : "Errado";
-    return `<article class="answer-item answer-item--${status}"><p class="answer-item__meta">ITEM ${index + 1} · ${escapeHtml(question.assunto)} · ${statusLabel}</p><p><strong>Sua resposta:</strong> ${answerLabel} &nbsp; <strong>Gabarito:</strong> ${keyLabel}</p><p class="answer-item__comment">${escapeHtml(question.comentario)}</p></article>`;
-  }).join("");
-  $("#finish-button").disabled = true;
-  $("#results").hidden = false;
-  renderDashboard();
-  renderRanking();
-  $("#results").scrollIntoView({ behavior: "smooth", block: "start" });
+  const form = event.target.closest(".quiz-form");
+  const type = form.dataset.quiz;
+  const state = quizStates[type];
+  if (!state || state.finished) return;
+  state.result = calculateResult(state);
+  state.reward = updateStatsAfterExam(state, state.result);
+  state.finished = true;
+  if (type === "real" && realTimer) clearInterval(realTimer);
+  renderApp();
+  document.querySelector(`#${type}-tab .results`)?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-function resetExam() {
-  if (!window.confirm("Deseja apagar as respostas desta tentativa? Os resultados já finalizados permanecem no perfil.")) return;
-  $("#quiz-form").reset();
-  $("#results").hidden = true;
-  $("#finish-button").disabled = false;
-  examFinished = false;
-  updateProgress();
-  window.scrollTo({ top: $("#quiz-form").offsetTop - 80, behavior: "smooth" });
+function resetAnswers(type) {
+  const state = quizStates[type];
+  if (!state || state.finished) return;
+  state.answers = {};
+  renderActiveTab();
 }
 
-function showLogin() {
-  $("#app-shell").hidden = true;
-  $("#login-screen").hidden = false;
+function getRemainingSeconds(state) {
+  const elapsed = Math.floor((Date.now() - state.startedAt) / 1000);
+  return Math.max(0, state.durationSeconds - elapsed);
 }
 
-function enterApp(userId, shouldRegister = true) {
+function formatTimer(seconds) {
+  const h = String(Math.floor(seconds / 3600)).padStart(2, "0");
+  const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, "0");
+  const s = String(seconds % 60).padStart(2, "0");
+  return `${h}:${m}:${s}`;
+}
+
+function startRealTimer() {
+  if (realTimer) clearInterval(realTimer);
+  realTimer = setInterval(() => {
+    const el = $("#real-timer");
+    if (!el || !quizStates.real || quizStates.real.finished) return;
+    el.textContent = formatTimer(getRemainingSeconds(quizStates.real));
+  }, 1000);
+}
+
+function handleDocumentClick(event) {
+  const action = event.target.closest("[data-action]")?.dataset.action;
+  if (!action) return;
+  if (action === "switch-user") renderUserSelection();
+  if (action === "clear-user") {
+    if (!window.confirm(`Zerar dados locais de ${USERS[activeUserId].name}?`)) return;
+    saveUserStats(activeUserId, { ...createDefaultStats(), name: USERS[activeUserId].name });
+    registerUserAccess(activeUserId);
+    renderApp();
+  }
+  if (action === "new-extra") {
+    const quantity = Number($("#extra-quantity")?.value || 20);
+    const difficulty = $("#extra-difficulty")?.value || "misto";
+    createExtraState(quantity, difficulty);
+    activeTab = "extra";
+    renderActiveTab();
+  }
+  if (action === "reset-answers") resetAnswers(event.target.dataset.quiz);
+  if (action === "start-real" || action === "restart-real") {
+    if (action === "restart-real" && !window.confirm("Recomeçar a prova real e apagar respostas desta tentativa?")) return;
+    createRealState();
+    renderActiveTab();
+  }
+  if (action === "go-studies") {
+    activeTab = "studies";
+    renderActiveTab();
+    $("#tabs").scrollIntoView({ behavior: "smooth" });
+  }
+}
+
+function handleTabClick(event) {
+  const button = event.target.closest("[data-tab]");
+  if (!button) return;
+  activeTab = button.dataset.tab;
+  renderActiveTab();
+}
+
+function enterApp(userId) {
   setCurrentUser(userId);
-  if (shouldRegister) registerAccess(userId);
-  dailyQuestions = getDailyQuestions();
-  $("#daily-date").textContent = new Intl.DateTimeFormat("pt-BR", { dateStyle: "long" }).format(new Date());
-  renderQuestions();
-  renderDashboard();
-  renderRanking();
-  updateProgress();
+  registerUserAccess(userId);
+  quizStates = {};
+  ensureDailyState();
+  activeTab = "daily";
   $("#login-screen").hidden = true;
   $("#app-shell").hidden = false;
+  renderApp();
   window.scrollTo({ top: 0 });
 }
 
-document.querySelectorAll("[data-user]").forEach((button) => button.addEventListener("click", () => enterApp(button.dataset.user)));
-$("#switch-user").addEventListener("click", showLogin);
-$("#switch-user-dashboard").addEventListener("click", showLogin);
-$("#clear-data").addEventListener("click", () => {
-  const user = getCurrentUser();
-  if (!window.confirm(`Zerar todo o histórico local de ${user.name}? Esta ação não pode ser desfeita.`)) return;
-  saveStats(user.id, createDefaultStats());
-  registerAccess(user.id);
-  renderDashboard();
-  renderRanking();
+document.querySelectorAll("[data-user]").forEach((button) => {
+  button.addEventListener("click", () => enterApp(button.dataset.user));
 });
-$("#quiz-form").addEventListener("change", updateProgress);
-$("#quiz-form").addEventListener("submit", finishExam);
-$("#reset-button").addEventListener("click", resetExam);
+$("#switch-user").addEventListener("click", renderUserSelection);
+$("#tabs").addEventListener("click", handleTabClick);
+document.addEventListener("click", handleDocumentClick);
+document.addEventListener("change", handleAnswerChange);
+document.addEventListener("submit", finishQuiz);
 
-const savedUser = getCurrentUser();
-if (savedUser) enterApp(savedUser.id);
-else showLogin();
+// Regra do projeto: sempre abrir na seleção, mesmo havendo usuário salvo.
+renderUserSelection();

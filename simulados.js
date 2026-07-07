@@ -1,644 +1,178 @@
-// Banco autoral usado pelo sorteio determinístico diário.
-// gabarito: "C" para Certo ou "E" para Errado.
-const BANCO_QUESTOES = [
-    {
-      id: 1,
-      bloco: "Conhecimentos básicos",
-      assunto: "Português",
-      enunciado: "No aviso “Os documentos enviados pelo candidato foram conferidos pela equipe”, a substituição de “pela equipe” por “a equipe” preservaria a correção gramatical e o sentido original.",
-      gabarito: "E",
-      comentario: "Na voz passiva, “pela equipe” é agente da passiva. A troca direta por “a equipe” deixa a oração sem estrutura sintática adequada e não preserva o sentido."
-    },
-    {
-      id: 2,
-      bloco: "Conhecimentos básicos",
-      assunto: "Português",
-      enunciado: "Na frase “O atendimento foi suspenso porque o sistema estava indisponível”, a conjunção “porque” introduz a causa da suspensão.",
-      gabarito: "C",
-      comentario: "A oração iniciada por “porque” apresenta a causa de o atendimento ter sido suspenso."
-    },
-    {
-      id: 3,
-      bloco: "Conhecimentos básicos",
-      assunto: "Português",
-      enunciado: "Em “Informamos aos profissionais que o prazo foi prorrogado”, o emprego de vírgula imediatamente após “profissionais” é obrigatório.",
-      gabarito: "E",
-      comentario: "A oração “que o prazo foi prorrogado” completa o sentido de “informamos”. Não se deve separar por vírgula o verbo de seus complementos."
-    },
-    {
-      id: 4,
-      bloco: "Conhecimentos básicos",
-      assunto: "Português",
-      enunciado: "No trecho “A servidora referiu-se à nova resolução”, o acento indicativo de crase resulta da união da preposição exigida por “referir-se” com o artigo feminino que antecede “nova resolução”.",
-      gabarito: "C",
-      comentario: "O verbo pronominal “referir-se” rege a preposição “a”, e o substantivo feminino determinado admite o artigo “a”: a + a = à."
-    },
-    {
-      id: 5,
-      bloco: "Conhecimentos básicos",
-      assunto: "Português",
-      enunciado: "A forma “Houveram muitas solicitações no protocolo” está de acordo com a norma-padrão, pois o verbo concorda com “muitas solicitações”.",
-      gabarito: "E",
-      comentario: "Com sentido de existir, “haver” é impessoal e fica na terceira pessoa do singular: “Houve muitas solicitações”."
-    },
-    {
-      id: 6,
-      bloco: "Conhecimentos básicos",
-      assunto: "Raciocínio Lógico e Matemática",
-      enunciado: "Se todo processo urgente recebe uma etiqueta vermelha e o processo 248 não recebeu etiqueta vermelha, então é válido concluir que o processo 248 não é urgente.",
-      gabarito: "C",
-      comentario: "É uma aplicação de modus tollens: se urgente implica etiqueta vermelha, a ausência da etiqueta permite negar que o processo seja urgente."
-    },
-    {
-      id: 7,
-      bloco: "Conhecimentos básicos",
-      assunto: "Raciocínio Lógico e Matemática",
-      enunciado: "Uma equipe analisou 80 processos na segunda-feira e 100 na terça-feira. Logo, a produção de terça foi 20% maior que a de segunda.",
-      gabarito: "E",
-      comentario: "O aumento foi de 20 sobre uma base de 80: 20/80 = 25%. Portanto, a produção foi 25% maior."
-    },
-    {
-      id: 8,
-      bloco: "Conhecimentos básicos",
-      assunto: "Raciocínio Lógico e Matemática",
-      enunciado: "A negação de “Todos os requerimentos foram respondidos” pode ser expressa por “Pelo menos um requerimento não foi respondido”.",
-      gabarito: "C",
-      comentario: "A negação de uma proposição universal afirmativa é uma proposição existencial negativa."
-    },
-    {
-      id: 9,
-      bloco: "Conhecimentos básicos",
-      assunto: "Raciocínio Lógico e Matemática",
-      enunciado: "Se 3 servidores, com a mesma produtividade, cadastram 180 documentos em 2 horas, então 5 servidores cadastrarão 300 documentos no mesmo período.",
-      gabarito: "C",
-      comentario: "Cada servidor cadastra 30 documentos por hora. Em 2 horas, 5 servidores cadastram 5 × 2 × 30 = 300."
-    },
-    {
-      id: 10,
-      bloco: "Conhecimentos básicos",
-      assunto: "Informática",
-      enunciado: "Em uma planilha, a fórmula =SOMA(B2:B6) adiciona os valores das células B2, B3, B4, B5 e B6.",
-      gabarito: "C",
-      comentario: "Os dois-pontos indicam um intervalo contínuo, incluindo as duas extremidades."
-    },
-    {
-      id: 11,
-      bloco: "Conhecimentos básicos",
-      assunto: "Informática",
-      enunciado: "Manter cópias de segurança apenas no mesmo disco físico dos arquivos originais protege os dados contra a falha total desse disco.",
-      gabarito: "E",
-      comentario: "Se o disco falhar, originais e cópias podem ser perdidos juntos. Backups devem incluir mídia ou localização separada."
-    },
-    {
-      id: 12,
-      bloco: "Conhecimentos básicos",
-      assunto: "Informática",
-      enunciado: "O uso de autenticação em dois fatores reduz o risco de acesso indevido mesmo quando a senha do usuário é descoberta por terceiro.",
-      gabarito: "C",
-      comentario: "O segundo fator cria uma barreira adicional; conhecer apenas a senha tende a não ser suficiente para concluir o acesso."
-    },
-    {
-      id: 13,
-      bloco: "Conhecimentos complementares",
-      assunto: "Ética no serviço público",
-      enunciado: "Um atendente que favoreça conhecido na fila, ainda que não receba vantagem financeira, viola a impessoalidade esperada na atuação pública.",
-      gabarito: "C",
-      comentario: "O favorecimento pessoal contraria o tratamento isonômico e impessoal, independentemente de haver ganho financeiro."
-    },
-    {
-      id: 14,
-      bloco: "Conhecimentos complementares",
-      assunto: "Administração Pública",
-      enunciado: "Pelo princípio da publicidade, todos os documentos administrativos devem ser divulgados integralmente, sem qualquer hipótese de restrição de acesso.",
-      gabarito: "E",
-      comentario: "A publicidade não é absoluta. A Constituição e as leis admitem restrição, por exemplo, para proteger dados pessoais e informações legalmente sigilosas."
-    },
-    {
-      id: 15,
-      bloco: "Conhecimentos complementares",
-      assunto: "Lei de Acesso à Informação (LAI)",
-      enunciado: "A LAI adota como diretriz a publicidade como preceito geral e o sigilo como exceção.",
-      gabarito: "C",
-      comentario: "Essa é uma diretriz expressa da Lei nº 12.527/2011, que privilegia o acesso e exige fundamento legal para restringi-lo."
-    },
-    {
-      id: 16,
-      bloco: "Conhecimentos complementares",
-      assunto: "Lei Geral de Proteção de Dados (LGPD)",
-      enunciado: "Para a LGPD, dado anonimizado é sempre considerado dado pessoal, ainda que a anonimização não possa ser revertida por meios razoáveis.",
-      gabarito: "E",
-      comentario: "Em regra, dado efetivamente anonimizado não é dado pessoal para fins da LGPD, salvo quando o processo puder ser revertido com meios próprios ou esforços razoáveis."
-    },
-    {
-      id: 17,
-      bloco: "Conhecimentos complementares",
-      assunto: "Lei nº 8.429/1992",
-      enunciado: "Após as alterações da Lei de Improbidade Administrativa, a configuração dos atos tipificados nos artigos 9º, 10 e 11 exige conduta dolosa.",
-      gabarito: "C",
-      comentario: "A Lei nº 8.429/1992, na redação vigente, considera atos de improbidade as condutas dolosas tipificadas nesses artigos."
-    },
-    {
-      id: 18,
-      bloco: "Conhecimentos complementares",
-      assunto: "Lei nº 9.784/1999",
-      enunciado: "Nos processos administrativos, a Administração deve observar, entre outros, os princípios da motivação, razoabilidade, proporcionalidade, ampla defesa e contraditório.",
-      gabarito: "C",
-      comentario: "Esses princípios constam expressamente do artigo 2º da Lei nº 9.784/1999."
-    },
-    {
-      id: 19,
-      bloco: "Conhecimentos complementares",
-      assunto: "Lei nº 9.784/1999",
-      enunciado: "A competência administrativa pode ser renunciada pelo órgão sempre que o agente considerar conveniente.",
-      gabarito: "E",
-      comentario: "A competência é irrenunciável e deve ser exercida pelo órgão a que foi atribuída, ressalvadas as hipóteses legais de delegação e avocação."
-    },
-    {
-      id: 20,
-      bloco: "Conhecimentos complementares",
-      assunto: "Administração Pública",
-      enunciado: "O CRT-SP, criado no sistema instituído pela Lei nº 13.639/2018, possui natureza de autarquia com autonomia administrativa e financeira.",
-      gabarito: "C",
-      comentario: "A Lei nº 13.639/2018 criou os conselhos federais e regionais como autarquias, dotadas de autonomia administrativa e financeira e estrutura federativa."
-    },
-    {
-      id: 21,
-      bloco: "Conhecimentos específicos",
-      assunto: "Administração Geral",
-      enunciado: "Na função administrativa de controle, comparam-se os resultados alcançados com padrões definidos, permitindo a adoção de medidas corretivas.",
-      gabarito: "C",
-      comentario: "Controle envolve estabelecer ou utilizar padrões, medir o desempenho, comparar resultados e corrigir desvios."
-    },
-    {
-      id: 22,
-      bloco: "Conhecimentos específicos",
-      assunto: "Administração Geral",
-      enunciado: "A descentralização decisória elimina a necessidade de coordenação entre unidades organizacionais.",
-      gabarito: "E",
-      comentario: "Distribuir decisões pode aumentar agilidade, mas continua exigindo coordenação para alinhar objetivos, fluxos e responsabilidades."
-    },
-    {
-      id: 23,
-      bloco: "Conhecimentos específicos",
-      assunto: "Rotinas administrativas",
-      enunciado: "Em uma rotina padronizada, registrar responsáveis, prazos e pontos de conferência favorece a rastreabilidade das tarefas.",
-      gabarito: "C",
-      comentario: "Esses registros permitem saber quem fez o quê, quando e sob quais verificações, reduzindo falhas e facilitando auditoria."
-    },
-    {
-      id: 24,
-      bloco: "Conhecimentos específicos",
-      assunto: "Redação oficial",
-      enunciado: "A redação oficial deve privilegiar clareza, precisão, objetividade, concisão, coesão, coerência, impessoalidade, formalidade e padronização.",
-      gabarito: "C",
-      comentario: "Esses atributos orientam a comunicação oficial, permitindo compreensão uniforme e adequada dos atos administrativos."
-    },
-    {
-      id: 25,
-      bloco: "Conhecimentos específicos",
-      assunto: "Redação oficial",
-      enunciado: "Para tornar um ofício mais cordial, recomenda-se empregar linguagem rebuscada e opiniões pessoais do redator.",
-      gabarito: "E",
-      comentario: "Comunicação oficial pede clareza, objetividade e impessoalidade. Rebuscamento e opiniões pessoais prejudicam esses atributos."
-    },
-    {
-      id: 26,
-      bloco: "Conhecimentos específicos",
-      assunto: "Protocolo e arquivo",
-      enunciado: "A autuação de um processo administrativo reúne e formaliza documentos relacionados a um assunto, com identificação própria para sua tramitação e controle.",
-      gabarito: "C",
-      comentario: "Autuar é constituir formalmente o processo, organizando suas peças e atribuindo identificação que possibilite acompanhar sua tramitação."
-    },
-    {
-      id: 27,
-      bloco: "Conhecimentos específicos",
-      assunto: "Protocolo e arquivo",
-      enunciado: "Documentos de uso frequente pela unidade produtora, necessários às atividades em andamento, integram tipicamente o arquivo permanente.",
-      gabarito: "E",
-      comentario: "Documentos em uso frequente e ligados a atividades correntes pertencem ao arquivo corrente, não ao permanente."
-    },
-    {
-      id: 28,
-      bloco: "Conhecimentos específicos",
-      assunto: "Atendimento ao público",
-      enunciado: "Diante de uma reclamação, a escuta ativa inclui confirmar o entendimento da demanda antes de orientar o usuário.",
-      gabarito: "C",
-      comentario: "Confirmar o que foi compreendido reduz ruídos, demonstra atenção e permite oferecer orientação mais adequada."
-    },
-    {
-      id: 29,
-      bloco: "Conhecimentos específicos",
-      assunto: "Atendimento ao público",
-      enunciado: "No atendimento inclusivo, o servidor deve falar exclusivamente com o acompanhante de uma pessoa com deficiência, ainda que ela possa se comunicar diretamente.",
-      gabarito: "E",
-      comentario: "O atendimento deve dirigir-se à própria pessoa, respeitando sua autonomia; o acompanhante auxilia quando necessário ou solicitado."
-    },
-    {
-      id: 30,
-      bloco: "Conhecimentos específicos",
-      assunto: "Materiais e estoques",
-      enunciado: "O estoque de segurança busca reduzir o risco de falta de material diante de oscilações de consumo ou atrasos de reposição.",
-      gabarito: "C",
-      comentario: "Ele funciona como uma reserva para absorver incertezas de demanda e de prazo de entrega."
-    },
-    {
-      id: 31,
-      bloco: "Conhecimentos específicos",
-      assunto: "Materiais e estoques",
-      enunciado: "Pelo método PEPS, os itens que entraram mais recentemente no estoque são os primeiros a sair.",
-      gabarito: "E",
-      comentario: "PEPS significa “primeiro que entra, primeiro que sai”; portanto, saem antes os itens mais antigos."
-    },
-    {
-      id: 32,
-      bloco: "Conhecimentos específicos",
-      assunto: "Logística",
-      enunciado: "O prazo de reposição, ou lead time, deve ser considerado na definição do momento de emitir um novo pedido de material.",
-      gabarito: "C",
-      comentario: "O ponto de pedido precisa considerar o consumo durante o período entre a solicitação e a efetiva disponibilidade do item."
-    },
-    {
-      id: 33,
-      bloco: "Conhecimentos específicos",
-      assunto: "Licitações e contratos",
-      enunciado: "Na Lei nº 14.133/2021, o pregão é modalidade obrigatória para aquisição de bens e serviços comuns, cujo critério pode ser o de menor preço ou maior desconto.",
-      gabarito: "C",
-      comentario: "A nova Lei de Licitações define o pregão para bens e serviços comuns e admite menor preço ou maior desconto."
-    },
-    {
-      id: 34,
-      bloco: "Conhecimentos específicos",
-      assunto: "Licitações e contratos",
-      enunciado: "A inexigibilidade de licitação ocorre quando há competição viável entre diversos fornecedores, mas a Administração prefere contratar diretamente.",
-      gabarito: "E",
-      comentario: "A inexigibilidade pressupõe inviabilidade de competição. Preferência administrativa, isoladamente, não autoriza contratação direta."
-    },
-    {
-      id: 35,
-      bloco: "Conhecimentos específicos",
-      assunto: "Lei nº 13.639/2018",
-      enunciado: "A função dos conselhos criados pela Lei nº 13.639/2018 inclui orientar, disciplinar e fiscalizar o exercício profissional das respectivas categorias.",
-      gabarito: "C",
-      comentario: "Essa tríade de funções está prevista no artigo 3º da Lei nº 13.639/2018."
-    },
-    {
-      id: 36,
-      bloco: "Conhecimentos específicos",
-      assunto: "Lei nº 5.524/1968",
-      enunciado: "A Lei nº 5.524/1968 inclui, no campo de atuação do técnico industrial de nível médio, a assistência técnica na compra, venda e utilização de produtos e equipamentos especializados.",
-      gabarito: "C",
-      comentario: "A atividade consta expressamente do artigo 2º, inciso IV, da Lei nº 5.524/1968."
-    },
-    {
-      id: 37,
-      bloco: "Conhecimentos específicos",
-      assunto: "Decreto nº 90.922/1985",
-      enunciado: "O Decreto nº 90.922/1985 regulamenta a Lei nº 5.524/1968 quanto ao exercício das profissões de técnico industrial e técnico agrícola de nível médio.",
-      gabarito: "C",
-      comentario: "Esse é o objeto central do decreto, que detalha atribuições e condições do exercício profissional."
-    },
-    {
-      id: 38,
-      bloco: "Conhecimentos específicos",
-      assunto: "Decreto nº 4.560/2002",
-      enunciado: "O Decreto nº 4.560/2002 alterou o Decreto nº 90.922/1985, incluindo previsões relacionadas às atribuições dos técnicos agrícolas.",
-      gabarito: "C",
-      comentario: "O Decreto nº 4.560/2002 promoveu alterações no regulamento, especialmente em dispositivos referentes aos técnicos agrícolas."
-    },
-    {
-      id: 39,
-      bloco: "Conhecimentos específicos",
-      assunto: "Regimento Interno do CRT-SP",
-      enunciado: "Conforme a estrutura legal dos conselhos regionais e o Regimento Interno do CRT-SP, o Plenário é órgão deliberativo, não mero setor de execução de rotinas administrativas.",
-      gabarito: "C",
-      comentario: "O Plenário exerce função deliberativa. A execução administrativa cabe à estrutura executiva e às unidades organizacionais competentes."
-    },
-    {
-      id: 40,
-      bloco: "Conhecimentos específicos",
-      assunto: "Resoluções CFT",
-      enunciado: "As resoluções do CFT podem disciplinar atribuições profissionais e o funcionamento do Sistema CFT/CRTs, desde que observados os limites da legislação aplicável.",
-      gabarito: "C",
-      comentario: "O poder normativo do CFT permite detalhar matérias do sistema, mas os atos infralegais permanecem subordinados às leis e aos demais atos superiores."
-    },
-    {
-      id: 41,
-      bloco: "Conhecimentos básicos",
-      assunto: "Português",
-      enunciado: "Na comunicação “Seguem anexos os comprovantes solicitados”, a forma “anexos” concorda corretamente com “comprovantes”.",
-      gabarito: "C",
-      comentario: "Quando empregado como adjetivo, “anexo” varia em gênero e número para concordar com o substantivo a que se refere."
-    },
-    {
-      id: 42,
-      bloco: "Conhecimentos básicos",
-      assunto: "Português",
-      enunciado: "Em “Faz dois meses que o setor adotou o novo procedimento”, substituir “Faz” por “Fazem” manteria a correção gramatical.",
-      gabarito: "E",
-      comentario: "Ao indicar tempo decorrido, o verbo fazer é impessoal e permanece na terceira pessoa do singular."
-    },
-    {
-      id: 43,
-      bloco: "Conhecimentos básicos",
-      assunto: "Português",
-      enunciado: "No período “Embora o sistema estivesse lento, a equipe concluiu os registros”, a oração iniciada por “Embora” expressa concessão.",
-      gabarito: "C",
-      comentario: "A lentidão poderia impedir a conclusão, mas não a impediu; por isso, a relação semântica é concessiva."
-    },
-    {
-      id: 44,
-      bloco: "Conhecimentos básicos",
-      assunto: "Português",
-      enunciado: "Na frase “É necessária a conferência dos dados”, a concordância de “necessária” com o substantivo determinado por artigo está adequada.",
-      gabarito: "C",
-      comentario: "Com o substantivo determinado por artigo, a expressão adjetiva concorda com ele: “é necessária a conferência”."
-    },
-    {
-      id: 45,
-      bloco: "Conhecimentos básicos",
-      assunto: "Português",
-      enunciado: "Em “O processo cujo o prazo venceu será revisado”, o emprego simultâneo de “cujo” e do artigo “o” segue a norma-padrão.",
-      gabarito: "E",
-      comentario: "O pronome relativo “cujo” não admite artigo depois dele. A forma adequada é “cujo prazo venceu”."
-    },
-    {
-      id: 46,
-      bloco: "Conhecimentos básicos",
-      assunto: "Raciocínio Lógico e Matemática",
-      enunciado: "Se a afirmação “O protocolo está aberto e o sistema está disponível” é verdadeira, então cada uma das duas proposições simples também é verdadeira.",
-      gabarito: "C",
-      comentario: "Uma conjunção só é verdadeira quando ambas as proposições que a compõem são verdadeiras."
-    },
-    {
-      id: 47,
-      bloco: "Conhecimentos básicos",
-      assunto: "Raciocínio Lógico e Matemática",
-      enunciado: "Um material que custava R$ 200 recebeu desconto de 10% e, depois, acréscimo de 10% sobre o novo valor, retornando a R$ 200.",
-      gabarito: "E",
-      comentario: "Após o desconto, o valor é R$ 180; o acréscimo de 10% resulta em R$ 198, pois as bases percentuais são diferentes."
-    },
-    {
-      id: 48,
-      bloco: "Conhecimentos básicos",
-      assunto: "Raciocínio Lógico e Matemática",
-      enunciado: "Em um grupo com 24 processos, dos quais 6 são urgentes, a probabilidade de escolher ao acaso um processo urgente é de 25%.",
-      gabarito: "C",
-      comentario: "A razão é 6/24, equivalente a 1/4 ou 25%."
-    },
-    {
-      id: 49,
-      bloco: "Conhecimentos básicos",
-      assunto: "Raciocínio Lógico e Matemática",
-      enunciado: "A proposição “Se o cadastro está correto, então o pedido será analisado” é logicamente equivalente a “Se o pedido não será analisado, então o cadastro não está correto”.",
-      gabarito: "C",
-      comentario: "A segunda proposição é a contrapositiva da primeira, e ambas são logicamente equivalentes."
-    },
-    {
-      id: 50,
-      bloco: "Conhecimentos básicos",
-      assunto: "Informática",
-      enunciado: "Uma mensagem que imita a identidade visual do CRT-SP e solicita credenciais por link urgente apresenta característica típica de phishing.",
-      gabarito: "C",
-      comentario: "Phishing usa engenharia social e aparência legítima para induzir a vítima a fornecer dados ou acessar conteúdo malicioso."
-    },
-    {
-      id: 51,
-      bloco: "Conhecimentos básicos",
-      assunto: "Informática",
-      enunciado: "No correio eletrônico, o campo Cco permite enviar uma cópia sem revelar aos demais destinatários os endereços inseridos nesse campo.",
-      gabarito: "C",
-      comentario: "Cco significa cópia oculta; seus destinatários não ficam visíveis aos demais receptores."
-    },
-    {
-      id: 52,
-      bloco: "Conhecimentos básicos",
-      assunto: "Informática",
-      enunciado: "A extensão PDF garante, por si só, que um arquivo recebido esteja livre de código malicioso.",
-      gabarito: "E",
-      comentario: "A extensão não garante segurança. Arquivos PDF também podem explorar falhas ou conter links e elementos maliciosos."
-    },
-    {
-      id: 53,
-      bloco: "Conhecimentos complementares",
-      assunto: "Ética no setor público",
-      enunciado: "Comunicar conflito de interesses à autoridade competente é conduta compatível com a integridade no exercício da função pública.",
-      gabarito: "C",
-      comentario: "A transparência sobre situações conflitantes permite prevenção, tratamento adequado e preservação da imparcialidade."
-    },
-    {
-      id: 54,
-      bloco: "Conhecimentos complementares",
-      assunto: "Princípios da Administração Pública",
-      enunciado: "O princípio da eficiência autoriza o agente público a afastar exigência legal quando isso tornar o atendimento mais rápido.",
-      gabarito: "E",
-      comentario: "A eficiência deve ser buscada dentro da legalidade; ela não permite descumprir exigências previstas em lei."
-    },
-    {
-      id: 55,
-      bloco: "Conhecimentos complementares",
-      assunto: "Lei nº 8.429/1992",
-      enunciado: "O mero exercício da função pública, sem comprovação de ato doloso com fim ilícito, afasta a responsabilidade por improbidade administrativa.",
-      gabarito: "C",
-      comentario: "A redação vigente da Lei de Improbidade exige dolo e afirma que o mero exercício da função, sem ato doloso com fim ilícito, não basta."
-    },
-    {
-      id: 56,
-      bloco: "Conhecimentos complementares",
-      assunto: "Lei nº 9.784/1999",
-      enunciado: "A Administração deve anular seus atos ilegais e pode revogar atos válidos por conveniência ou oportunidade, respeitados os direitos adquiridos.",
-      gabarito: "C",
-      comentario: "A Lei nº 9.784/1999 diferencia anulação por ilegalidade e revogação por mérito administrativo."
-    },
-    {
-      id: 57,
-      bloco: "Conhecimentos complementares",
-      assunto: "Lei de Acesso à Informação (LAI)",
-      enunciado: "O pedido de acesso à informação precisa conter os motivos pelos quais o requerente deseja obter os dados.",
-      gabarito: "E",
-      comentario: "A LAI veda exigências relativas aos motivos determinantes da solicitação de informação de interesse público."
-    },
-    {
-      id: 58,
-      bloco: "Conhecimentos complementares",
-      assunto: "Lei Geral de Proteção de Dados (LGPD)",
-      enunciado: "O princípio da necessidade limita o tratamento ao mínimo necessário para a realização de suas finalidades.",
-      gabarito: "C",
-      comentario: "A necessidade exige dados pertinentes, proporcionais e não excessivos em relação às finalidades informadas."
-    },
-    {
-      id: 59,
-      bloco: "Conhecimentos complementares",
-      assunto: "Lei Geral de Proteção de Dados (LGPD)",
-      enunciado: "O poder público somente pode tratar dados pessoais mediante consentimento expresso do titular.",
-      gabarito: "E",
-      comentario: "A LGPD prevê diversas bases legais além do consentimento, inclusive execução de políticas públicas e cumprimento de obrigação legal."
-    },
-    {
-      id: 60,
-      bloco: "Conhecimentos complementares",
-      assunto: "Lei de Acesso à Informação (LAI)",
-      enunciado: "A transparência ativa ocorre quando o órgão divulga informações de interesse coletivo independentemente de solicitação.",
-      gabarito: "C",
-      comentario: "Transparência ativa é a divulgação espontânea; a passiva responde a pedidos de acesso."
-    },
-    {
-      id: 61,
-      bloco: "Conhecimentos específicos",
-      assunto: "Gestão da qualidade",
-      enunciado: "No ciclo PDCA, a etapa Check envolve verificar resultados e compará-los com objetivos e padrões definidos.",
-      gabarito: "C",
-      comentario: "Check é a etapa de checagem, medição e análise do desempenho obtido após a execução."
-    },
-    {
-      id: 62,
-      bloco: "Conhecimentos específicos",
-      assunto: "Processos e projetos",
-      enunciado: "Um projeto caracteriza-se por esforço temporário voltado à criação de resultado único, ao passo que um processo tende a ser contínuo e repetível.",
-      gabarito: "C",
-      comentario: "Temporalidade e singularidade distinguem projetos de operações e processos recorrentes."
-    },
-    {
-      id: 63,
-      bloco: "Conhecimentos específicos",
-      assunto: "Trabalho em equipe",
-      enunciado: "A existência de divergências em uma equipe implica, necessariamente, queda de desempenho e deve ser suprimida pela chefia.",
-      gabarito: "E",
-      comentario: "Divergências bem administradas podem ampliar perspectivas e melhorar decisões; o efeito depende da forma de gestão do conflito."
-    },
-    {
-      id: 64,
-      bloco: "Conhecimentos específicos",
-      assunto: "Administração Pública",
-      enunciado: "A desconcentração distribui competências dentro da mesma pessoa jurídica, criando órgãos sem personalidade jurídica própria.",
-      gabarito: "C",
-      comentario: "Na desconcentração há repartição interna de competências; a descentralização transfere execução a outra pessoa."
-    },
-    {
-      id: 65,
-      bloco: "Conhecimentos específicos",
-      assunto: "Rotinas administrativas",
-      enunciado: "Um checklist de conferência substitui integralmente a capacitação dos responsáveis e elimina a possibilidade de erro humano.",
-      gabarito: "E",
-      comentario: "Checklists reduzem esquecimentos e padronizam verificações, mas não eliminam erros nem substituem competência técnica."
-    },
-    {
-      id: 66,
-      bloco: "Conhecimentos específicos",
-      assunto: "Materiais e estoques",
-      enunciado: "Na curva ABC, itens da classe A costumam representar menor quantidade de itens e maior parcela do valor movimentado.",
-      gabarito: "C",
-      comentario: "A classificação ABC prioriza controle conforme relevância econômica; poucos itens A concentram grande valor."
-    },
-    {
-      id: 67,
-      bloco: "Conhecimentos específicos",
-      assunto: "Logística",
-      enunciado: "A unitização de cargas pode facilitar movimentação e armazenagem ao agrupar volumes menores em uma unidade maior.",
-      gabarito: "C",
-      comentario: "Paletes e contêineres são exemplos de unitização que racionalizam manuseio, transporte e armazenagem."
-    },
-    {
-      id: 68,
-      bloco: "Conhecimentos específicos",
-      assunto: "Licitações e contratos",
-      enunciado: "O planejamento da contratação na Lei nº 14.133/2021 antecede a seleção do fornecedor e busca definir a necessidade e a solução mais adequada.",
-      gabarito: "C",
-      comentario: "A fase preparatória é marcada pelo planejamento e pela compatibilização com necessidades, orçamento e aspectos técnicos."
-    },
-    {
-      id: 69,
-      bloco: "Conhecimentos específicos",
-      assunto: "Licitações e contratos",
-      enunciado: "Dispensa e inexigibilidade são expressões sinônimas, ambas caracterizadas sempre pela inviabilidade de competição.",
-      gabarito: "E",
-      comentario: "Na inexigibilidade a competição é inviável; na dispensa, a competição pode ser possível, mas a lei autoriza não licitar."
-    },
-    {
-      id: 70,
-      bloco: "Conhecimentos específicos",
-      assunto: "Protocolo e arquivo",
-      enunciado: "A tabela de temporalidade define prazos de guarda e destinação dos documentos, apoiando sua eliminação ou recolhimento.",
-      gabarito: "C",
-      comentario: "O instrumento estabelece prazos nas fases documentais e a destinação final conforme avaliação arquivística."
-    },
-    {
-      id: 71,
-      bloco: "Conhecimentos específicos",
-      assunto: "Atendimento ao público",
-      enunciado: "Quando não souber responder a uma demanda, o atendente deve inventar uma solução provável para evitar espera do usuário.",
-      gabarito: "E",
-      comentario: "O correto é buscar informação confiável ou encaminhar ao setor competente, comunicando com clareza o próximo passo."
-    },
-    {
-      id: 72,
-      bloco: "Conhecimentos específicos",
-      assunto: "Redação oficial",
-      enunciado: "A concisão na redação oficial consiste em transmitir o máximo de informações com o mínimo de palavras, sem sacrificar clareza.",
-      gabarito: "C",
-      comentario: "Ser conciso é eliminar excessos, não omitir informações necessárias à compreensão."
-    },
-    {
-      id: 73,
-      bloco: "Conhecimentos específicos",
-      assunto: "Lei nº 13.639/2018",
-      enunciado: "Os conselhos regionais são compostos pela Diretoria Executiva e pelo Plenário deliberativo.",
-      gabarito: "C",
-      comentario: "Essa composição está expressamente prevista no artigo 9º da Lei nº 13.639/2018."
-    },
-    {
-      id: 74,
-      bloco: "Conhecimentos específicos",
-      assunto: "Lei nº 5.524/1968",
-      enunciado: "A elaboração e a execução de projetos compatíveis com a formação profissional integram o campo de atuação do técnico industrial de nível médio.",
-      gabarito: "C",
-      comentario: "A previsão consta do artigo 2º, inciso V, da Lei nº 5.524/1968."
-    },
-    {
-      id: 75,
-      bloco: "Conhecimentos específicos",
-      assunto: "Decreto nº 90.922/1985",
-      enunciado: "O Decreto nº 90.922/1985 veda ao técnico industrial ministrar disciplinas técnicas de sua especialidade.",
-      gabarito: "E",
-      comentario: "O decreto admite ministrar disciplinas técnicas da especialidade, atendidas as exigências específicas do exercício do magistério."
-    },
-    {
-      id: 76,
-      bloco: "Conhecimentos específicos",
-      assunto: "Regimento Interno do CRT-SP",
-      enunciado: "O Regimento Interno organiza competências e funcionamento do CRT-SP, devendo ser interpretado em harmonia com a Lei nº 13.639/2018 e atos do CFT.",
-      gabarito: "C",
-      comentario: "O regimento disciplina a organização interna sem afastar as normas legais e federais superiores do Sistema CFT/CRTs."
-    },
-    {
-      id: 77,
-      bloco: "Conhecimentos específicos",
-      assunto: "Resolução CFT nº 206/2022",
-      enunciado: "A Resolução CFT nº 206/2022 adota o Código de Ética e Disciplina do Técnico Industrial.",
-      gabarito: "C",
-      comentario: "A resolução reformulou e adotou o código que orienta deveres, direitos e condutas dos técnicos industriais."
-    },
-    {
-      id: 78,
-      bloco: "Conhecimentos específicos",
-      assunto: "Resolução CFT nº 207/2022",
-      enunciado: "Segundo o Código de Processo Ético, a instrução e o julgamento disciplinar no Sistema CFT/CRTs se resumem a uma única instância federal.",
-      gabarito: "E",
-      comentario: "O sistema possui instâncias regional e federal: Comissão de Ética Regional, Plenário do CRT e Plenário do CFT."
-    },
-    {
-      id: 79,
-      bloco: "Conhecimentos específicos",
-      assunto: "Resolução CFT nº 208/2023",
-      enunciado: "A Resolução CFT nº 208/2023 estabelece Código de Conduta Ética aplicável aos diretores e conselheiros do Sistema CFT/CRTs.",
-      gabarito: "C",
-      comentario: "A norma se dirige aos membros eleitos das diretorias e aos conselheiros do sistema."
-    },
-    {
-      id: 80,
-      bloco: "Conhecimentos específicos",
-      assunto: "Resolução CFT nº 288/2025",
-      enunciado: "A Resolução CFT nº 288/2025 orienta que a fiscalização profissional priorize natureza educativa e prevenção, sem excluir as medidas cabíveis diante de infrações.",
-      gabarito: "C",
-      comentario: "A resolução prioriza fiscalização inteligente, preventiva e educativa, preservando a atuação fiscalizatória e sancionatória quando necessária."
-    }
+// Banco autoral. Não copia questões reais; usa afirmações inéditas inspiradas no estilo Certo/Errado.
+"use strict";
+
+const BLOCOS = {
+  BASICOS: "Conhecimentos Básicos",
+  COMPLEMENTARES: "Conhecimentos Complementares",
+  ESPECIFICOS: "Conhecimentos Específicos",
+};
+
+const MINIMOS_PROVA_REAL = {
+  basicos: 10,
+  complementares: 8,
+  especificos: 17,
+  total: 36,
+};
+
+function q(id, bloco, disciplina, assunto, dificuldade, gabarito, enunciado, comentario, tags = []) {
+  return { id, bloco, disciplina, assunto, dificuldade, gabarito, enunciado, comentario, tags };
+}
+
+const QUESTOES_BASE = [
+  // Conhecimentos Básicos — 44 itens
+  q("BAS-POR-001", BLOCOS.BASICOS, "Português", "Crase", "facil", "C", "No expediente “Encaminhou-se a solicitação à unidade de protocolo”, o sinal indicativo de crase decorre da fusão da preposição exigida por “encaminhar” com o artigo feminino de “unidade”.", "O verbo admite complemento introduzido por preposição e o termo feminino determinado aceita artigo; ocorre a fusão a + a.", ["portugues", "crase"]),
+  q("BAS-POR-002", BLOCOS.BASICOS, "Português", "Concordância", "facil", "E", "A forma “Houveram muitos requerimentos pendentes” está correta porque o verbo concorda com o sujeito plural “requerimentos”.", "Com sentido de existir, “haver” é impessoal e fica no singular: houve muitos requerimentos.", ["portugues", "concordancia"]),
+  q("BAS-POR-003", BLOCOS.BASICOS, "Português", "Pontuação", "medio", "E", "Em “O setor informou aos candidatos que a análise foi concluída”, a vírgula depois de “candidatos” é obrigatória.", "Não se separa por vírgula o verbo de seu complemento oracional.", ["portugues", "pontuacao"]),
+  q("BAS-POR-004", BLOCOS.BASICOS, "Português", "Voz passiva", "medio", "C", "Na frase “Os documentos foram conferidos pela comissão”, “pela comissão” exerce função de agente da passiva.", "Na voz passiva analítica, o termo introduzido por por/pelo/pela pode indicar quem pratica a ação.", ["portugues", "voz-passiva"]),
+  q("BAS-POR-005", BLOCOS.BASICOS, "Português", "Coesão", "medio", "C", "Em comunicação oficial, o emprego de conectivos adequados favorece a coesão e reduz ambiguidade entre etapas de um procedimento.", "Conectivos explicitam relações lógicas e ajudam o leitor a seguir a sequência do texto.", ["portugues", "coesao"]),
+  q("BAS-POR-006", BLOCOS.BASICOS, "Português", "Regência", "dificil", "E", "A construção “visou o cumprimento da exigência” é a única forma admitida pela norma-padrão quando “visar” tem sentido de objetivar.", "Com sentido de objetivar, é tradicionalmente admitida a regência transitiva indireta: visar ao cumprimento; o item erra ao falar em única forma.", ["portugues", "regencia"]),
+  q("BAS-POR-007", BLOCOS.BASICOS, "Português", "Pronome relativo", "dificil", "E", "Em “o processo cujo o prazo venceu”, o artigo após “cujo” é facultativo em textos administrativos.", "O pronome “cujo” não admite artigo posposto. A forma correta é “cujo prazo”.", ["portugues", "pronome"]),
+  q("BAS-POR-008", BLOCOS.BASICOS, "Português", "Concordância", "facil", "C", "Em “Seguem anexos os comprovantes”, o termo “anexos” concorda corretamente com “comprovantes”.", "Quando funciona como adjetivo, “anexo” varia em gênero e número.", ["portugues", "concordancia"]),
+  q("BAS-POR-009", BLOCOS.BASICOS, "Português", "Semântica", "medio", "C", "No período “Embora o sistema estivesse lento, o atendimento continuou”, a oração iniciada por “embora” tem valor concessivo.", "A concessão indica um obstáculo que não impede o fato principal.", ["portugues", "semantica"]),
+  q("BAS-POR-010", BLOCOS.BASICOS, "Português", "Redação", "facil", "C", "Clareza, precisão e objetividade são atributos desejáveis em avisos dirigidos a profissionais registrados no CRT-SP.", "Textos administrativos devem permitir compreensão rápida e uniforme.", ["portugues", "redacao"]),
+  q("BAS-POR-011", BLOCOS.BASICOS, "Português", "Ortografia", "medio", "E", "A palavra “excessão” está grafada corretamente quando usada no sentido de ressalva a uma regra.", "A grafia correta é “exceção”.", ["portugues", "ortografia"]),
+  q("BAS-POR-012", BLOCOS.BASICOS, "Português", "Interpretação", "dificil", "C", "Em item de prova, expressões como “sempre” e “nunca” tendem a exigir atenção especial, pois podem tornar uma afirmação absoluta e incorreta.", "Generalizações absolutas são pegadinhas comuns em itens de julgamento.", ["portugues", "interpretacao"]),
+
+  q("BAS-RLM-001", BLOCOS.BASICOS, "Raciocínio Lógico e Matemática", "Lógica proposicional", "facil", "C", "Se todo protocolo urgente recebe prioridade e o protocolo X não recebeu prioridade, é válido concluir, pela contrapositiva, que X não é urgente.", "Se P implica Q, então não Q implica não P.", ["rlm", "logica"]),
+  q("BAS-RLM-002", BLOCOS.BASICOS, "Raciocínio Lógico e Matemática", "Porcentagem", "facil", "E", "Um setor que passou de 80 para 100 processos analisados teve aumento de 20%.", "O aumento foi de 20 sobre base 80: 25%.", ["rlm", "porcentagem"]),
+  q("BAS-RLM-003", BLOCOS.BASICOS, "Raciocínio Lógico e Matemática", "Proporcionalidade", "medio", "C", "Se 3 servidores analisam 180 documentos em 2 horas, 5 servidores, no mesmo ritmo, analisam 300 documentos no mesmo período.", "Cada servidor analisa 30 documentos por hora; 5 × 2 × 30 = 300.", ["rlm", "proporcao"]),
+  q("BAS-RLM-004", BLOCOS.BASICOS, "Raciocínio Lógico e Matemática", "Negações", "facil", "C", "A negação de “todos os requerimentos foram respondidos” é “pelo menos um requerimento não foi respondido”.", "A negação de universal afirmativa é existencial negativa.", ["rlm", "negacao"]),
+  q("BAS-RLM-005", BLOCOS.BASICOS, "Raciocínio Lógico e Matemática", "Conjuntos", "medio", "C", "Se 18 dos 60 atendimentos de um dia foram presenciais, então 30% dos atendimentos foram presenciais.", "18/60 = 0,3 = 30%.", ["rlm", "porcentagem"]),
+  q("BAS-RLM-006", BLOCOS.BASICOS, "Raciocínio Lógico e Matemática", "Equivalência lógica", "dificil", "C", "“Se o cadastro está completo, então o pedido será analisado” equivale logicamente a “se o pedido não será analisado, então o cadastro não está completo”.", "É a contrapositiva da condicional.", ["rlm", "equivalencia"]),
+  q("BAS-RLM-007", BLOCOS.BASICOS, "Raciocínio Lógico e Matemática", "Porcentagem composta", "medio", "E", "Um desconto de 10% seguido de acréscimo de 10% sobre o novo valor retorna obrigatoriamente ao preço inicial.", "As bases são diferentes; o valor final fica 99% do inicial.", ["rlm", "porcentagem"]),
+  q("BAS-RLM-008", BLOCOS.BASICOS, "Raciocínio Lógico e Matemática", "Probabilidade", "facil", "C", "Em uma amostra de 24 processos, dos quais 6 são urgentes, a chance de escolher um urgente ao acaso é de 25%.", "6/24 = 1/4 = 25%.", ["rlm", "probabilidade"]),
+  q("BAS-RLM-009", BLOCOS.BASICOS, "Raciocínio Lógico e Matemática", "Sequências", "medio", "E", "Na sequência 3, 6, 12, 24, o próximo termo é 36, pois a razão é constante e igual a 12.", "A sequência dobra a cada termo; o próximo é 48.", ["rlm", "sequencias"]),
+  q("BAS-RLM-010", BLOCOS.BASICOS, "Raciocínio Lógico e Matemática", "Razão", "facil", "C", "A razão entre 15 processos deferidos e 45 processos analisados é equivalente a 1/3.", "15/45 simplifica para 1/3.", ["rlm", "razao"]),
+  q("BAS-RLM-011", BLOCOS.BASICOS, "Raciocínio Lógico e Matemática", "Tabela verdade", "dificil", "E", "Uma disjunção inclusiva só é verdadeira quando exatamente uma de suas proposições componentes é verdadeira.", "Na disjunção inclusiva, basta que pelo menos uma seja verdadeira; ambas verdadeiras também tornam a disjunção verdadeira.", ["rlm", "logica"]),
+
+  q("BAS-INF-001", BLOCOS.BASICOS, "Informática", "Planilhas", "facil", "C", "Em uma planilha, a fórmula =SOMA(B2:B6) soma os valores de B2, B3, B4, B5 e B6.", "Os dois-pontos indicam intervalo contínuo com as extremidades incluídas.", ["informatica", "planilhas"]),
+  q("BAS-INF-002", BLOCOS.BASICOS, "Informática", "Segurança", "facil", "E", "Backup salvo apenas no mesmo disco físico dos arquivos originais protege contra falha total desse disco.", "Se o disco falhar, originais e cópias podem ser perdidos.", ["informatica", "backup"]),
+  q("BAS-INF-003", BLOCOS.BASICOS, "Informática", "Segurança", "medio", "C", "Autenticação em dois fatores reduz o risco de acesso indevido mesmo que a senha seja descoberta por terceiro.", "O segundo fator acrescenta uma barreira de autenticação.", ["informatica", "seguranca"]),
+  q("BAS-INF-004", BLOCOS.BASICOS, "Informática", "E-mail", "facil", "C", "No e-mail, o campo Cco permite ocultar dos demais destinatários os endereços ali inseridos.", "Cco significa cópia oculta.", ["informatica", "email"]),
+  q("BAS-INF-005", BLOCOS.BASICOS, "Informática", "Phishing", "medio", "C", "Mensagem que simula identidade visual de órgão público e solicita credenciais por link urgente apresenta característica típica de phishing.", "Phishing usa engenharia social para capturar dados.", ["informatica", "phishing"]),
+  q("BAS-INF-006", BLOCOS.BASICOS, "Informática", "Arquivos", "medio", "E", "A extensão PDF garante, por si só, que o arquivo esteja livre de código malicioso.", "Extensão não garante segurança; PDFs podem conter links ou explorar vulnerabilidades.", ["informatica", "arquivos"]),
+  q("BAS-INF-007", BLOCOS.BASICOS, "Informática", "Nuvem", "facil", "C", "Serviços em nuvem podem facilitar acesso remoto e compartilhamento controlado de documentos administrativos.", "A nuvem permite sincronização e controle de acesso quando bem configurada.", ["informatica", "nuvem"]),
+  q("BAS-INF-008", BLOCOS.BASICOS, "Informática", "Navegadores", "medio", "E", "O modo anônimo do navegador torna o usuário invisível para todos os sites e para a rede utilizada.", "Ele reduz rastros locais, mas não garante anonimato para sites, provedores ou rede.", ["informatica", "navegador"]),
+  q("BAS-INF-009", BLOCOS.BASICOS, "Informática", "Atalhos", "facil", "C", "Em editores de texto, Ctrl+F normalmente abre recurso de localização de termos no documento.", "É atalho comum para buscar texto.", ["informatica", "atalhos"]),
+  q("BAS-INF-010", BLOCOS.BASICOS, "Informática", "LGPD e sistemas", "dificil", "C", "Em sistema de atendimento, permissões por perfil ajudam a limitar acesso a dados pessoais conforme necessidade da função.", "Controle de acesso é medida compatível com segurança e necessidade.", ["informatica", "lgpd"]),
+  q("BAS-INF-011", BLOCOS.BASICOS, "Informática", "Malware", "medio", "E", "Antivírus atualizado elimina integralmente qualquer risco de infecção por malware.", "Antivírus reduz risco, mas não elimina todas as ameaças.", ["informatica", "malware"]),
+  q("BAS-POR-013", BLOCOS.BASICOS, "Português", "Concordância verbal", "medio", "C", "Em “Faz três dias que o protocolo recebeu a demanda”, o verbo “fazer” permanece no singular por indicar tempo decorrido.", "Com sentido temporal, “fazer” é impessoal e fica no singular.", ["portugues", "concordancia"]),
+  q("BAS-POR-014", BLOCOS.BASICOS, "Português", "Paralelismo", "dificil", "E", "Em listas de atribuições administrativas, a falta de paralelismo sintático melhora a precisão porque evita repetição de estruturas.", "Paralelismo favorece clareza e padronização; falta de paralelismo pode gerar ambiguidade.", ["portugues", "paralelismo"]),
+  q("BAS-RLM-012", BLOCOS.BASICOS, "Raciocínio Lógico e Matemática", "Regra de três", "facil", "C", "Se 4 atendentes concluem 120 triagens em uma manhã, mantendo-se a produtividade, 2 atendentes concluem 60 triagens no mesmo período.", "A quantidade é diretamente proporcional ao número de atendentes.", ["rlm", "regra-de-tres"]),
+  q("BAS-RLM-013", BLOCOS.BASICOS, "Raciocínio Lógico e Matemática", "Números inteiros", "medio", "E", "Na pontuação Quadrix, errar 12 itens e acertar 18 resulta em pontuação líquida 30.", "A líquida é acertos menos erros: 18 − 12 = 6.", ["rlm", "pontuacao"]),
+  q("BAS-INF-012", BLOCOS.BASICOS, "Informática", "Planilhas", "medio", "C", "Em planilhas, referência absoluta pode ser útil quando uma fórmula copiada deve manter fixa uma célula de parâmetro.", "O uso de $ fixa linha e/ou coluna, conforme o caso.", ["informatica", "planilhas"]),
+  q("BAS-INF-013", BLOCOS.BASICOS, "Informática", "Segurança da informação", "dificil", "E", "Compartilhar senha institucional com colega é aceitável quando a finalidade é dar continuidade ao atendimento público.", "Credenciais são pessoais; compartilhamento compromete rastreabilidade e segurança.", ["informatica", "seguranca"]),
+
+  // Complementares — 36 itens
+  q("COM-ETI-001", BLOCOS.COMPLEMENTARES, "Ética no setor público", "Impessoalidade", "facil", "C", "Favorecer conhecido na fila de atendimento, ainda que sem vantagem financeira, viola a impessoalidade esperada na atuação pública.", "O tratamento deve ser isonômico e orientado por critérios objetivos.", ["etica", "impessoalidade"]),
+  q("COM-ETI-002", BLOCOS.COMPLEMENTARES, "Ética no setor público", "Conflito de interesses", "medio", "C", "Comunicar conflito de interesses à autoridade competente é conduta compatível com integridade pública.", "A comunicação permite prevenção e tratamento adequado do conflito.", ["etica", "integridade"]),
+  q("COM-ETI-003", BLOCOS.COMPLEMENTARES, "Ética no setor público", "Cortesia", "facil", "E", "A cortesia no atendimento autoriza o agente a prometer resultado que depende de análise técnica futura.", "Cortesia não permite criar expectativa indevida nem prometer decisão incerta.", ["etica", "atendimento"]),
+  q("COM-ETI-004", BLOCOS.COMPLEMENTARES, "Ética no setor público", "Sigilo", "medio", "C", "Informação funcional sigilosa conhecida em razão do cargo não deve ser compartilhada em grupo informal de mensagens.", "O dever de sigilo alcança canais não oficiais.", ["etica", "sigilo"]),
+  q("COM-ETI-005", BLOCOS.COMPLEMENTARES, "Ética no setor público", "Moralidade", "dificil", "C", "A moralidade administrativa exige conduta compatível não apenas com a lei formal, mas também com padrões de honestidade e boa-fé.", "Moralidade amplia o controle para padrões éticos da Administração.", ["etica", "moralidade"]),
+  q("COM-ADM-001", BLOCOS.COMPLEMENTARES, "Administração Pública", "Princípios", "facil", "C", "Legalidade, impessoalidade, moralidade, publicidade e eficiência são princípios constitucionais expressos da Administração Pública.", "É o conjunto conhecido como LIMPE.", ["administracao-publica", "principios"]),
+  q("COM-ADM-002", BLOCOS.COMPLEMENTARES, "Administração Pública", "Publicidade", "medio", "E", "O princípio da publicidade impõe divulgação integral de todo documento administrativo, sem exceção.", "Há restrições legítimas, como sigilo legal e proteção de dados pessoais.", ["administracao-publica", "publicidade"]),
+  q("COM-ADM-003", BLOCOS.COMPLEMENTARES, "Administração Pública", "Eficiência", "medio", "E", "A eficiência autoriza afastar requisito legal para acelerar atendimento.", "Eficiência deve operar dentro da legalidade.", ["administracao-publica", "eficiencia"]),
+  q("COM-ADM-004", BLOCOS.COMPLEMENTARES, "Administração Pública", "Autarquias", "medio", "C", "Conselhos profissionais podem possuir natureza autárquica e exercer fiscalização profissional nos limites da lei.", "Conselhos fiscalizadores são entidades administrativas com função pública típica.", ["administracao-publica", "autarquia"]),
+  q("COM-ADM-005", BLOCOS.COMPLEMENTARES, "Administração Pública", "Descentralização", "dificil", "E", "Na desconcentração, a Administração transfere atividade para pessoa jurídica distinta.", "Isso é descentralização; desconcentração distribui competências internamente.", ["administracao-publica", "organizacao"]),
+  q("COM-LAI-001", BLOCOS.COMPLEMENTARES, "LAI", "Diretriz", "facil", "C", "A Lei de Acesso à Informação adota a publicidade como regra e o sigilo como exceção.", "Essa é diretriz central da LAI.", ["lai", "transparencia"]),
+  q("COM-LAI-002", BLOCOS.COMPLEMENTARES, "LAI", "Pedido de acesso", "medio", "E", "O pedido de acesso à informação deve conter justificativa do motivo pelo qual o requerente deseja os dados.", "A LAI veda exigir motivos determinantes do pedido.", ["lai", "pedido"]),
+  q("COM-LAI-003", BLOCOS.COMPLEMENTARES, "LAI", "Transparência ativa", "facil", "C", "Transparência ativa ocorre quando o órgão divulga informações de interesse coletivo independentemente de solicitação.", "É divulgação espontânea; transparência passiva responde a pedidos.", ["lai", "transparencia"]),
+  q("COM-LAI-004", BLOCOS.COMPLEMENTARES, "LAI", "Sigilo", "dificil", "E", "Informação classificada como sigilosa torna-se permanentemente inacessível.", "A classificação possui prazos e possibilidade de reavaliação, conforme a lei.", ["lai", "sigilo"]),
+  q("COM-LAI-005", BLOCOS.COMPLEMENTARES, "LAI", "Responsabilidade", "medio", "C", "Negar informação pública sem fundamento legal pode ensejar responsabilização do agente público.", "A LAI prevê deveres e responsabilização por condutas ilícitas.", ["lai", "responsabilidade"]),
+  q("COM-LGPD-001", BLOCOS.COMPLEMENTARES, "LGPD", "Dado pessoal", "facil", "C", "Dado pessoal é informação relacionada a pessoa natural identificada ou identificável.", "Essa é a noção central da LGPD.", ["lgpd", "dados"]),
+  q("COM-LGPD-002", BLOCOS.COMPLEMENTARES, "LGPD", "Anonimização", "medio", "E", "Dado efetivamente anonimizado é sempre tratado como dado pessoal, mesmo quando a reversão não é razoável.", "Em regra, dado anonimizado não é dado pessoal se não puder ser revertido por meios razoáveis.", ["lgpd", "anonimizacao"]),
+  q("COM-LGPD-003", BLOCOS.COMPLEMENTARES, "LGPD", "Necessidade", "facil", "C", "O princípio da necessidade limita o tratamento ao mínimo necessário para cumprir a finalidade informada.", "O tratamento deve ser pertinente, proporcional e não excessivo.", ["lgpd", "necessidade"]),
+  q("COM-LGPD-004", BLOCOS.COMPLEMENTARES, "LGPD", "Poder público", "dificil", "E", "O poder público só pode tratar dados pessoais mediante consentimento expresso do titular.", "A LGPD prevê outras bases legais, como obrigação legal e execução de políticas públicas.", ["lgpd", "bases-legais"]),
+  q("COM-LGPD-005", BLOCOS.COMPLEMENTARES, "LGPD", "Segurança", "medio", "C", "Controle de acesso e registro de operações são medidas compatíveis com a segurança no tratamento de dados pessoais.", "Essas medidas ajudam a prevenir acessos indevidos e rastrear operações.", ["lgpd", "seguranca"]),
+  q("COM-L8429-001", BLOCOS.COMPLEMENTARES, "Lei 8.429/1992", "Dolo", "medio", "C", "Na redação vigente da Lei de Improbidade, os atos tipificados exigem conduta dolosa.", "A lei passou a enfatizar o dolo para configuração dos atos de improbidade.", ["improbidade", "dolo"]),
+  q("COM-L8429-002", BLOCOS.COMPLEMENTARES, "Lei 8.429/1992", "Mero exercício", "dificil", "C", "O mero exercício da função pública, sem ato doloso com fim ilícito, não basta para responsabilização por improbidade.", "A responsabilização exige elementos específicos previstos em lei.", ["improbidade", "responsabilidade"]),
+  q("COM-L8429-003", BLOCOS.COMPLEMENTARES, "Lei 8.429/1992", "Sanções", "medio", "E", "Sanções por improbidade podem ser aplicadas livremente pela Administração, sem necessidade de processo.", "A aplicação exige processo e observância de garantias.", ["improbidade", "sancoes"]),
+  q("COM-L8429-004", BLOCOS.COMPLEMENTARES, "Lei 8.429/1992", "Enriquecimento ilícito", "facil", "C", "Receber vantagem patrimonial indevida em razão da função pública relaciona-se ao núcleo de enriquecimento ilícito.", "É categoria clássica da improbidade administrativa.", ["improbidade", "enriquecimento"]),
+  q("COM-L9784-001", BLOCOS.COMPLEMENTARES, "Lei 9.784/1999", "Princípios", "facil", "C", "A Lei 9.784/1999 prevê princípios como motivação, razoabilidade, proporcionalidade, ampla defesa e contraditório.", "Tais princípios constam do regime do processo administrativo federal.", ["processo-administrativo", "principios"]),
+  q("COM-L9784-002", BLOCOS.COMPLEMENTARES, "Lei 9.784/1999", "Competência", "medio", "E", "A competência administrativa pode ser renunciada pelo agente quando considerar conveniente.", "A competência é irrenunciável, ressalvadas delegação e avocação previstas em lei.", ["processo-administrativo", "competencia"]),
+  q("COM-L9784-003", BLOCOS.COMPLEMENTARES, "Lei 9.784/1999", "Anulação e revogação", "medio", "C", "A Administração deve anular atos ilegais e pode revogar atos válidos por conveniência ou oportunidade, respeitados direitos adquiridos.", "A lei diferencia controle de legalidade e mérito administrativo.", ["processo-administrativo", "atos"]),
+  q("COM-L9784-004", BLOCOS.COMPLEMENTARES, "Lei 9.784/1999", "Motivação", "dificil", "C", "Decisões administrativas que afetem direitos ou interesses devem indicar pressupostos de fato e de direito.", "A motivação permite controle e compreensão da decisão.", ["processo-administrativo", "motivacao"]),
+  q("COM-L9784-005", BLOCOS.COMPLEMENTARES, "Lei 9.784/1999", "Prazos", "medio", "E", "A ausência de prazo legal autoriza a Administração a decidir sem limitação temporal razoável.", "A duração razoável e a eficiência impedem demora injustificada.", ["processo-administrativo", "prazos"]),
+  q("COM-ADM-006", BLOCOS.COMPLEMENTARES, "Administração Pública", "Controle", "dificil", "C", "Controle administrativo pode ocorrer de ofício ou por provocação, visando corrigir ilegalidades ou rever mérito quando cabível.", "A autotutela permite anulação e revogação nos limites jurídicos.", ["administracao-publica", "controle"]),
+  q("COM-ADM-007", BLOCOS.COMPLEMENTARES, "Administração Pública", "Finalidade", "medio", "E", "O agente pode usar competência pública para finalidade privada se o resultado também beneficiar a Administração.", "O desvio de finalidade invalida o ato.", ["administracao-publica", "finalidade"]),
+  q("COM-ETI-006", BLOCOS.COMPLEMENTARES, "Ética no setor público", "Urbanidade", "facil", "C", "Urbanidade e respeito no atendimento não eliminam o dever de cumprir normas e registrar adequadamente a demanda.", "Cortesia e formalidade administrativa devem caminhar juntas.", ["etica", "urbanidade"]),
+  q("COM-LGPD-006", BLOCOS.COMPLEMENTARES, "LGPD", "Compartilhamento", "dificil", "E", "Dados pessoais de profissionais registrados podem ser compartilhados com qualquer interessado quando constarem em sistema público.", "Publicidade deve respeitar finalidade, necessidade e bases legais.", ["lgpd", "compartilhamento"]),
+  q("COM-LAI-006", BLOCOS.COMPLEMENTARES, "LAI", "Dados pessoais", "dificil", "C", "Pedidos de acesso que envolvam dados pessoais exigem compatibilização entre transparência e proteção à intimidade.", "LAI e LGPD devem ser harmonizadas.", ["lai", "lgpd"]),
+
+  // Específicos — 84 itens
+  q("ESP-ADM-001", BLOCOS.ESPECIFICOS, "Administração Geral", "Controle", "facil", "C", "A função controle compara resultados alcançados com padrões definidos e permite medidas corretivas.", "Controle mede, compara e corrige desvios.", ["administracao", "controle"]),
+  q("ESP-ADM-002", BLOCOS.ESPECIFICOS, "Administração Geral", "Planejamento", "facil", "C", "Planejamento define objetivos e caminhos antes da execução das atividades administrativas.", "Planejar antecede organizar, dirigir e controlar.", ["administracao", "planejamento"]),
+  q("ESP-ADM-003", BLOCOS.ESPECIFICOS, "Administração Geral", "Descentralização", "medio", "E", "Descentralizar decisões elimina a necessidade de coordenação entre unidades.", "A coordenação continua necessária para alinhar esforços.", ["administracao", "coordenacao"]),
+  q("ESP-ADM-004", BLOCOS.ESPECIFICOS, "Administração Pública", "Desconcentração", "medio", "C", "A desconcentração distribui competências dentro da mesma pessoa jurídica, criando órgãos sem personalidade própria.", "É repartição interna de competências.", ["administracao-publica", "desconcentracao"]),
+  q("ESP-ADM-005", BLOCOS.ESPECIFICOS, "Gestão da qualidade", "PDCA", "facil", "C", "No ciclo PDCA, a etapa Check envolve verificar resultados e compará-los com objetivos definidos.", "Check é a etapa de checagem.", ["qualidade", "pdca"]),
+  q("ESP-ADM-006", BLOCOS.ESPECIFICOS, "Gestão da qualidade", "Melhoria contínua", "medio", "C", "Indicadores de qualidade ajudam a identificar gargalos em atendimento, protocolo e tramitação de documentos.", "Indicadores transformam percepção em evidência gerencial.", ["qualidade", "indicadores"]),
+  q("ESP-ADM-007", BLOCOS.ESPECIFICOS, "Processos e projetos", "Projetos", "facil", "C", "Projeto é esforço temporário voltado a resultado único; processo tende a ser contínuo e repetível.", "Temporalidade e singularidade distinguem projetos.", ["processos", "projetos"]),
+  q("ESP-ADM-008", BLOCOS.ESPECIFICOS, "Processos e projetos", "Mapeamento", "medio", "C", "Mapear processos permite visualizar etapas, responsáveis e pontos de decisão.", "O mapeamento reduz ambiguidades e apoia melhoria.", ["processos", "mapeamento"]),
+  q("ESP-ADM-009", BLOCOS.ESPECIFICOS, "Trabalho em equipe", "Conflitos", "medio", "E", "Divergências em equipe implicam necessariamente queda de desempenho e devem sempre ser suprimidas.", "Conflitos bem geridos podem melhorar decisões.", ["equipe", "conflitos"]),
+  q("ESP-ADM-010", BLOCOS.ESPECIFICOS, "Trabalho em equipe", "Comunicação", "facil", "C", "Alinhar responsabilidades e prazos reduz retrabalho em rotinas administrativas.", "Clareza de papéis melhora execução.", ["equipe", "comunicacao"]),
+
+  q("ESP-ROT-001", BLOCOS.ESPECIFICOS, "Rotinas administrativas", "Padronização", "facil", "C", "Registrar responsáveis, prazos e pontos de conferência favorece rastreabilidade da rotina administrativa.", "Rastreabilidade permite saber quem fez, quando e com qual evidência.", ["rotinas", "rastreabilidade"]),
+  q("ESP-ROT-002", BLOCOS.ESPECIFICOS, "Rotinas administrativas", "Checklist", "medio", "E", "Checklist substitui integralmente a capacitação dos responsáveis e elimina erro humano.", "Checklist reduz falhas, mas não substitui preparo nem elimina todo erro.", ["rotinas", "checklist"]),
+  q("ESP-ROT-003", BLOCOS.ESPECIFICOS, "Rotinas administrativas", "Triagem", "medio", "C", "Triagem documental ajuda a encaminhar demandas ao setor competente e evita tramitação desnecessária.", "Classificação inicial adequada aumenta eficiência.", ["rotinas", "triagem"]),
+  q("ESP-ROT-004", BLOCOS.ESPECIFICOS, "Atendimento", "Escuta ativa", "facil", "C", "Confirmar o entendimento da demanda antes de orientar o usuário é prática de escuta ativa.", "A confirmação reduz ruídos e melhora a orientação.", ["atendimento", "escuta"]),
+  q("ESP-ROT-005", BLOCOS.ESPECIFICOS, "Atendimento", "Inclusão", "medio", "E", "No atendimento inclusivo, deve-se falar exclusivamente com o acompanhante da pessoa com deficiência.", "O atendimento deve se dirigir à própria pessoa sempre que possível.", ["atendimento", "inclusao"]),
+  q("ESP-ROT-006", BLOCOS.ESPECIFICOS, "Atendimento", "Encaminhamento", "facil", "E", "Quando não souber responder a uma demanda, o atendente deve inventar solução provável para evitar espera.", "O correto é buscar informação confiável ou encaminhar ao setor competente.", ["atendimento", "orientacao"]),
+  q("ESP-ROT-007", BLOCOS.ESPECIFICOS, "Protocolo", "Autuação", "facil", "C", "Autuação reúne e formaliza documentos relacionados a um assunto, com identificação própria para tramitação e controle.", "Autuar é constituir formalmente o processo.", ["protocolo", "autuacao"]),
+  q("ESP-ROT-008", BLOCOS.ESPECIFICOS, "Protocolo", "Arquivo corrente", "medio", "E", "Documentos de uso frequente pela unidade produtora pertencem tipicamente ao arquivo permanente.", "Documentos em uso frequente integram o arquivo corrente.", ["protocolo", "arquivo"]),
+  q("ESP-ROT-009", BLOCOS.ESPECIFICOS, "Protocolo", "Temporalidade", "medio", "C", "Tabela de temporalidade define prazos de guarda e destinação dos documentos.", "O instrumento orienta eliminação ou recolhimento.", ["protocolo", "temporalidade"]),
+  q("ESP-ROT-010", BLOCOS.ESPECIFICOS, "Redação oficial", "Atributos", "facil", "C", "A redação oficial deve privilegiar clareza, precisão, objetividade, impessoalidade, formalidade e padronização.", "São atributos clássicos da comunicação oficial.", ["redacao-oficial", "atributos"]),
+  q("ESP-ROT-011", BLOCOS.ESPECIFICOS, "Redação oficial", "Linguagem", "facil", "E", "Linguagem rebuscada e opiniões pessoais tornam o ofício mais adequado ao padrão oficial.", "Rebuscamento e opinião pessoal prejudicam clareza e impessoalidade.", ["redacao-oficial", "linguagem"]),
+  q("ESP-ROT-012", BLOCOS.ESPECIFICOS, "Redação oficial", "Concisão", "medio", "C", "Concisão consiste em transmitir informação necessária com o mínimo de palavras, sem sacrificar clareza.", "Concisão elimina excessos, não conteúdo essencial.", ["redacao-oficial", "concisao"]),
+
+  q("ESP-MAT-001", BLOCOS.ESPECIFICOS, "Materiais e estoques", "Estoque de segurança", "facil", "C", "Estoque de segurança reduz risco de falta diante de oscilações de consumo ou atraso de reposição.", "É reserva para incertezas de demanda e prazo.", ["materiais", "estoques"]),
+  q("ESP-MAT-002", BLOCOS.ESPECIFICOS, "Materiais e estoques", "PEPS", "medio", "E", "No método PEPS, os itens que entraram mais recentemente são os primeiros a sair.", "PEPS significa primeiro que entra, primeiro que sai.", ["materiais", "peps"]),
+  q("ESP-MAT-003", BLOCOS.ESPECIFICOS, "Materiais e estoques", "Curva ABC", "medio", "C", "Na curva ABC, itens da classe A costumam representar menor quantidade e maior parcela de valor.", "Poucos itens concentram maior relevância econômica.", ["materiais", "abc"]),
+  q("ESP-MAT-004", BLOCOS.ESPECIFICOS, "Logística", "Lead time", "facil", "C", "O prazo de reposição deve ser considerado para definir o momento de emitir novo pedido de material.", "O ponto de pedido deve cobrir consumo durante o lead time.", ["logistica", "lead-time"]),
+  q("ESP-MAT-005", BLOCOS.ESPECIFICOS, "Logística", "Unitização", "medio", "C", "Unitização de cargas pode facilitar movimentação e armazenagem ao agrupar volumes menores.", "Paletes e contêineres são exemplos.", ["logistica", "unitizacao"]),
+  q("ESP-MAT-006", BLOCOS.ESPECIFICOS, "Logística", "Inventário", "medio", "E", "Inventário físico é desnecessário quando o sistema informatizado aponta saldo positivo.", "Conferência física identifica perdas, erros e divergências.", ["logistica", "inventario"]),
+
+  q("ESP-LIC-001", BLOCOS.ESPECIFICOS, "Licitações", "Pregão", "medio", "C", "Na Lei 14.133/2021, pregão é modalidade para bens e serviços comuns, com critério de menor preço ou maior desconto.", "É modalidade própria para objetos comuns.", ["licitacoes", "pregao"]),
+  q("ESP-LIC-002", BLOCOS.ESPECIFICOS, "Licitações", "Inexigibilidade", "medio", "E", "Inexigibilidade ocorre quando há competição viável, mas a Administração prefere contratar diretamente.", "Inexigibilidade pressupõe inviabilidade de competição.", ["licitacoes", "inexigibilidade"]),
+  q("ESP-LIC-003", BLOCOS.ESPECIFICOS, "Licitações", "Planejamento", "facil", "C", "O planejamento da contratação antecede a seleção do fornecedor e busca definir necessidade e solução adequada.", "A fase preparatória organiza demanda, justificativas e requisitos.", ["licitacoes", "planejamento"]),
+  q("ESP-LIC-004", BLOCOS.ESPECIFICOS, "Licitações", "Dispensa", "dificil", "E", "Dispensa e inexigibilidade são sinônimas, ambas sempre caracterizadas por inviabilidade de competição.", "Dispensa é hipótese legal; inexigibilidade decorre de inviabilidade de competição.", ["licitacoes", "dispensa"]),
+  q("ESP-LIC-005", BLOCOS.ESPECIFICOS, "Licitações", "Fiscalização contratual", "medio", "C", "A fiscalização contratual acompanha a execução do ajuste e registra ocorrências relevantes.", "Fiscalização controla cumprimento de obrigações.", ["licitacoes", "contratos"]),
+  q("ESP-LIC-006", BLOCOS.ESPECIFICOS, "Licitações", "Segregação de funções", "dificil", "C", "A segregação de funções busca reduzir risco de erros e fraudes ao evitar concentração indevida de etapas críticas.", "Separar funções fortalece controle interno.", ["licitacoes", "controle"]),
+
+  q("ESP-CFT-001", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Lei 13.639/2018", "facil", "C", "A Lei 13.639/2018 criou o Conselho Federal dos Técnicos Industriais e os Conselhos Regionais dos Técnicos Industriais.", "A lei instituiu o Sistema CFT/CRTs.", ["cft", "lei-13639"]),
+  q("ESP-CFT-002", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Lei 13.639/2018", "medio", "C", "Orientar, disciplinar e fiscalizar o exercício profissional integram a finalidade dos conselhos do Sistema CFT/CRTs.", "A tríade corresponde à função típica dos conselhos profissionais.", ["cft", "lei-13639"]),
+  q("ESP-CFT-003", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Lei 13.639/2018", "dificil", "E", "Os CRTs são subordinados hierarquicamente às prefeituras dos municípios onde mantêm sede.", "CRTs integram sistema profissional próprio, não estrutura municipal.", ["cft", "lei-13639"]),
+  q("ESP-CFT-004", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Lei 13.639/2018", "medio", "C", "Os conselhos regionais possuem Diretoria Executiva e Plenário deliberativo, conforme a estrutura legal do sistema.", "A composição está na lei de criação do sistema.", ["cft", "lei-13639"]),
+  q("ESP-CFT-005", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Lei 13.639/2018", "dificil", "E", "O registro profissional no CRT tem natureza meramente decorativa e não se relaciona à fiscalização do exercício profissional.", "Registro e fiscalização são instrumentos centrais do sistema.", ["cft", "registro"]),
+  q("ESP-CFT-006", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Lei 5.524/1968", "facil", "C", "A Lei 5.524/1968 dispõe sobre o exercício da profissão de Técnico Industrial de nível médio.", "É a lei básica da profissão.", ["lei-5524", "tecnico-industrial"]),
+  q("ESP-CFT-007", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Lei 5.524/1968", "medio", "C", "A assistência técnica na compra, venda e utilização de produtos e equipamentos especializados integra o campo de atuação do técnico industrial de nível médio.", "A atividade é prevista no campo profissional da lei.", ["lei-5524", "atribuicoes"]),
+  q("ESP-CFT-008", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Lei 5.524/1968", "medio", "C", "A elaboração e execução de projetos compatíveis com a formação profissional podem integrar atribuições do técnico industrial.", "A lei contempla projetos compatíveis com formação.", ["lei-5524", "projetos"]),
+  q("ESP-CFT-009", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Lei 5.524/1968", "dificil", "E", "A Lei 5.524/1968 atribui ao técnico industrial competência ilimitada para qualquer projeto de engenharia.", "As atribuições são compatíveis com formação e limites regulamentares.", ["lei-5524", "limites"]),
+  q("ESP-CFT-010", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Decreto 90.922/1985", "facil", "C", "O Decreto 90.922/1985 regulamenta a Lei 5.524/1968 quanto ao exercício das profissões de técnico industrial e técnico agrícola de nível médio.", "Esse é o objeto central do decreto.", ["decreto-90922", "regulamentacao"]),
+  q("ESP-CFT-011", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Decreto 90.922/1985", "medio", "E", "O Decreto 90.922/1985 veda ao técnico industrial ministrar disciplinas técnicas de sua especialidade.", "O decreto admite essa atividade atendidos requisitos aplicáveis.", ["decreto-90922", "magisterio"]),
+  q("ESP-CFT-012", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Decreto 90.922/1985", "dificil", "C", "O decreto deve ser interpretado em conjunto com a Lei 5.524/1968 e com normas posteriores do Sistema CFT/CRTs.", "Regulamento não vive isolado; deve respeitar hierarquia e atualizações normativas.", ["decreto-90922", "hierarquia"]),
+  q("ESP-CFT-013", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Decreto 4.560/2002", "medio", "C", "O Decreto 4.560/2002 alterou o Decreto 90.922/1985, atualizando dispositivos do regulamento profissional.", "O decreto é ato alterador do regulamento de 1985.", ["decreto-4560", "alteracao"]),
+  q("ESP-CFT-014", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Decreto 4.560/2002", "dificil", "E", "O Decreto 4.560/2002 revogou integralmente a Lei 5.524/1968.", "Decreto não revoga integralmente lei; ele alterou decreto regulamentador.", ["decreto-4560", "hierarquia"]),
+  q("ESP-CFT-015", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Regimento Interno CRT-SP", "medio", "C", "O Regimento Interno do CRT-SP organiza competências e funcionamento interno, em harmonia com a Lei 13.639/2018 e atos do CFT.", "Regimento disciplina organização interna dentro do sistema normativo.", ["regimento-crtsp", "organizacao"]),
+  q("ESP-CFT-016", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Regimento Interno CRT-SP", "dificil", "C", "O Plenário do CRT-SP tem natureza deliberativa, não sendo mero setor executor de rotinas administrativas.", "Órgãos colegiados deliberam; a execução é da estrutura administrativa.", ["regimento-crtsp", "plenario"]),
+  q("ESP-CFT-017", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Regimento Interno CRT-SP", "dificil", "E", "O Regimento Interno pode afastar regra legal da Lei 13.639/2018 quando houver decisão administrativa local.", "Regimento é ato inferior e deve respeitar a lei.", ["regimento-crtsp", "hierarquia"]),
+  q("ESP-CFT-018", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Resolução CFT 206/2022", "medio", "C", "A Resolução CFT 206/2022 relaciona-se ao Código de Ética e Disciplina do Técnico Industrial.", "É norma de referência ética no Sistema CFT/CRTs.", ["resolucao-206", "etica"]),
+  q("ESP-CFT-019", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Resolução CFT 207/2022", "medio", "E", "O processo ético-disciplinar no Sistema CFT/CRTs resume-se sempre a instância federal única.", "Há atuação em instâncias regional e federal conforme a norma processual.", ["resolucao-207", "processo-etico"]),
+  q("ESP-CFT-020", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Resolução CFT 208/2023", "medio", "C", "A Resolução CFT 208/2023 trata de Código de Conduta Ética aplicável a membros eleitos do Sistema CFT/CRTs.", "A norma disciplina conduta de diretores e conselheiros.", ["resolucao-208", "conduta"]),
+  q("ESP-CFT-021", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Resolução CFT 288/2025", "medio", "C", "A Resolução CFT 288/2025 orienta a fiscalização profissional com ênfase preventiva e educativa, sem excluir medidas cabíveis diante de infrações.", "Fiscalização preventiva não elimina o poder fiscalizatório e sancionatório.", ["resolucao-288", "fiscalizacao"]),
+  q("ESP-CFT-022", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Resoluções CFT", "dificil", "E", "Resoluções do CFT podem contrariar leis federais se aprovadas pelo Plenário Federal.", "Atos normativos infralegais devem respeitar a lei.", ["resolucoes-cft", "hierarquia"]),
+
+  q("ESP-QUA-001", BLOCOS.ESPECIFICOS, "Gestão da qualidade", "Padronização", "medio", "C", "Padronizar procedimentos de protocolo reduz variação indevida e facilita treinamento de novos servidores.", "Padrões tornam o processo mais previsível.", ["qualidade", "padronizacao"]),
+  q("ESP-QUA-002", BLOCOS.ESPECIFICOS, "Gestão da qualidade", "Indicadores", "dificil", "E", "Indicador de desempenho é útil apenas quando confirma percepção prévia da chefia.", "Indicadores devem apoiar decisões com evidência, inclusive contrariando percepções.", ["qualidade", "indicadores"]),
+  q("ESP-QUA-003", BLOCOS.ESPECIFICOS, "Processos e projetos", "Cronograma", "medio", "C", "Em projeto de implantação de atendimento digital, cronograma auxilia a controlar entregas e dependências.", "Cronogramas organizam sequência, prazos e marcos.", ["projetos", "cronograma"]),
+  q("ESP-QUA-004", BLOCOS.ESPECIFICOS, "Processos e projetos", "Escopo", "dificil", "E", "Mudança de escopo nunca afeta prazo, custo ou qualidade do projeto.", "Alterações de escopo podem afetar várias restrições do projeto.", ["projetos", "escopo"]),
+  q("ESP-ROT-013", BLOCOS.ESPECIFICOS, "Rotinas administrativas", "Controle de documentos", "medio", "C", "Numerar versões de documentos internos ajuda a evitar uso de instruções desatualizadas.", "Controle de versão reduz erro operacional.", ["rotinas", "documentos"]),
+  q("ESP-ROT-014", BLOCOS.ESPECIFICOS, "Atendimento", "Linguagem simples", "facil", "C", "No atendimento ao público, linguagem simples facilita compreensão sem reduzir formalidade necessária.", "Formalidade não exige obscuridade.", ["atendimento", "linguagem"]),
+  q("ESP-ROT-015", BLOCOS.ESPECIFICOS, "Protocolo", "Recebimento", "facil", "C", "Registrar data, origem e assunto no recebimento de documento favorece controle de tramitação.", "Metadados básicos permitem localizar e acompanhar documentos.", ["protocolo", "recebimento"]),
+  q("ESP-ROT-016", BLOCOS.ESPECIFICOS, "Redação oficial", "Pronomes de tratamento", "dificil", "E", "Em redação oficial contemporânea, o uso de pronomes de tratamento rebuscados é sempre obrigatório para demonstrar respeito.", "A tendência é simplificar e preservar clareza, respeitando normas vigentes.", ["redacao-oficial", "tratamento"]),
+  q("ESP-MAT-007", BLOCOS.ESPECIFICOS, "Materiais e estoques", "Ponto de pedido", "medio", "C", "Ponto de pedido considera consumo médio e prazo de reposição para evitar ruptura de estoque.", "Ele indica momento de solicitar reposição.", ["materiais", "ponto-pedido"]),
+  q("ESP-MAT-008", BLOCOS.ESPECIFICOS, "Logística", "Armazenagem", "facil", "C", "Organização física do almoxarifado deve favorecer localização, segurança e conservação dos materiais.", "Layout e identificação reduzem perdas e tempo de busca.", ["logistica", "armazenagem"]),
+  q("ESP-LIC-007", BLOCOS.ESPECIFICOS, "Licitações", "Termo de referência", "medio", "C", "Termo de referência bem elaborado descreve necessidade, objeto e critérios suficientes para orientar a contratação.", "Documento mal definido aumenta risco de contratação inadequada.", ["licitacoes", "termo-referencia"]),
+  q("ESP-LIC-008", BLOCOS.ESPECIFICOS, "Licitações", "Competitividade", "dificil", "E", "Exigências excessivas e sem pertinência com o objeto são desejáveis porque reduzem o número de propostas a analisar.", "Exigências indevidas restringem competitividade e podem viciar o certame.", ["licitacoes", "competitividade"]),
 ];
+
+const BANCO_QUESTOES = QUESTOES_BASE;
