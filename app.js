@@ -4,6 +4,7 @@
 const USERS = {
   kaua: { id: "kaua", name: "Kauã", initial: "K" },
   vitoria: { id: "vitoria", name: "Vitória", initial: "V" },
+  caio: { id: "caio", name: "Caio", initial: "C" },
 };
 
 const STORAGE_KEYS = {
@@ -65,6 +66,46 @@ const YOUTUBE_SEARCHES = [
   "Redação oficial para concursos",
   "Lei 13.639/2018 CFT CRT",
   "Sistema CFT CRT",
+];
+
+const STUDY_LINKS_BY_TAG = {
+  "lei-13639": ["Lei 13.639/2018 no Planalto", "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13639.htm"],
+  "lei-5524": ["Lei 5.524/1968 no Planalto", "https://www.planalto.gov.br/ccivil_03/leis/l5524.htm"],
+  "decreto-90922": ["Decreto 90.922/1985 no Planalto", "https://www.planalto.gov.br/ccivil_03/decreto/antigos/d90922.htm"],
+  "decreto-4560": ["Decreto 4.560/2002 no Planalto", "https://www.planalto.gov.br/ccivil_03/decreto/2002/D4560.htm"],
+  lai: ["Lei 12.527/2011 — LAI", "https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2011/lei/l12527.htm"],
+  lgpd: ["Lei 13.709/2018 — LGPD", "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm"],
+  improbidade: ["Lei 8.429/1992 — Improbidade", "https://www.planalto.gov.br/ccivil_03/leis/l8429.htm"],
+  "processo-administrativo": ["Lei 9.784/1999 no Planalto", "https://www.planalto.gov.br/ccivil_03/leis/l9784.htm"],
+  "regimento-crtsp": ["Regimento Interno CRT-SP", "https://crtsp.gov.br/regimento-interno-crt-sp/"],
+  "resolucoes-cft": ["Resoluções CFT", "https://cft.org.br/category/resolucoes/"],
+  "resolucao-206": ["Resolução CFT 206/2022", "https://www.cft.org.br/wp-content/uploads/2022/12/Resolucao-cft-n-206-2022.pdf"],
+  "resolucao-207": ["Resolução CFT 207/2022", "https://www.cft.org.br/wp-content/uploads/2022/12/Resolucao-cft-n-207-2022.pdf"],
+  "resolucao-208": ["Resolução CFT 208/2023", "https://cft.org.br/wp-content/uploads/2023/03/RESOLUCAO-CFT-N-208-2023.pdf"],
+  "resolucao-288": ["Resolução CFT 288/2025", "https://cft.org.br/wp-content/uploads/2026/03/288.pdf"],
+};
+
+const DAILY_STUDY_ROTATION = [
+  {
+    title: "Sistema CFT/CRTs sem dó",
+    focus: "Lei 13.639/2018 + Lei 5.524/1968",
+    tasks: ["20 min lendo artigos secos", "15 min fazendo itens de legislação", "10 min anotando pegadinhas de competência"],
+  },
+  {
+    title: "Bloco administrativo",
+    focus: "rotinas, protocolo, atendimento e redação oficial",
+    tasks: ["30 min teoria objetiva", "20 min questões de protocolo/arquivo", "10 min revisar erros anteriores"],
+  },
+  {
+    title: "Complementares que derrubam",
+    focus: "LAI, LGPD, Lei 9.784/1999 e improbidade",
+    tasks: ["25 min lei seca", "20 min questões Certo/Errado", "15 min flashcards de exceções"],
+  },
+  {
+    title: "Básicos para ganhar gordura",
+    focus: "Português, RLM e Informática",
+    tasks: ["20 min Português", "20 min porcentagem/lógica", "15 min informática e segurança"],
+  },
 ];
 
 let activeUserId = null;
@@ -267,6 +308,48 @@ function answerLabel(value) {
   return "Em branco";
 }
 
+function getQuestionStatus(question, answer) {
+  if (answer === "B" || !answer) return "blank";
+  return answer === question.gabarito ? "correct" : "wrong";
+}
+
+function statusLabel(status) {
+  return { correct: "Certa", wrong: "Errada", blank: "Em branco" }[status] || "Em branco";
+}
+
+function statusEmoji(status) {
+  return { correct: "✅", wrong: "❌", blank: "⚪" }[status] || "⚪";
+}
+
+function getQuestionStudyLinks(question) {
+  const links = [];
+  (question.tags || []).forEach((tag) => {
+    if (STUDY_LINKS_BY_TAG[tag] && !links.some((link) => link.url === STUDY_LINKS_BY_TAG[tag][1])) {
+      const [label, url] = STUDY_LINKS_BY_TAG[tag];
+      links.push({ label, url });
+    }
+  });
+  const queryBase = `${question.disciplina} ${question.assunto} concurso CRT CFT`;
+  links.push({
+    label: "Buscar videoaula no YouTube",
+    url: `https://www.youtube.com/results?search_query=${encodeURIComponent(queryBase)}`,
+  });
+  links.push({
+    label: "Pesquisar resumo no Google",
+    url: `https://www.google.com/search?q=${encodeURIComponent(`${queryBase} resumo`)}`,
+  });
+  return links.slice(0, 4);
+}
+
+function renderQuestionStudyLinks(question) {
+  return `
+    <div class="study-links">
+      <strong>Links para estudar este tema:</strong>
+      <div>${getQuestionStudyLinks(question).map((link) => `<a href="${link.url}" target="_blank" rel="noreferrer">${escapeHtml(link.label)}</a>`).join("")}</div>
+    </div>
+  `;
+}
+
 function calculateResult(state) {
   const result = {
     correct: 0,
@@ -372,6 +455,7 @@ function renderDashboard() {
       ${statCard("Média líquida", formatScore(average), "todos os modos")}
       ${statCard("Taxa geral", `${accuracy}%`, `${stats.questionsAnswered} questões`)}
     </div>
+    ${renderDailyStudyCard(stats)}
   `;
 }
 
@@ -379,28 +463,73 @@ function statCard(label, value, detail, featured = false) {
   return `<article class="stat-card ${featured ? "stat-card--featured" : ""}"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong><small>${escapeHtml(detail)}</small></article>`;
 }
 
+function getDailyStudySuggestion(stats = loadUserStats()) {
+  const weak = new Map();
+  stats.history.forEach((item) => (item.weakSubjects || []).forEach((subject) => {
+    weak.set(subject.assunto, (weak.get(subject.assunto) || 0) + subject.count);
+  }));
+  const topWeak = [...weak.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3);
+  if (topWeak.length) {
+    return {
+      title: "Hoje é dia de atacar seus erros",
+      focus: topWeak.map(([topic]) => topic).join(", "),
+      tasks: [
+        "15 min relendo o resumo dos temas fracos",
+        "20 min refazendo itens errados ou em branco",
+        "10 min criando anotações curtas com a pegadinha de cada tema",
+      ],
+    };
+  }
+  return DAILY_STUDY_ROTATION[hashSeed(`${getTodayKey()}:${activeUserId || "geral"}`) % DAILY_STUDY_ROTATION.length];
+}
+
+function renderDailyStudyCard(stats) {
+  const suggestion = getDailyStudySuggestion(stats);
+  return `
+    <article class="daily-study-card">
+      <div>
+        <p class="section-kicker">Sugestão de estudo diário</p>
+        <h3>${escapeHtml(suggestion.title)}</h3>
+        <p><strong>Foco:</strong> ${escapeHtml(suggestion.focus)}</p>
+      </div>
+      <ul>${suggestion.tasks.map((task) => `<li>${escapeHtml(task)}</li>`).join("")}</ul>
+    </article>
+  `;
+}
+
 function renderRanking() {
   const all = loadAllStats();
+  const userIds = Object.keys(USERS);
   const rows = [
-    ["Pontos", all.kaua.totalPoints, all.vitoria.totalPoints],
-    ["Acessos", all.kaua.totalAccesses, all.vitoria.totalAccesses],
-    ["Maior foguinho", all.kaua.bestStreak, all.vitoria.bestStreak],
-    ["Simulados", all.kaua.examsFinished, all.vitoria.examsFinished],
-    ["Provas reais", all.kaua.realExamsFinished, all.vitoria.realExamsFinished],
+    ["Pontos", "totalPoints"],
+    ["Acessos", "totalAccesses"],
+    ["Maior foguinho", "bestStreak"],
+    ["Simulados", "examsFinished"],
+    ["Provas reais", "realExamsFinished"],
   ];
-  const scoreKaua = rows.reduce((sum, [, k, v]) => sum + (k > v ? 1 : 0), 0);
-  const scoreVitoria = rows.reduce((sum, [, k, v]) => sum + (v > k ? 1 : 0), 0);
-  const winner = scoreKaua === scoreVitoria ? "Empate técnico" : scoreKaua > scoreVitoria ? "Kauã lidera" : "Vitória lidera";
+  const scoreboard = Object.fromEntries(userIds.map((id) => [id, 0]));
+  rows.forEach(([, field]) => {
+    const values = userIds.map((id) => all[id][field] || 0);
+    const max = Math.max(...values);
+    if (max > 0) userIds.forEach((id) => { if ((all[id][field] || 0) === max) scoreboard[id] += 1; });
+  });
+  const bestScore = Math.max(...Object.values(scoreboard));
+  const leaders = userIds.filter((id) => scoreboard[id] === bestScore && bestScore > 0);
+  const winner = leaders.length === 1 ? `${USERS[leaders[0]].name} lidera` : "Empate técnico";
   $("#ranking").innerHTML = `
     <div class="ranking__header">
-      <div><p class="section-kicker">Duelo amistoso</p><h2>Kauã × Vitória</h2></div>
+      <div><p class="section-kicker">Duelo amistoso</p><h2>${userIds.map((id) => USERS[id].name).join(" × ")}</h2></div>
       <p class="ranking-status">${winner}</p>
     </div>
-    <div class="ranking-table">
-      <div class="ranking-row ranking-row--head"><span>Métrica</span><strong>Kauã</strong><strong>Vitória</strong></div>
-      ${rows.map(([label, kaua, vitoria]) => {
-        const max = Math.max(kaua, vitoria);
-        return `<div class="ranking-row"><span>${label}</span><strong class="${kaua === max && max > 0 ? "is-leading" : ""}">${kaua}</strong><strong class="${vitoria === max && max > 0 ? "is-leading" : ""}">${vitoria}</strong></div>`;
+    <div class="ranking-table" style="--ranking-user-count:${userIds.length}">
+      <div class="ranking-row ranking-row--head"><span>Métrica</span>${userIds.map((id) => `<strong>${escapeHtml(USERS[id].name)}</strong>`).join("")}</div>
+      ${rows.map(([label, field]) => {
+        const values = userIds.map((id) => all[id][field] || 0);
+        const max = Math.max(...values);
+        return `<div class="ranking-row"><span>${label}</span>${userIds.map((id) => {
+          const value = all[id][field] || 0;
+          return `<strong class="${value === max && max > 0 ? "is-leading" : ""}">${value}</strong>`;
+        }).join("")}</div>`;
       }).join("")}
     </div>
   `;
@@ -476,7 +605,7 @@ function renderDailyTab() {
       <div>
         <p class="section-kicker">Simulado do dia · ${new Intl.DateTimeFormat("pt-BR", { dateStyle: "long" }).format(new Date())}</p>
         <h2>40 itens para manter o ritmo.</h2>
-        <p>Mesma prova para Kauã e Vitória. A seleção muda automaticamente amanhã com sorteio determinístico pela data.</p>
+        <p>Mesma prova para todos os perfis. A seleção muda automaticamente amanhã com sorteio determinístico pela data.</p>
       </div>
       <div class="chip-list">${subjects.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>
     </section>
@@ -565,16 +694,27 @@ function renderQuiz(state) {
 function renderQuestion(question, state) {
   const name = `${state.type}-${question.id}`;
   const current = state.answers[question.id] || "";
+  const finishedAnswer = state.result?.answers?.[question.id] || "B";
+  const selectedAnswer = state.finished ? finishedAnswer : current;
+  const status = state.finished ? getQuestionStatus(question, finishedAnswer) : null;
   return `
-    <article class="question">
+    <article class="question ${state.finished ? `question--review question--${status}` : ""}" ${state.finished ? "data-review-question=\"true\"" : ""}>
       <div class="question__meta"><span class="question__number">${question.displayNumber}</span><span>${escapeHtml(question.disciplina)} · ${escapeHtml(question.assunto)} · ${escapeHtml(DIFFICULTY_LABELS[question.dificuldade])}</span></div>
+      ${state.finished ? `<div class="question-status question-status--${status}"><span>${statusEmoji(status)} ${statusLabel(status)}</span><small>Sua resposta: ${answerLabel(finishedAnswer)} · Gabarito: ${answerLabel(question.gabarito)}</small></div>` : ""}
       <p class="question__text">${escapeHtml(question.enunciado)}</p>
       <div class="choices" role="radiogroup" aria-label="Resposta do item ${question.displayNumber}">
         ${[["C", "Certo"], ["E", "Errado"], ["B", "Em branco"]].map(([value, label]) => `
-          <input type="radio" id="${name}-${value}" name="${name}" value="${value}" ${current === value ? "checked" : ""} ${state.finished ? "disabled" : ""}>
+          <input type="radio" id="${name}-${value}" name="${name}" value="${value}" ${selectedAnswer === value ? "checked" : ""} ${state.finished ? "disabled" : ""}>
           <label for="${name}-${value}">${label}</label>
         `).join("")}
       </div>
+      ${state.finished ? `
+        <details class="question-explanation">
+          <summary>Ver explicação e links de estudo</summary>
+          <p>${escapeHtml(question.comentario)}</p>
+          ${renderQuestionStudyLinks(question)}
+        </details>
+      ` : ""}
     </article>
   `;
 }
@@ -650,7 +790,7 @@ function renderEliminationRisk(result) {
 }
 
 function renderAnswerItem(question, number, answer) {
-  const status = answer === "B" ? "blank" : answer === question.gabarito ? "correct" : "wrong";
+  const status = getQuestionStatus(question, answer);
   return `
     <article class="answer-item answer-item--${status}">
       <p class="answer-item__meta">ITEM ${number} · ${escapeHtml(question.disciplina)} · ${escapeHtml(question.assunto)}</p>
@@ -662,10 +802,15 @@ function renderAnswerItem(question, number, answer) {
 
 function renderStudyTab() {
   const recs = getPersonalizedStudyRecommendations();
+  const dailySuggestion = getDailyStudySuggestion();
   $("#studies-tab").innerHTML = `
     <section class="mode-card">
       <div><p class="section-kicker">Central de estudos</p><h2>Revisão com peso de edital.</h2><p>Use esta aba entre simulados: primeiro legislação do Sistema CFT/CRTs, depois rotinas, protocolo, atendimento e leis complementares.</p></div>
-      <div class="study-plan"><strong>Plano sugerido</strong><span>40 min teoria · 30 min questões · 15 min revisão dos erros</span></div>
+      <div class="study-plan">
+        <strong>Sugestão de hoje: ${escapeHtml(dailySuggestion.title)}</strong>
+        <span><b>Foco:</b> ${escapeHtml(dailySuggestion.focus)}</span>
+        ${dailySuggestion.tasks.map((task) => `<span>• ${escapeHtml(task)}</span>`).join("")}
+      </div>
     </section>
     <section class="study-grid">
       ${studyCard("A) Maior prioridade", ["Sistema CFT/CRT", "Lei 13.639/2018", "Lei 5.524/1968", "Decreto 90.922/1985", "Decreto 4.560/2002", "Regimento Interno CRT-SP", "Resoluções CFT", "rotinas administrativas", "protocolo", "atendimento", "redação oficial", "LAI", "LGPD", "Lei 9.784/1999", "improbidade administrativa"])}
@@ -798,6 +943,12 @@ function startRealTimer() {
 }
 
 function handleDocumentClick(event) {
+  const reviewQuestion = event.target.closest("[data-review-question='true']");
+  if (reviewQuestion && !event.target.closest("a, button, input, label, summary, .question-explanation")) {
+    const details = reviewQuestion.querySelector(".question-explanation");
+    if (details) details.open = !details.open;
+    return;
+  }
   const action = event.target.closest("[data-action]")?.dataset.action;
   if (!action) return;
   if (action === "switch-user") renderUserSelection();

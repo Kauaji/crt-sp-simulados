@@ -9,16 +9,17 @@ O projeto usa HTML, CSS e JavaScript puro. A etapa `npm run build` apenas copia 
 ## O que existe no site
 
 - tela inicial obrigatória “Quem vai estudar hoje?”;
-- perfis locais separados para Kauã e Vitória;
+- perfis locais separados para Kauã, Vitória e Caio;
 - foguinho/streak individual por usuário;
 - dashboard com pontos, acessos, histórico, taxa de acerto e médias;
-- ranking Kauã × Vitória;
+- ranking Kauã × Vitória × Caio;
 - abas: Simulado diário, Questionário extra, Prova real, Estudos e Dashboard;
 - simulado diário com 40 itens Certo/Errado/Em branco;
 - questionário extra com 10, 20 ou 40 itens e seletor de dificuldade;
 - prova real com 120 itens e cronômetro sugerido de 3 horas;
 - relatório com acertos, erros, brancos, líquida, desempenho por bloco/disciplina e revisão;
 - gabarito comentado somente depois de finalizar;
+- questões corrigidas visualmente após finalizar, com explicação e links de estudo ao clicar;
 - aba Estudos com prioridades, resumos, links oficiais, buscas de videoaulas e revisão personalizada.
 
 ## Pontuação
@@ -123,7 +124,7 @@ Use somente chave pública/publishable no frontend. Nunca coloque `service_role`
 
 ## Limitação do localStorage
 
-Os dados de pontos, acessos, histórico e foguinho ficam salvos apenas neste navegador. Se Kauã ou Vitória abrirem em outro celular/computador, o ranking local não sincroniza.
+Os dados de pontos, acessos, histórico e foguinho ficam salvos apenas neste navegador. Se Kauã, Vitória ou Caio abrirem em outro celular/computador, o ranking local não sincroniza.
 
 Para ranking real entre dispositivos, a próxima evolução pode usar Supabase ou Vercel KV.
 
