@@ -1410,6 +1410,13 @@
         { label: "Notícia oficial Santos", url: DATA.sources.santos_noticia.url },
       );
     }
+    if (contest.id === "pm-sp") {
+      sources.push(
+        { label: "VUNESP PMES2601", url: DATA.sources.pmsp_vunesp.url },
+        { label: "Concursos PM-SP", url: DATA.sources.pmsp_concursos.url },
+        { label: "Agência SP — concurso PM-SP", url: DATA.sources.pmsp_agencia_sp.url },
+      );
+    }
     return sources;
   }
 

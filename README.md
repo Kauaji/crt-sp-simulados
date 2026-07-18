@@ -1,4 +1,4 @@
-# Simulados CRT-SP, IBGE e Prefeitura de Santos
+# Simulados CRT-SP, IBGE, Prefeitura de Santos e PM-SP
 
 Site estático em HTML, CSS e JavaScript puro para publicar simulados e treinos autocorrigíveis no Vercel.
 
@@ -7,6 +7,7 @@ O projeto começou focado no CRT-SP, mas agora funciona como plataforma multi-co
 - CRT-SP — Técnico Administrativo (Baixada Santista) e Fiscal (Baixada Santista)
 - IBGE — Agente Censitário de Qualidade e Analista Censitário em TI/Dados
 - Prefeitura de Santos — Oficial de Administração
+- PM-SP — Aluno-Soldado PM do Quadro de Praças
 
 Não há backend obrigatório. O progresso fica salvo no navegador via `localStorage`, separado por usuário, concurso e cargo.
 
@@ -131,8 +132,9 @@ O Vercel fará o redeploy automaticamente no projeto conectado.
 - IBGE ACQ: 120 questões inéditas de múltipla escolha.
 - IBGE Analista TI/Dados: 80 questões inéditas de múltipla escolha.
 - Prefeitura de Santos: 150 questões inéditas de múltipla escolha.
+- PM-SP Aluno-Soldado: 120 questões inéditas de múltipla escolha no estilo VUNESP.
 
-Total inicial: 500 questões objetivas.
+Total inicial: 620 questões objetivas.
 
 ## Observações importantes
 

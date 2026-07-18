@@ -47,6 +47,21 @@
       url: "https://www.santos.sp.gov.br/?q=noticia%2Fsantos-abre-concurso-com-226-vagas-para-niveis-fundamental-medio-e-superior",
       type: "orgao",
     },
+    pmsp_vunesp: {
+      title: "VUNESP — PM-SP Aluno-Soldado PM 2026",
+      url: "https://www.vunesp.com.br/PMES2601",
+      type: "edital",
+    },
+    pmsp_agencia_sp: {
+      title: "Agência SP — PM de SP abre inscrições para 2 mil vagas",
+      url: "https://www.agenciasp.sp.gov.br/policia-militar-de-sp-inscreve-para-2-mil-vagas-de-soldados-ate-agosto-veja-requisitos-e-etapas-do-concurso/",
+      type: "orgao",
+    },
+    pmsp_concursos: {
+      title: "Concursos Polícia Militar do Estado de São Paulo",
+      url: "https://concursos.policiamilitar.sp.gov.br/",
+      type: "orgao",
+    },
     lei_13639: {
       title: "Lei 13.639/2018",
       url: "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13639.htm",
@@ -334,6 +349,72 @@
         "No IBAM, leia a alternativa inteira: pequenas palavras mudam o sentido de afirmações administrativas.",
         "Treine Português com interpretação e gramática aplicada, porque a banca mistura regra com texto.",
         "Uma vez por semana, escreva redação de 20 a 30 linhas e corrija clareza, coesão e respeito ao tema.",
+      ],
+    },
+    {
+      id: "pm-sp",
+      priority: 4,
+      nome: "PM-SP",
+      orgao: "Polícia Militar do Estado de São Paulo",
+      banca: "VUNESP",
+      status: "Inscrições abertas",
+      edital: "Edital DP-3/321/26",
+      editalUrl: SOURCES.pmsp_vunesp.url,
+      dataPublicacao: "2026-06-03",
+      dataProva: "2026-09-20",
+      nivel: "Ensino médio",
+      cargoPrincipal: "Aluno-Soldado PM do Quadro de Praças",
+      defaultRoleId: "pmsp-aluno-soldado-qp",
+      formatos: ["multipla_escolha", "redacao"],
+      scoringDescription: "+1 por acerto na objetiva; redação/dissertativa avaliada separadamente",
+      criterios: [
+        "Prova objetiva de múltipla escolha no padrão VUNESP.",
+        "Exames de Conhecimentos com Parte I objetiva e Parte II dissertativa/redação no mesmo dia.",
+        "Duração total de 5 horas para objetiva e dissertativa, conforme divulgação oficial do Governo SP.",
+      ],
+      roles: [
+        {
+          id: "pmsp-aluno-soldado-qp",
+          nome: "Aluno-Soldado PM do Quadro de Praças",
+          principal: true,
+          escolaridade: "Ensino médio completo",
+          exam: {
+            formato: "multipla_escolha",
+            totalQuestoes: 60,
+            duracaoMinutos: 300,
+            scoring: { correct: 1, wrong: 0, blank: 0 },
+            minima: { objetiva: 30, redacao: 20 },
+            distribution: [
+              { kind: "materia", id: "pmsp-portugues", label: "Língua Portuguesa e Interpretação de Texto", count: 20 },
+              { kind: "materia", id: "pmsp-matematica", label: "Matemática", count: 15 },
+              { kind: "materia", id: "pmsp-conhecimentos-gerais", label: "Conhecimentos Gerais", count: 15 },
+              { kind: "materia", id: "pmsp-informatica", label: "Noções Básicas de Informática", count: 5 },
+              { kind: "materia", id: "pmsp-administracao-publica", label: "Noções de Administração Pública", count: 5 },
+            ],
+            writing: {
+              tipo: "redacao",
+              linhas: "texto dissertativo em padrão VUNESP",
+              minima: 20,
+              propostas: [
+                "O papel da Polícia Militar na proteção da vida e na preservação da ordem pública.",
+                "Tecnologia, cidadania e limites éticos no policiamento ostensivo.",
+                "Respeito aos direitos humanos como fundamento da atuação policial.",
+              ],
+            },
+          },
+        },
+      ],
+      materias: [
+        { id: "pmsp-portugues", nome: "Língua Portuguesa e Interpretação de Texto", bloco: "Conhecimentos gerais", assuntos: ["Interpretação", "Coesão", "Concordância", "Regência", "Pontuação"] },
+        { id: "pmsp-matematica", nome: "Matemática", bloco: "Conhecimentos gerais", assuntos: ["Porcentagem", "Razão e proporção", "Equações", "Geometria", "Estatística"] },
+        { id: "pmsp-conhecimentos-gerais", nome: "Conhecimentos Gerais", bloco: "Conhecimentos gerais", assuntos: ["Atualidades", "História do Brasil", "Geografia do Brasil", "Cidadania", "Segurança pública"] },
+        { id: "pmsp-informatica", nome: "Noções Básicas de Informática", bloco: "Conhecimentos gerais", assuntos: ["Internet", "Segurança da informação", "Pacote Office", "Sistemas operacionais"] },
+        { id: "pmsp-administracao-publica", nome: "Noções de Administração Pública", bloco: "Conhecimentos gerais", assuntos: ["Constituição Federal", "Constituição do Estado de São Paulo", "Lei de Acesso à Informação", "Princípios administrativos"] },
+      ],
+      studySuggestions: [
+        "Treine objetiva e redação no mesmo bloco de estudo para simular a gestão real das 5 horas.",
+        "Em VUNESP, leia todas as alternativas antes de marcar: duas costumam parecer boas, mas uma é mais precisa.",
+        "Intercale Português/Matemática com Conhecimentos Gerais para não deixar a parte de base roubar energia da redação.",
       ],
     },
   ];
@@ -853,6 +934,90 @@
         explicacao: "A comunicação oficial representa o órgão e deve ser objetiva e institucional.",
       },
     ],
+    pmspConhecimentosGerais: [
+      {
+        pergunta: "em tema de cidadania e segurança pública, assinale a alternativa correta.",
+        correta: "A preservação da ordem pública deve ser compatibilizada com o respeito à dignidade da pessoa humana e aos direitos fundamentais.",
+        distratores: ["A atuação policial afasta integralmente a incidência dos direitos fundamentais.", "A ordem pública autoriza tratamento desigual sem justificativa legal.", "A cidadania é conceito restrito ao direito de votar.", "A dignidade humana vale apenas para relações privadas."],
+        explicacao: "A atuação estatal em segurança pública deve observar legalidade, proporcionalidade, direitos fundamentais e proteção da vida.",
+      },
+      {
+        pergunta: "quanto a conhecimentos gerais de História do Brasil, é correto afirmar que",
+        correta: "a Constituição de 1988 é marco da redemocratização e ampliou direitos e garantias fundamentais.",
+        distratores: ["a Constituição de 1988 extinguiu todos os direitos sociais.", "a redemocratização brasileira ocorreu exclusivamente no período colonial.", "o voto direto foi abolido pela Constituição de 1988.", "os direitos fundamentais foram retirados do texto constitucional de 1988."],
+        explicacao: "A Constituição de 1988 consolidou a redemocratização e organizou amplo catálogo de direitos fundamentais e sociais.",
+      },
+      {
+        pergunta: "em Geografia do Brasil, a urbanização brasileira caracteriza-se por",
+        correta: "concentração populacional urbana, desigualdades regionais e forte influência das redes metropolitanas.",
+        distratores: ["predomínio rural absoluto em todas as regiões desde 1980.", "ausência de metrópoles e de desigualdades socioespaciais.", "distribuição populacional idêntica em todos os estados.", "fim completo dos fluxos migratórios internos."],
+        explicacao: "A urbanização brasileira é marcada por concentração urbana, metropolização e desigualdades territoriais.",
+      },
+      {
+        pergunta: "em Atualidades, a leitura crítica de notícias exige",
+        correta: "verificar fonte, data, contexto e coerência das informações antes de compartilhar conclusões.",
+        distratores: ["aceitar manchetes sem ler o conteúdo.", "preferir mensagens anônimas a fontes oficiais.", "desconsiderar a data da publicação.", "compartilhar informação antes de checar autoria e contexto."],
+        explicacao: "Atualidades em concursos valorizam compreensão contextual, checagem de fontes e leitura responsável de fatos recentes.",
+      },
+      {
+        pergunta: "sobre Geografia Geral, assinale a alternativa correta.",
+        correta: "clima e tempo atmosférico são conceitos distintos, pois clima envolve padrões observados em períodos mais longos.",
+        distratores: ["clima é a condição momentânea observada em poucas horas.", "tempo atmosférico e clima são sinônimos absolutos.", "clima independe de latitude, altitude e massas de ar.", "tempo atmosférico só existe em áreas urbanas."],
+        explicacao: "Tempo atmosférico descreve condições momentâneas; clima representa padrões de longo prazo.",
+      },
+    ],
+    informaticaBasica: [
+      {
+        pergunta: "sobre segurança da informação no uso de computadores, assinale a alternativa correta.",
+        correta: "Senhas fortes, autenticação adicional e atualização de sistemas reduzem riscos de acesso indevido.",
+        distratores: ["Compartilhar senha institucional é prática recomendada quando há urgência.", "Atualizações devem ser evitadas porque sempre reduzem a segurança.", "Antivírus dispensa qualquer cuidado do usuário.", "Links desconhecidos podem ser abertos sem verificação quando chegam por e-mail."],
+        explicacao: "Segurança depende de controles técnicos e comportamento preventivo do usuário.",
+      },
+      {
+        pergunta: "em planilhas eletrônicas, a finalidade de uma fórmula é",
+        correta: "realizar cálculos ou operações automáticas com base em valores e referências de células.",
+        distratores: ["impedir a edição de qualquer célula da planilha.", "substituir obrigatoriamente todos os textos por imagens.", "apagar dados sempre que a planilha for aberta.", "criar uma cópia física do documento."],
+        explicacao: "Fórmulas automatizam cálculos, referências e funções em planilhas.",
+      },
+      {
+        pergunta: "quanto a navegadores de internet, é correto afirmar que",
+        correta: "o protocolo HTTPS indica comunicação criptografada entre navegador e servidor, embora não garanta sozinho a legitimidade do conteúdo.",
+        distratores: ["HTTPS significa que todo conteúdo da página é verdadeiro.", "HTTP e HTTPS possuem sempre a mesma proteção criptográfica.", "o cadeado do navegador autoriza fornecer qualquer dado pessoal.", "navegadores não registram histórico ou cache em nenhuma hipótese."],
+        explicacao: "HTTPS protege a comunicação, mas o usuário ainda deve verificar domínio, contexto e finalidade da página.",
+      },
+      {
+        pergunta: "em editores de texto, o recurso de localizar e substituir serve para",
+        correta: "encontrar ocorrências de uma expressão e, se desejado, trocá-las por outro conteúdo.",
+        distratores: ["formatar automaticamente todos os parágrafos como tabela.", "excluir obrigatoriamente o arquivo original.", "converter o documento em imagem sem texto editável.", "impedir revisão ortográfica posterior."],
+        explicacao: "Localizar/substituir é recurso básico de produtividade e revisão de documentos.",
+      },
+    ],
+    pmspAdministracaoPublica: [
+      {
+        pergunta: "em noções de Administração Pública, o princípio da legalidade impõe que",
+        correta: "o agente público atue conforme a lei e a finalidade pública.",
+        distratores: ["a vontade pessoal do agente prevaleça sobre a lei.", "a administração aja sem fundamento normativo quando houver conveniência.", "normas internas substituam integralmente a Constituição.", "o servidor escolha quais regras deseja cumprir."],
+        explicacao: "Na Administração Pública, a legalidade vincula a atuação estatal à lei e ao interesse público.",
+      },
+      {
+        pergunta: "à luz da Lei de Acesso à Informação, é correto afirmar que",
+        correta: "a publicidade é regra, e o sigilo deve ser exceção justificada nas hipóteses legais.",
+        distratores: ["todo documento público é sigiloso por prazo indeterminado.", "o cidadão precisa sempre justificar o motivo do pedido de informação.", "órgãos públicos são proibidos de divulgar informações de interesse coletivo.", "a transparência ativa é incompatível com portais oficiais."],
+        explicacao: "A LAI estabelece transparência como regra, com restrições legais para proteger dados e interesses específicos.",
+      },
+      {
+        pergunta: "sobre impessoalidade administrativa, assinale a alternativa correta.",
+        correta: "a atuação do agente público deve buscar finalidade pública, sem favorecimentos ou perseguições pessoais.",
+        distratores: ["a Administração pode favorecer conhecidos quando isso acelera o serviço.", "a publicidade oficial deve promover a imagem pessoal do agente.", "decisões públicas podem ser guiadas por amizade, antipatia ou interesse privado.", "a impessoalidade vale apenas para contratos privados."],
+        explicacao: "Impessoalidade exige finalidade pública e tratamento isonômico.",
+      },
+      {
+        pergunta: "quanto à eficiência no serviço público, é correto afirmar que",
+        correta: "ela se relaciona ao uso adequado de recursos, qualidade do serviço e busca de resultados públicos.",
+        distratores: ["ela autoriza descumprir a lei para ganhar rapidez.", "ela elimina controles e registros administrativos.", "ela significa atender apenas demandas mais simples.", "ela permite substituir interesse público por metas pessoais."],
+        explicacao: "Eficiência deve caminhar com legalidade, controle, qualidade e resultado institucional.",
+      },
+    ],
   };
 
   const QUESTIONS = [];
@@ -1017,6 +1182,11 @@
     { prefix: "SAN-MAT", count: 25, concurso_id: "santos-oficial", cargo_id: "santos-oficial-administracao", materia_id: "santos-matematica", materia: "Matemática", assunto_id: "matematica", assunto: "Matemática para Oficial de Administração", subassuntos: ["porcentagem", "regra-de-tres", "media", "logica"], bloco: "Conhecimentos gerais", facts: MC_FACTS.matematica, sourceKey: "santos_pdf", inspiracao: "Edital Santos 71/2026 e padrão IBAM", tags: ["santos", "ibam"] },
     { prefix: "SAN-LEG", count: 35, concurso_id: "santos-oficial", cargo_id: "santos-oficial-administracao", materia_id: "santos-legislacao", materia: "Legislação municipal e serviço público", assunto_id: "legislacao-municipal", assunto: "Serviço público municipal", subassuntos: ["legalidade", "atendimento", "sigilo"], bloco: "Legislação", facts: MC_FACTS.santosLegislacao, sourceKey: "santos_pdf", inspiracao: "Edital Santos 71/2026, legislação municipal e padrão IBAM", tags: ["santos", "ibam"] },
     { prefix: "SAN-ADM", count: 45, concurso_id: "santos-oficial", cargo_id: "santos-oficial-administracao", materia_id: "santos-especificos", materia: "Conhecimentos específicos administrativos", assunto_id: "administracao", assunto: "Rotinas administrativas municipais", subassuntos: ["protocolo", "arquivo", "materiais", "redacao"], bloco: "Conhecimentos específicos", facts: MC_FACTS.administracao, sourceKey: "santos_pdf", inspiracao: "Edital Santos 71/2026 e provas administrativas no padrão IBAM", tags: ["santos", "ibam"] },
+    { prefix: "PMSP-POR", count: 40, concurso_id: "pm-sp", cargo_id: "pmsp-aluno-soldado-qp", materia_id: "pmsp-portugues", materia: "Língua Portuguesa e Interpretação de Texto", assunto_id: "portugues", assunto: "Português e interpretação para PM-SP", subassuntos: ["interpretacao", "concordancia", "pontuacao", "coesao"], bloco: "Prova objetiva", facts: MC_FACTS.portugues, sourceKey: "pmsp_vunesp", inspiracao: "Edital PM-SP DP-3/321/26 e padrão VUNESP", tags: ["pmsp", "vunesp"] },
+    { prefix: "PMSP-MAT", count: 30, concurso_id: "pm-sp", cargo_id: "pmsp-aluno-soldado-qp", materia_id: "pmsp-matematica", materia: "Matemática", assunto_id: "matematica", assunto: "Matemática para PM-SP", subassuntos: ["porcentagem", "regra-de-tres", "media", "logica"], bloco: "Prova objetiva", facts: MC_FACTS.matematica, sourceKey: "pmsp_vunesp", inspiracao: "Edital PM-SP DP-3/321/26 e padrão VUNESP", tags: ["pmsp", "vunesp"] },
+    { prefix: "PMSP-CGE", count: 30, concurso_id: "pm-sp", cargo_id: "pmsp-aluno-soldado-qp", materia_id: "pmsp-conhecimentos-gerais", materia: "Conhecimentos Gerais", assunto_id: "conhecimentos-gerais", assunto: "História, Geografia e Atualidades", subassuntos: ["historia-do-brasil", "geografia-do-brasil", "atualidades", "cidadania"], bloco: "Prova objetiva", facts: MC_FACTS.pmspConhecimentosGerais, sourceKey: "pmsp_agencia_sp", inspiracao: "Edital PM-SP DP-3/321/26, conteúdo programático oficial e padrão VUNESP", tags: ["pmsp", "vunesp"] },
+    { prefix: "PMSP-INF", count: 10, concurso_id: "pm-sp", cargo_id: "pmsp-aluno-soldado-qp", materia_id: "pmsp-informatica", materia: "Noções Básicas de Informática", assunto_id: "informatica", assunto: "Informática básica", subassuntos: ["seguranca", "planilhas", "internet", "editor-texto"], bloco: "Prova objetiva", facts: MC_FACTS.informaticaBasica, sourceKey: "pmsp_agencia_sp", inspiracao: "Edital PM-SP DP-3/321/26 e padrão VUNESP", tags: ["pmsp", "vunesp"] },
+    { prefix: "PMSP-ADM", count: 10, concurso_id: "pm-sp", cargo_id: "pmsp-aluno-soldado-qp", materia_id: "pmsp-administracao-publica", materia: "Noções de Administração Pública", assunto_id: "administracao-publica", assunto: "Constituição, Constituição paulista e LAI", subassuntos: ["legalidade", "impessoalidade", "eficiencia", "lai"], bloco: "Prova objetiva", facts: MC_FACTS.pmspAdministracaoPublica, sourceKey: "pmsp_agencia_sp", inspiracao: "Edital PM-SP DP-3/321/26, Lei 12.527/2011 e padrão VUNESP", tags: ["pmsp", "vunesp"] },
   ].forEach(generateMC);
 
   const questionCountsByRole = QUESTIONS.reduce((acc, question) => {
@@ -1033,7 +1203,7 @@
   }, {});
 
   window.STUDY_DATA = {
-    version: "2026.07.18-multiconcurso",
+    version: "2026.07.18-pmsp",
     generatedAt: CREATED_AT,
     users: USERS,
     concursos: CONCURSOS,

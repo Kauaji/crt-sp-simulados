@@ -12,3 +12,4 @@ A fonte ativa do site é `simulados.js`. Estes JSONs servem para importação, a
 - `ibge-agente.json`
 - `ibge-analista-ti.json`
 - `santos-oficial-administracao.json`
+- `pm-sp-aluno-soldado.json`

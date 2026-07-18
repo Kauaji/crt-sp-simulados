@@ -34,6 +34,10 @@ const files = [
     file: "santos-oficial-administracao.json",
     filter: (question) => question.concurso_id === "santos-oficial",
   },
+  {
+    file: "pm-sp-aluno-soldado.json",
+    filter: (question) => question.concurso_id === "pm-sp" && question.cargos_compativeis.includes("pmsp-aluno-soldado-qp"),
+  },
 ];
 
 for (const item of files) {
@@ -60,4 +64,5 @@ A fonte ativa do site é \`simulados.js\`. Estes JSONs servem para importação,
 - \`ibge-agente.json\`
 - \`ibge-analista-ti.json\`
 - \`santos-oficial-administracao.json\`
+- \`pm-sp-aluno-soldado.json\`
 `);
