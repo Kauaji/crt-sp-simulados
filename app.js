@@ -1,1285 +1,1616 @@
-/* global BANCO_QUESTOES, MINIMOS_PROVA_REAL */
+/* global STUDY_DATA */
 "use strict";
 
-const USERS = {
-  kaua: { id: "kaua", name: "Kauã", initial: "K" },
-  vitoria: { id: "vitoria", name: "Vitória", initial: "V" },
-  caio: { id: "caio", name: "Caio", initial: "C" },
-};
-
-const STORAGE_KEYS = {
-  currentUser: "crtsp.currentUser",
-  stats: "crtsp.stats.v2",
-};
-
-const TAB_LABELS = {
-  daily: "Simulado diário",
-  extra: "Questionário extra",
-  real: "Prova real",
-  studies: "Estudos",
-  dashboard: "Dashboard",
-};
-
-const QUOTAS = {
-  daily: {
-    "Conhecimentos Básicos": 12,
-    "Conhecimentos Complementares": 8,
-    "Conhecimentos Específicos": 20,
-  },
-  real: {
-    "Conhecimentos Básicos": 40,
-    "Conhecimentos Complementares": 30,
-    "Conhecimentos Específicos": 50,
-  },
-};
-
-const DIFFICULTY_LABELS = {
-  facil: "Fácil",
-  medio: "Médio",
-  dificil: "Difícil",
-  misto: "Misto",
-};
-
-const OFFICIAL_LINKS = [
-  ["Lei 13.639/2018", "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13639.htm"],
-  ["Lei 5.524/1968", "https://www.planalto.gov.br/ccivil_03/leis/l5524.htm"],
-  ["Decreto 90.922/1985", "https://www.planalto.gov.br/ccivil_03/decreto/antigos/d90922.htm"],
-  ["Decreto 4.560/2002", "https://www.planalto.gov.br/ccivil_03/decreto/2002/D4560.htm"],
-  ["Lei 9.784/1999", "https://www.planalto.gov.br/ccivil_03/leis/l9784.htm"],
-  ["Lei 12.527/2011 — LAI", "https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2011/lei/l12527.htm"],
-  ["Lei 13.709/2018 — LGPD", "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm"],
-  ["Lei 8.429/1992 — Improbidade", "https://www.planalto.gov.br/ccivil_03/leis/l8429.htm"],
-  ["CFT", "https://www.cft.org.br/"],
-  ["CRT-SP", "https://crtsp.gov.br/"],
-  ["Regimento Interno CRT-SP", "https://crtsp.gov.br/regimento-interno-crt-sp/"],
-  ["Resoluções CFT", "https://cft.org.br/category/resolucoes/"],
-];
-
-const YOUTUBE_SEARCHES = [
-  "Português para concursos Quadrix",
-  "Raciocínio lógico Quadrix",
-  "Informática para concursos",
-  "LAI para concursos",
-  "LGPD para concursos",
-  "Lei 9.784 para concursos",
-  "Administração Pública para concursos",
-  "Redação oficial para concursos",
-  "Lei 13.639/2018 CFT CRT",
-  "Sistema CFT CRT",
-];
-
-const STUDY_LINKS_BY_TAG = {
-  "lei-13639": ["Lei 13.639/2018 no Planalto", "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13639.htm"],
-  "lei-5524": ["Lei 5.524/1968 no Planalto", "https://www.planalto.gov.br/ccivil_03/leis/l5524.htm"],
-  "decreto-90922": ["Decreto 90.922/1985 no Planalto", "https://www.planalto.gov.br/ccivil_03/decreto/antigos/d90922.htm"],
-  "decreto-4560": ["Decreto 4.560/2002 no Planalto", "https://www.planalto.gov.br/ccivil_03/decreto/2002/D4560.htm"],
-  lai: ["Lei 12.527/2011 — LAI", "https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2011/lei/l12527.htm"],
-  lgpd: ["Lei 13.709/2018 — LGPD", "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm"],
-  improbidade: ["Lei 8.429/1992 — Improbidade", "https://www.planalto.gov.br/ccivil_03/leis/l8429.htm"],
-  "processo-administrativo": ["Lei 9.784/1999 no Planalto", "https://www.planalto.gov.br/ccivil_03/leis/l9784.htm"],
-  "regimento-crtsp": ["Regimento Interno CRT-SP", "https://crtsp.gov.br/regimento-interno-crt-sp/"],
-  "resolucoes-cft": ["Resoluções CFT", "https://cft.org.br/category/resolucoes/"],
-  "resolucao-206": ["Resolução CFT 206/2022", "https://www.cft.org.br/wp-content/uploads/2022/12/Resolucao-cft-n-206-2022.pdf"],
-  "resolucao-207": ["Resolução CFT 207/2022", "https://www.cft.org.br/wp-content/uploads/2022/12/Resolucao-cft-n-207-2022.pdf"],
-  "resolucao-208": ["Resolução CFT 208/2023", "https://cft.org.br/wp-content/uploads/2023/03/RESOLUCAO-CFT-N-208-2023.pdf"],
-  "resolucao-288": ["Resolução CFT 288/2025", "https://cft.org.br/wp-content/uploads/2026/03/288.pdf"],
-};
-
-const DAILY_STUDY_ROTATION = [
-  {
-    title: "Sistema CFT/CRTs sem dó",
-    focus: "Lei 13.639/2018 + Lei 5.524/1968",
-    tasks: ["20 min lendo artigos secos", "15 min fazendo itens de legislação", "10 min anotando pegadinhas de competência"],
-  },
-  {
-    title: "Bloco administrativo",
-    focus: "rotinas, protocolo, atendimento e redação oficial",
-    tasks: ["30 min teoria objetiva", "20 min questões de protocolo/arquivo", "10 min revisar erros anteriores"],
-  },
-  {
-    title: "Complementares que derrubam",
-    focus: "LAI, LGPD, Lei 9.784/1999 e improbidade",
-    tasks: ["25 min lei seca", "20 min questões Certo/Errado", "15 min flashcards de exceções"],
-  },
-  {
-    title: "Básicos para ganhar gordura",
-    focus: "Português, RLM e Informática",
-    tasks: ["20 min Português", "20 min porcentagem/lógica", "15 min informática e segurança"],
-  },
-];
-
-const SOURCE_REFERENCES = [
-  ["Edital CRT-SP 2026 — Quadrix", "https://quadrix.org.br/informacoes/3048/"],
-  ["Acervo de provas anteriores Quadrix", "https://ajuda.quadrix.org.br/pt-BR/articles/8185732-acesso-as-provas-de-concursos-anteriores"],
-  ["Lei 13.639/2018", "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13639.htm"],
-  ["Lei 5.524/1968", "https://www.planalto.gov.br/ccivil_03/leis/l5524.htm"],
-  ["Decreto 90.922/1985", "https://www.planalto.gov.br/ccivil_03/decreto/antigos/d90922.htm"],
-  ["Decreto 4.560/2002", "https://www.planalto.gov.br/ccivil_03/decreto/2002/D4560.htm"],
-  ["Lei 9.784/1999", "https://www.planalto.gov.br/ccivil_03/leis/l9784.htm"],
-  ["Lei 12.527/2011 — LAI", "https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2011/lei/l12527.htm"],
-  ["Lei 13.709/2018 — LGPD", "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm"],
-  ["Lei 8.429/1992", "https://www.planalto.gov.br/ccivil_03/leis/l8429.htm"],
-  ["Regimento Interno CRT-SP", "https://crtsp.gov.br/regimento-interno-crt-sp/"],
-  ["Resoluções oficiais do CFT", "https://cft.org.br/category/resolucoes/"],
-];
-
-const INCIDENCE_WEIGHTS = {
-  "lei-13639": 10,
-  "processo-administrativo": 10,
-  lai: 9,
-  lgpd: 9,
-  "administracao-publica": 9,
-  "lei-5524": 8,
-  "decreto-90922": 8,
-  "regimento-crtsp": 8,
-  improbidade: 8,
-  protocolo: 8,
-  atendimento: 8,
-  "redacao-oficial": 8,
-  "resolucao-206": 7,
-  "resolucao-207": 7,
-  "resolucao-208": 7,
-  "resolucao-288": 7,
-  licitacoes: 7,
-  portugues: 7,
-  rlm: 6,
-  informatica: 6,
-  materiais: 5,
-  logistica: 5,
-  qualidade: 4,
-  projetos: 4,
-};
-
-const ORIGIN_RULES = [
-  { tags: ["lei-13639"], category: "Lei seca", origin: "Base legal: Lei 13.639/2018", detail: "Artigos 1º ao 9º; Sistema CFT/CRTs." },
-  { tags: ["lei-5524"], category: "Lei seca", origin: "Base legal: Lei 5.524/1968", detail: "Atribuições do técnico industrial de nível médio." },
-  { tags: ["decreto-90922"], category: "Lei seca", origin: "Base legal: Decreto 90.922/1985", detail: "Regulamentação do exercício profissional técnico." },
-  { tags: ["decreto-4560"], category: "Lei seca", origin: "Base legal: Decreto 4.560/2002", detail: "Alterações no Decreto 90.922/1985." },
-  { tags: ["lai"], category: "Lei seca", origin: "Base legal: Lei 12.527/2011", detail: "Publicidade, sigilo, transparência ativa/passiva e pedidos de acesso." },
-  { tags: ["lgpd"], category: "Lei seca", origin: "Base legal: Lei 13.709/2018", detail: "Princípios, bases legais, segurança e tratamento pelo poder público." },
-  { tags: ["improbidade"], category: "Lei seca", origin: "Base legal: Lei 8.429/1992", detail: "Dolo, atos de improbidade, sanções e responsabilidade." },
-  { tags: ["processo-administrativo"], category: "Lei seca", origin: "Base legal: Lei 9.784/1999", detail: "Artigos 2º, 11, 50 e temas recorrentes de processo administrativo." },
-  { tags: ["regimento-crtsp"], category: "Lei seca", origin: "Base normativa: Regimento Interno do CRT-SP", detail: "Organização, competências e funcionamento interno." },
-  { tags: ["resolucao-206"], category: "Lei seca", origin: "Base normativa: Resolução CFT 206/2022", detail: "Código de Ética e Disciplina do Técnico Industrial." },
-  { tags: ["resolucao-207"], category: "Lei seca", origin: "Base normativa: Resolução CFT 207/2022", detail: "Código de Processo Ético do Sistema CFT/CRTs." },
-  { tags: ["resolucao-208"], category: "Lei seca", origin: "Base normativa: Resolução CFT 208/2023", detail: "Conduta ética de diretores e conselheiros." },
-  { tags: ["resolucao-288"], category: "Lei seca", origin: "Base normativa: Resolução CFT 288/2025", detail: "Fiscalização profissional preventiva, educativa e inteligente." },
-  { tags: ["licitacoes", "materiais", "logistica", "administracao", "qualidade", "projetos"], category: "Quadrix CREA", origin: "Inspirada no padrão Quadrix — CREA-GO/CREA-RO — área administrativa", detail: "Contexto de órgão fiscalizador, rotinas administrativas, compras, materiais e controle." },
-  { tags: ["protocolo", "atendimento", "redacao-oficial", "rotinas"], category: "Quadrix CREF", origin: "Inspirada no padrão Quadrix — CREF/CREFONO — Técnico Administrativo", detail: "Cobrança de atendimento, protocolo, documentos, linguagem oficial e rotinas de conselho." },
-  { tags: ["etica", "administracao-publica"], category: "Quadrix CRC", origin: "Inspirada no padrão Quadrix — CRC/CRN — Assistente Administrativo", detail: "Princípios administrativos, ética, integridade e conduta funcional." },
-  { tags: ["portugues", "rlm", "informatica"], category: "Demais Conselhos Quadrix", origin: "Inspirada no padrão Quadrix — Conselhos Profissionais 2021-2026", detail: "Conhecimentos básicos no estilo Certo/Errado aplicado a rotinas administrativas." },
-  { tags: ["cft", "crt"], category: "Quadrix CRT/CFT", origin: "Inspirada no padrão Quadrix — CRT/CFT e Conselhos Profissionais", detail: "Conteúdo contextualizado para conselhos de fiscalização profissional." },
-];
-
-const QUADRIX_TRAPS = {
-  legislacao: [
-    "Trocar competência legal por atribuição administrativa genérica.",
-    "Usar “sempre”, “nunca” ou “apenas” para tornar regra relativa em absoluta.",
-    "Confundir lei, decreto, regimento e resolução na hierarquia normativa.",
-    "Afirmar que transparência elimina proteção de dados pessoais.",
-    "Transformar poder fiscalizatório em atuação meramente educativa.",
-  ],
-  administracao: [
-    "Confundir descentralização com desconcentração.",
-    "Tratar eficiência como autorização para afastar a legalidade.",
-    "Misturar controle, planejamento, direção e organização.",
-    "Dizer que checklist elimina erro humano.",
-    "Confundir processo contínuo com projeto temporário.",
-  ],
-  protocolo: [
-    "Confundir arquivo corrente com arquivo permanente.",
-    "Achar que autuação é mero arquivamento físico.",
-    "Ignorar rastreabilidade, temporalidade e controle de versões.",
-    "Transformar atendimento cordial em promessa de resultado.",
-    "Confundir linguagem simples com informalidade inadequada.",
-  ],
-  basicos: [
-    "Separar verbo de complemento por vírgula sem justificativa.",
-    "Errar negação de proposições com “todos” e “algum”.",
-    "Calcular porcentagem sobre a base errada.",
-    "Achar que modo anônimo ou antivírus elimina todo risco.",
-    "Ignorar palavras absolutas em interpretação de texto.",
-  ],
-};
-
-let activeUserId = null;
-let activeTab = "daily";
-let quizStates = {};
-let realTimer = null;
-
-const $ = (selector) => document.querySelector(selector);
-const $$ = (selector) => [...document.querySelectorAll(selector)];
-const escapeHtml = (value) => String(value ?? "")
-  .replaceAll("&", "&amp;")
-  .replaceAll("<", "&lt;")
-  .replaceAll(">", "&gt;")
-  .replaceAll('"', "&quot;")
-  .replaceAll("'", "&#039;");
-
-function getTodayKey(date = new Date()) {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
-}
-
-function daysBetweenSafe(fromKey, toKey) {
-  const [fy, fm, fd] = fromKey.split("-").map(Number);
-  const [ty, tm, td] = toKey.split("-").map(Number);
-  return Math.round((Date.UTC(ty, tm - 1, td) - Date.UTC(fy, fm - 1, fd)) / 86400000);
-}
-
-function hashSeed(text) {
-  let hash = 2166136261;
-  for (let i = 0; i < text.length; i += 1) {
-    hash ^= text.charCodeAt(i);
-    hash = Math.imul(hash, 16777619);
-  }
-  return hash >>> 0;
-}
-
-function seededRandom(seed) {
-  let state = seed >>> 0;
-  return () => {
-    state += 0x6D2B79F5;
-    let value = state;
-    value = Math.imul(value ^ (value >>> 15), value | 1);
-    value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
-    return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-function shuffleWithSeed(items, seedText) {
-  const output = [...items];
-  const random = seededRandom(hashSeed(seedText));
-  for (let i = output.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(random() * (i + 1));
-    [output[i], output[j]] = [output[j], output[i]];
-  }
-  return output;
-}
-
-function createDefaultStats() {
-  return {
-    name: "",
-    totalAccesses: 0,
-    lastAccessDate: null,
-    currentStreak: 0,
-    bestStreak: 0,
-    totalPoints: 0,
-    examsFinished: 0,
-    realExamsFinished: 0,
-    bestNetScore: null,
-    lastNetScore: null,
-    netScoreSum: 0,
-    history: [],
-    questionsAnswered: 0,
-    correctCount: 0,
-    wrongCount: 0,
-    blankCount: 0,
-    extraAttempts: 0,
-  };
-}
-
-function loadAllStats() {
-  try {
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEYS.stats) || "{}");
-    return Object.fromEntries(Object.keys(USERS).map((id) => [
-      id,
-      { ...createDefaultStats(), name: USERS[id].name, ...(saved[id] || {}) },
-    ]));
-  } catch {
-    return Object.fromEntries(Object.keys(USERS).map((id) => [id, { ...createDefaultStats(), name: USERS[id].name }]));
-  }
-}
-
-function loadUserStats(userId = activeUserId) {
-  return loadAllStats()[userId] || { ...createDefaultStats(), name: USERS[userId]?.name || "" };
-}
-
-function saveUserStats(userId, stats) {
-  const all = loadAllStats();
-  all[userId] = { ...stats, name: USERS[userId].name };
-  localStorage.setItem(STORAGE_KEYS.stats, JSON.stringify(all));
-}
-
-function getCurrentUser() {
-  return activeUserId ? USERS[activeUserId] : null;
-}
-
-function setCurrentUser(userId) {
-  activeUserId = userId;
-  localStorage.setItem(STORAGE_KEYS.currentUser, userId);
-}
-
-function updateUserStreak(stats, today = getTodayKey()) {
-  if (stats.lastAccessDate === today) return stats;
-  const diff = stats.lastAccessDate ? daysBetweenSafe(stats.lastAccessDate, today) : null;
-  stats.currentStreak = diff === 1 ? stats.currentStreak + 1 : 1;
-  stats.bestStreak = Math.max(stats.bestStreak, stats.currentStreak);
-  stats.lastAccessDate = today;
-  return stats;
-}
-
-function registerUserAccess(userId) {
-  const stats = loadUserStats(userId);
-  const today = getTodayKey();
-  if (stats.lastAccessDate !== today) {
-    stats.totalAccesses += 1;
-    updateUserStreak(stats, today);
-    saveUserStats(userId, stats);
-  }
-  return stats;
-}
-
-function streakPhrase(streak) {
-  if (streak >= 30) return "Monstro do CRT-SP.";
-  if (streak >= 15) return "Agora virou disciplina.";
-  if (streak >= 7) return "Uma semana no modo concurseiro.";
-  if (streak >= 3) return "Tá criando ritmo.";
-  return "Começou a sequência.";
-}
-
-function formatScore(value) {
-  return value === null || value === undefined ? "—" : String(Math.round(value * 10) / 10);
-}
-
-function normalizeDifficulty(difficulty) {
-  return ["facil", "medio", "dificil"].includes(difficulty) ? difficulty : "misto";
-}
-
-function filterByDifficulty(pool, difficulty) {
-  const normalized = normalizeDifficulty(difficulty);
-  if (normalized === "misto") return pool;
-  const exact = pool.filter((q) => q.dificuldade === normalized);
-  return exact.length ? exact : pool;
-}
-
-function getIncidenceWeight(question) {
-  const tagWeight = (question.tags || []).reduce((max, tag) => Math.max(max, INCIDENCE_WEIGHTS[tag] || 0), 0);
-  const text = `${question.disciplina} ${question.assunto}`.toLowerCase();
-  const textWeight = Object.entries({
-    "lei 9.784": 10,
-    "lei 13.639": 10,
-    "lai": 9,
-    "lgpd": 9,
-    "protocolo": 8,
-    "atendimento": 8,
-    "redação": 8,
-    "administração pública": 9,
-    "improbidade": 8,
-    "resolução": 7,
-    "decreto": 7,
-  }).reduce((max, [needle, weight]) => (text.includes(needle) ? Math.max(max, weight) : max), 0);
-  return Math.max(3, tagWeight, textWeight);
-}
-
-function weightedOrder(items, seedText) {
-  const random = seededRandom(hashSeed(seedText));
-  return [...items]
-    .map((item) => {
-      const draw = Math.max(random(), 0.000001);
-      return { item, score: -Math.log(draw) / getIncidenceWeight(item) };
-    })
-    .sort((a, b) => a.score - b.score)
-    .map(({ item }) => item);
-}
-
-function selectFromPool(pool, count, seedText, avoidIds = new Set(), difficulty = "misto") {
-  const filtered = filterByDifficulty(pool, difficulty);
-  const preferred = filtered.filter((question) => !avoidIds.has(question.id));
-  const fallback = filtered.filter((question) => avoidIds.has(question.id));
-  const ordered = [
-    ...weightedOrder(preferred, `${seedText}:weighted`),
-    ...weightedOrder(fallback, `${seedText}:fallback`),
+(function runApp() {
+  const DATA = window.STUDY_DATA;
+  const BLANK = "__blank";
+  const STORE_KEY = "multiconcurso.study.v1";
+  const SESSION_KEY = "multiconcurso.session.v1";
+  const TABS = [
+    ["dashboard", "Dashboard"],
+    ["treino", "Treino"],
+    ["simulado", "Simulado"],
+    ["revisao", "Revisão"],
+    ["materias", "Matérias"],
+    ["historico", "Histórico"],
+    ["metas", "Metas"],
   ];
-  if (ordered.length >= count) return ordered.slice(0, count);
 
-  const expanded = [...ordered];
-  let round = 1;
-  while (expanded.length < count) {
-    expanded.push(...weightedOrder(filtered, `${seedText}:fill:${round}`));
-    round += 1;
+  const state = {
+    currentUserId: null,
+    activeContestId: null,
+    activeRoleId: null,
+    activeTab: "dashboard",
+    showContestPicker: true,
+    practice: {
+      queueIds: [],
+      answered: {},
+      startedAt: {},
+      mode: "modo-treino",
+    },
+    mock: null,
+    timerInterval: null,
+  };
+
+  const $ = (selector) => document.querySelector(selector);
+  const $$ = (selector) => [...document.querySelectorAll(selector)];
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
   }
-  return expanded.slice(0, count).map((question, index) => (
-    index < ordered.length ? question : { ...question, id: `${question.id}-R${index}` }
-  ));
-}
 
-function selectByQuotas(quotas, seedText, difficulty = "misto", avoidIds = new Set()) {
-  return Object.entries(quotas).flatMap(([block, quota]) => {
-    const pool = BANCO_QUESTOES.filter((question) => question.bloco === block);
-    return selectFromPool(pool, quota, `${seedText}:${block}`, avoidIds, difficulty);
-  });
-}
+  function percent(part, total, decimals = 0) {
+    if (!total) return "0";
+    return ((part / total) * 100).toFixed(decimals);
+  }
 
-function selectDailyQuestions(difficulty = "misto") {
-  return shuffleWithSeed(selectByQuotas(QUOTAS.daily, `daily:${getTodayKey()}`, difficulty), `daily-order:${getTodayKey()}:${difficulty}`);
-}
+  function formatDate(dateString) {
+    if (!dateString) return "—";
+    const [year, month, day] = dateString.split("-").map(Number);
+    return new Intl.DateTimeFormat("pt-BR", { dateStyle: "short" }).format(new Date(year, month - 1, day));
+  }
 
-function selectExtraQuestions(quantity = 40, difficulty = "misto") {
-  const stats = loadUserStats();
-  const dailyIds = new Set((quizStates.daily?.questions || selectDailyQuestions()).map((question) => question.id));
-  const seed = `extra:${getTodayKey()}:${stats.extraAttempts}:${difficulty}:${quantity}`;
-  const selected = selectFromPool(BANCO_QUESTOES, quantity, seed, dailyIds, difficulty);
-  return shuffleWithSeed(selected, `${seed}:order`);
-}
+  function daysUntil(dateString) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const [year, month, day] = dateString.split("-").map(Number);
+    const target = new Date(year, month - 1, day);
+    target.setHours(0, 0, 0, 0);
+    return Math.ceil((target - today) / 86400000);
+  }
 
-function selectRealExamQuestions() {
-  return shuffleWithSeed(selectByQuotas(QUOTAS.real, `real:${getTodayKey()}`, "misto"), `real-order:${getTodayKey()}`);
-}
+  function nowIso() {
+    return new Date().toISOString();
+  }
 
-function answerLabel(value) {
-  if (value === "C") return "Certo";
-  if (value === "E") return "Errado";
-  return "Em branco";
-}
+  function safeNumber(value, fallback = 0) {
+    const number = Number(value);
+    return Number.isFinite(number) ? number : fallback;
+  }
 
-function getQuestionStatus(question, answer) {
-  if (answer === "B" || !answer) return "blank";
-  return answer === question.gabarito ? "correct" : "wrong";
-}
+  function normalizeAnswer(answer) {
+    return answer === undefined || answer === null || answer === "" ? BLANK : answer;
+  }
 
-function statusLabel(status) {
-  return { correct: "Certa", wrong: "Errada", blank: "Em branco" }[status] || "Em branco";
-}
+  function isBlank(answer) {
+    return normalizeAnswer(answer) === BLANK;
+  }
 
-function statusEmoji(status) {
-  return { correct: "✅", wrong: "❌", blank: "⚪" }[status] || "⚪";
-}
+  function contestById(contestId = state.activeContestId) {
+    return DATA.concursos.find((contest) => contest.id === contestId);
+  }
 
-function getQuestionStudyLinks(question) {
-  const links = [];
-  (question.tags || []).forEach((tag) => {
-    if (STUDY_LINKS_BY_TAG[tag] && !links.some((link) => link.url === STUDY_LINKS_BY_TAG[tag][1])) {
-      const [label, url] = STUDY_LINKS_BY_TAG[tag];
-      links.push({ label, url });
+  function roleById(contestId = state.activeContestId, roleId = state.activeRoleId) {
+    return contestById(contestId)?.roles.find((role) => role.id === roleId);
+  }
+
+  function currentUserDef() {
+    return DATA.users.find((user) => user.id === state.currentUserId);
+  }
+
+  function loadStore() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(STORE_KEY) || "{}");
+      return parsed && typeof parsed === "object" ? parsed : { users: {} };
+    } catch {
+      return { users: {} };
     }
-  });
-  const queryBase = `${question.disciplina} ${question.assunto} concurso CRT CFT`;
-  links.push({
-    label: "Buscar videoaula no YouTube",
-    url: `https://www.youtube.com/results?search_query=${encodeURIComponent(queryBase)}`,
-  });
-  links.push({
-    label: "Pesquisar resumo no Google",
-    url: `https://www.google.com/search?q=${encodeURIComponent(`${queryBase} resumo`)}`,
-  });
-  return links.slice(0, 4);
-}
+  }
 
-function renderQuestionStudyLinks(question) {
-  return `
-    <div class="study-links">
-      <strong>Links para estudar este tema:</strong>
-      <div>${getQuestionStudyLinks(question).map((link) => `<a href="${link.url}" target="_blank" rel="noreferrer">${escapeHtml(link.label)}</a>`).join("")}</div>
-    </div>
-  `;
-}
+  function saveStore(store) {
+    localStorage.setItem(STORE_KEY, JSON.stringify(store));
+  }
 
-function getQuestionOrigin(question) {
-  const tags = question.tags || [];
-  const rule = ORIGIN_RULES.find((item) => item.tags.some((tag) => tags.includes(tag)));
-  if (rule) return rule;
-  return {
-    category: "Autoral legislativo",
-    origin: "Questão autoral baseada em edital, legislação vigente e padrão Quadrix",
-    detail: "Sem cópia literal de prova anterior; item criado para treino contextualizado.",
-  };
-}
+  function withStore(mutator) {
+    const store = loadStore();
+    store.users = store.users || {};
+    DATA.users.forEach((user) => {
+      store.users[user.id] = store.users[user.id] || makeUserRecord(user.id);
+    });
+    const result = mutator(store);
+    saveStore(store);
+    return result;
+  }
 
-function renderQuestionSource(question) {
-  const origin = getQuestionOrigin(question);
-  return `
-    <div class="question-source">
-      <strong>${origin.origin}</strong>
-      <span>${escapeHtml(origin.detail)}</span>
-    </div>
-  `;
-}
-
-function getQuestionTrapGroup(question) {
-  const tags = question.tags || [];
-  if (tags.some((tag) => ["lei-13639", "lei-5524", "decreto-90922", "decreto-4560", "lai", "lgpd", "improbidade", "processo-administrativo", "regimento-crtsp", "resolucao-206", "resolucao-207", "resolucao-208", "resolucao-288"].includes(tag))) return "legislacao";
-  if (tags.some((tag) => ["administracao", "administracao-publica", "qualidade", "projetos", "licitacoes", "materiais", "logistica"].includes(tag))) return "administracao";
-  if (tags.some((tag) => ["protocolo", "atendimento", "redacao-oficial", "rotinas"].includes(tag))) return "protocolo";
-  return "basicos";
-}
-
-function renderQuestionTraps(question) {
-  const traps = QUADRIX_TRAPS[getQuestionTrapGroup(question)].slice(0, 4);
-  return `
-    <div class="quadrix-traps">
-      <strong>Pegadinhas da Quadrix neste assunto:</strong>
-      <ul>${traps.map((trap) => `<li>${escapeHtml(trap)}</li>`).join("")}</ul>
-    </div>
-  `;
-}
-
-function getOriginStats(questions) {
-  const counts = questions.reduce((acc, question) => {
-    const category = getQuestionOrigin(question).category;
-    acc[category] = (acc[category] || 0) + 1;
-    return acc;
-  }, {});
-  return Object.entries(counts)
-    .map(([category, count]) => ({ category, count, percent: Math.round((count / questions.length) * 100) }))
-    .sort((a, b) => b.count - a.count);
-}
-
-function renderQuadrixFidelity(state) {
-  const stats = getOriginStats(state.questions);
-  const referenced = stats.filter((item) => item.category !== "Autoral legislativo").reduce((sum, item) => sum + item.count, 0);
-  const fidelity = referenced / state.questions.length >= 0.9 ? 95 : 90;
-  const stars = fidelity >= 95 ? "★★★★★" : "★★★★☆";
-  return `
-    <section class="quadrix-audit">
-      <div>
-        <p class="section-kicker">Fidelidade ao estilo Quadrix</p>
-        <h3>${stars} (${fidelity}%)</h3>
-      </div>
-      <p>O nível foi atribuído porque o simulado usa formato Certo/Errado, pontuação líquida, assuntos do edital CRT-SP 2026, pesos de incidência e matriz de inspiração em provas Quadrix de conselhos profissionais, sem cópia literal de itens protegidos.</p>
-    </section>
-  `;
-}
-
-function renderOriginStats(questions) {
-  const stats = getOriginStats(questions);
-  return `
-    <section class="source-stats">
-      <p class="section-kicker">Distribuição das inspirações</p>
-      <div>${stats.map((item) => `
-        <div class="source-stat">
-          <span>${escapeHtml(item.category)}</span>
-          <strong>${item.percent}%</strong>
-          <small>${item.count} item(ns)</small>
-        </div>
-      `).join("")}</div>
-    </section>
-  `;
-}
-
-function renderOriginTable(questions) {
-  return `
-    <section class="origin-table">
-      <p class="section-kicker">Transparência das questões</p>
-      <h3>Origem do conteúdo</h3>
-      <div class="origin-row origin-row--head"><span>Questão</span><span>Origem</span></div>
-      ${questions.map((question, index) => {
-        const origin = getQuestionOrigin(question);
-        return `<div class="origin-row"><span>${index + 1}</span><span>${escapeHtml(origin.origin)}</span></div>`;
-      }).join("")}
-    </section>
-  `;
-}
-
-function renderSourcesUsedPanel() {
-  return `
-    <article class="study-card study-card--wide sources-used">
-      <h3>FONTES UTILIZADAS</h3>
-      <ul>${SOURCE_REFERENCES.map(([label, url]) => `<li>✓ <a href="${url}" target="_blank" rel="noreferrer">${escapeHtml(label)}</a></li>`).join("")}</ul>
-      <p><strong>Questões adaptadas/inspiradas por matriz de estilo:</strong> Quadrix — CREA-GO, CREA-RO, CREF/CREFONO, CRN/CRC, CRF/CRMV e demais Conselhos Profissionais entre 2021 e 2026.</p>
-    </article>
-  `;
-}
-
-function renderIncidencePanel() {
-  const rows = Object.entries(INCIDENCE_WEIGHTS)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 12);
-  return `
-    <article class="study-card study-card--wide incidence-panel">
-      <h3>Pesos de incidência por assunto</h3>
-      <p>O sorteio não é uniforme: temas mais recorrentes no edital CRT-SP e no padrão de provas Quadrix para conselhos profissionais entram com prioridade maior.</p>
-      <div>${rows.map(([tag, weight]) => `<span>${escapeHtml(tag)} · peso ${weight}</span>`).join("")}</div>
-    </article>
-  `;
-}
-
-function renderDailyLessonPanel() {
-  const suggestion = getDailyStudySuggestion();
-  const group = suggestion.focus.toLowerCase().includes("português") || suggestion.focus.toLowerCase().includes("rlm") ? "basicos"
-    : suggestion.focus.toLowerCase().includes("protocolo") || suggestion.focus.toLowerCase().includes("atendimento") ? "protocolo"
-      : suggestion.focus.toLowerCase().includes("lei") || suggestion.focus.toLowerCase().includes("lgpd") || suggestion.focus.toLowerCase().includes("lai") ? "legislacao"
-        : "administracao";
-  return `
-    <article class="study-card study-card--wide lesson-panel">
-      <p class="section-kicker">Material do dia em formato apostila</p>
-      <h3>${escapeHtml(suggestion.title)}</h3>
-      <p><strong>Teoria resumida:</strong> estude primeiro a regra geral, depois exceções, competências, prazos e palavras absolutas usadas pela banca.</p>
-      <p><strong>Macete:</strong> quando o item trouxer “sempre”, “nunca”, “apenas” ou “obrigatoriamente”, compare com a literalidade da lei ou com o conceito administrativo antes de marcar.</p>
-      <div class="quadrix-traps">
-        <strong>PEGADINHAS DA QUADRIX</strong>
-        <ul>${QUADRIX_TRAPS[group].map((trap) => `<li>${escapeHtml(trap)}</li>`).join("")}</ul>
-      </div>
-    </article>
-  `;
-}
-
-function calculateResult(state) {
-  const result = {
-    correct: 0,
-    wrong: 0,
-    blank: 0,
-    netScore: 0,
-    blocks: {},
-    disciplines: {},
-    weakTopics: new Map(),
-    answers: { ...state.answers },
-  };
-
-  state.questions.forEach((question) => {
-    const answer = result.answers[question.id] || "B";
-    const status = answer === "B" ? "blank" : answer === question.gabarito ? "correct" : "wrong";
-    result[status] += 1;
-    for (const [bucket, key] of [["blocks", question.bloco], ["disciplines", question.disciplina]]) {
-      result[bucket][key] ||= { correct: 0, wrong: 0, blank: 0, total: 0, net: 0 };
-      result[bucket][key].total += 1;
-      result[bucket][key][status] += 1;
-      result[bucket][key].net = result[bucket][key].correct - result[bucket][key].wrong;
-    }
-    if (status !== "correct") {
-      const key = question.assunto;
-      const current = result.weakTopics.get(key) || { count: 0, discipline: question.disciplina };
-      current.count += 1;
-      result.weakTopics.set(key, current);
-    }
-  });
-
-  result.netScore = result.correct - result.wrong;
-  result.securityPercent = Math.round((result.correct / state.questions.length) * 100);
-  return result;
-}
-
-function updateStatsAfterExam(state, result) {
-  const stats = loadUserStats();
-  const streakBonus = Math.min(stats.currentStreak, 10);
-  const earnedPoints = Math.max(0, result.netScore) + result.correct + streakBonus;
-  const weakSubjects = [...result.weakTopics.entries()]
-    .sort((a, b) => b[1].count - a[1].count)
-    .slice(0, 8)
-    .map(([assunto, data]) => ({ assunto, disciplina: data.discipline, count: data.count }));
-
-  stats.totalPoints += earnedPoints;
-  stats.examsFinished += 1;
-  if (state.type === "real") stats.realExamsFinished += 1;
-  stats.lastNetScore = result.netScore;
-  stats.bestNetScore = stats.bestNetScore === null ? result.netScore : Math.max(stats.bestNetScore, result.netScore);
-  stats.netScoreSum += result.netScore;
-  stats.questionsAnswered += state.questions.length;
-  stats.correctCount += result.correct;
-  stats.wrongCount += result.wrong;
-  stats.blankCount += result.blank;
-  stats.history.unshift({
-    date: getTodayKey(),
-    type: state.type,
-    label: state.title,
-    difficulty: state.difficulty,
-    correct: result.correct,
-    wrong: result.wrong,
-    blank: result.blank,
-    netScore: result.netScore,
-    earnedPoints,
-    weakSubjects,
-  });
-  stats.history = stats.history.slice(0, 12);
-  saveUserStats(activeUserId, stats);
-  return { stats, earnedPoints, streakBonus };
-}
-
-function renderUserSelection() {
-  $("#app-shell").hidden = true;
-  $("#login-screen").hidden = false;
-  activeUserId = null;
-  if (realTimer) clearInterval(realTimer);
-}
-
-function renderDashboard() {
-  const user = getCurrentUser();
-  const stats = loadUserStats();
-  const average = stats.examsFinished ? stats.netScoreSum / stats.examsFinished : null;
-  const accuracy = stats.correctCount + stats.wrongCount ? Math.round((stats.correctCount / (stats.correctCount + stats.wrongCount)) * 100) : 0;
-  $("#top-user-name").textContent = user.name;
-  $("#dashboard").innerHTML = `
-    <div class="dashboard__intro">
-      <p class="section-kicker">Painel de bordo</p>
-      <h2>Olá, <span>${escapeHtml(user.name)}</span>.</h2>
-      <p class="streak-callout">🔥 ${stats.currentStreak} ${stats.currentStreak === 1 ? "dia" : "dias"} — ${streakPhrase(stats.currentStreak)}</p>
-      <div class="dashboard__actions">
-        <button class="button button--small button--ghost" data-action="switch-user" type="button">Trocar usuário</button>
-        <button class="button button--small button--danger" data-action="clear-user" type="button">Zerar meus dados locais</button>
-      </div>
-    </div>
-    <div class="stat-grid">
-      ${statCard("🏆 Pontos totais", stats.totalPoints, "pontos de jornada", true)}
-      ${statCard("🔥 Foguinho atual", stats.currentStreak, `Recorde: ${stats.bestStreak}`)}
-      ${statCard("🚀 Acessos", stats.totalAccesses, "dias registrados")}
-      ${statCard("📚 Simulados", stats.examsFinished, "inclui extras")}
-      ${statCard("🎯 Provas reais", stats.realExamsFinished, "120 itens")}
-      ${statCard("Melhor líquida", formatScore(stats.bestNetScore), "recorde pessoal")}
-      ${statCard("Última líquida", formatScore(stats.lastNetScore), "resultado recente")}
-      ${statCard("Média líquida", formatScore(average), "todos os modos")}
-      ${statCard("Taxa geral", `${accuracy}%`, `${stats.questionsAnswered} questões`)}
-    </div>
-    ${renderDailyStudyCard(stats)}
-  `;
-}
-
-function statCard(label, value, detail, featured = false) {
-  return `<article class="stat-card ${featured ? "stat-card--featured" : ""}"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong><small>${escapeHtml(detail)}</small></article>`;
-}
-
-function getDailyStudySuggestion(stats = loadUserStats()) {
-  const weak = new Map();
-  stats.history.forEach((item) => (item.weakSubjects || []).forEach((subject) => {
-    weak.set(subject.assunto, (weak.get(subject.assunto) || 0) + subject.count);
-  }));
-  const topWeak = [...weak.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3);
-  if (topWeak.length) {
+  function makeUserRecord(userId) {
     return {
-      title: "Hoje é dia de atacar seus erros",
-      focus: topWeak.map(([topic]) => topic).join(", "),
-      tasks: [
-        "15 min relendo o resumo dos temas fracos",
-        "20 min refazendo itens errados ou em branco",
-        "10 min criando anotações curtas com a pegadinha de cada tema",
-      ],
+      userId,
+      selectedContestId: null,
+      selectedRoleByContest: {},
+      scopes: {},
+      createdAt: nowIso(),
     };
   }
-  return DAILY_STUDY_ROTATION[hashSeed(`${getTodayKey()}:${activeUserId || "geral"}`) % DAILY_STUDY_ROTATION.length];
-}
 
-function renderDailyStudyCard(stats) {
-  const suggestion = getDailyStudySuggestion(stats);
-  return `
-    <article class="daily-study-card">
-      <div>
-        <p class="section-kicker">Sugestão de estudo diário</p>
-        <h3>${escapeHtml(suggestion.title)}</h3>
-        <p><strong>Foco:</strong> ${escapeHtml(suggestion.focus)}</p>
-      </div>
-      <ul>${suggestion.tasks.map((task) => `<li>${escapeHtml(task)}</li>`).join("")}</ul>
-    </article>
-  `;
-}
+  function currentUserRecord(store = loadStore()) {
+    store.users = store.users || {};
+    store.users[state.currentUserId] = store.users[state.currentUserId] || makeUserRecord(state.currentUserId);
+    return store.users[state.currentUserId];
+  }
 
-function renderRanking() {
-  const all = loadAllStats();
-  const userIds = Object.keys(USERS);
-  const rows = [
-    ["Pontos", "totalPoints"],
-    ["Acessos", "totalAccesses"],
-    ["Maior foguinho", "bestStreak"],
-    ["Simulados", "examsFinished"],
-    ["Provas reais", "realExamsFinished"],
-  ];
-  const scoreboard = Object.fromEntries(userIds.map((id) => [id, 0]));
-  rows.forEach(([, field]) => {
-    const values = userIds.map((id) => all[id][field] || 0);
-    const max = Math.max(...values);
-    if (max > 0) userIds.forEach((id) => { if ((all[id][field] || 0) === max) scoreboard[id] += 1; });
-  });
-  const bestScore = Math.max(...Object.values(scoreboard));
-  const leaders = userIds.filter((id) => scoreboard[id] === bestScore && bestScore > 0);
-  const winner = leaders.length === 1 ? `${USERS[leaders[0]].name} lidera` : "Empate técnico";
-  $("#ranking").innerHTML = `
-    <div class="ranking__header">
-      <div><p class="section-kicker">Duelo amistoso</p><h2>${userIds.map((id) => USERS[id].name).join(" × ")}</h2></div>
-      <p class="ranking-status">${winner}</p>
-    </div>
-    <div class="ranking-table" style="--ranking-user-count:${userIds.length}">
-      <div class="ranking-row ranking-row--head"><span>Métrica</span>${userIds.map((id) => `<strong>${escapeHtml(USERS[id].name)}</strong>`).join("")}</div>
-      ${rows.map(([label, field]) => {
-        const values = userIds.map((id) => all[id][field] || 0);
-        const max = Math.max(...values);
-        return `<div class="ranking-row"><span>${label}</span>${userIds.map((id) => {
-          const value = all[id][field] || 0;
-          return `<strong class="${value === max && max > 0 ? "is-leading" : ""}">${value}</strong>`;
-        }).join("")}</div>`;
-      }).join("")}
-    </div>
-  `;
-}
+  function scopeKey(contestId = state.activeContestId, roleId = state.activeRoleId) {
+    return `${contestId}::${roleId}`;
+  }
 
-function renderTabs() {
-  $("#tabs").innerHTML = Object.entries(TAB_LABELS).map(([id, label]) => (
-    `<button class="tab-button ${activeTab === id ? "is-active" : ""}" type="button" data-tab="${id}">${label}</button>`
-  )).join("");
-  Object.keys(TAB_LABELS).forEach((id) => {
-    const panel = $(`#${id}-tab`);
-    if (panel) panel.hidden = activeTab !== id;
-  });
-}
-
-function ensureDailyState() {
-  if (!quizStates.daily || quizStates.daily.date !== getTodayKey()) {
-    quizStates.daily = {
-      type: "daily",
-      title: "Simulado diário",
-      date: getTodayKey(),
-      difficulty: "misto",
-      questions: selectDailyQuestions("misto"),
+  function makeScope() {
+    return {
       answers: {},
-      finished: false,
-      result: null,
-      reward: null,
+      history: [],
+      mocks: [],
+      favorites: {},
+      notes: {},
+      reports: {},
+      revisionMarked: {},
+      goals: {
+        dailyQuestions: 30,
+        weeklyMocks: 2,
+        reviewWrong: 20,
+        targetAccuracy: 80,
+      },
+      createdAt: nowIso(),
     };
   }
-  return quizStates.daily;
-}
 
-function createExtraState(quantity = 40, difficulty = "misto") {
-  const stats = loadUserStats();
-  stats.extraAttempts += 1;
-  saveUserStats(activeUserId, stats);
-  quizStates.extra = {
-    type: "extra",
-    title: "Questionário extra",
-    date: getTodayKey(),
-    difficulty,
-    questions: selectExtraQuestions(quantity, difficulty),
-    answers: {},
-    finished: false,
-    result: null,
-    reward: null,
-  };
-}
-
-function createRealState() {
-  quizStates.real = {
-    type: "real",
-    title: "Prova real",
-    date: getTodayKey(),
-    difficulty: "misto",
-    questions: selectRealExamQuestions(),
-    answers: {},
-    finished: false,
-    started: true,
-    durationSeconds: 3 * 60 * 60,
-    startedAt: Date.now(),
-    result: null,
-    reward: null,
-  };
-  startRealTimer();
-}
-
-function renderDailyTab() {
-  const state = ensureDailyState();
-  const subjects = [...new Set(state.questions.map((question) => question.assunto))].slice(0, 12);
-  $("#daily-tab").innerHTML = `
-    <section class="mode-card">
-      <div>
-        <p class="section-kicker">Simulado do dia · ${new Intl.DateTimeFormat("pt-BR", { dateStyle: "long" }).format(new Date())}</p>
-        <h2>40 itens para manter o ritmo.</h2>
-        <p>Mesma prova para todos os perfis. A seleção muda automaticamente amanhã com sorteio determinístico pela data.</p>
-      </div>
-      <div class="chip-list">${subjects.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>
-    </section>
-    ${renderQuiz(state)}
-  `;
-}
-
-function renderExtraTab() {
-  if (!quizStates.extra) createExtraState(20, "misto");
-  $("#extra-tab").innerHTML = `
-    <section class="mode-card mode-card--controls">
-      <div>
-        <p class="section-kicker">Treino livre</p>
-        <h2>Gere perguntas diferentes.</h2>
-        <p>O sorteio evita repetir exatamente o simulado diário e usa data, tentativa, quantidade e dificuldade como seed.</p>
-      </div>
-      <div class="control-grid">
-        <label>Quantidade<select id="extra-quantity"><option value="10">10 questões</option><option value="20" selected>20 questões</option><option value="40">40 questões</option></select></label>
-        <label>Dificuldade<select id="extra-difficulty">${difficultyOptions("misto")}</select></label>
-        <button class="button button--primary" data-action="new-extra" type="button">Gerar novo questionário</button>
-      </div>
-    </section>
-    ${renderQuiz(quizStates.extra)}
-  `;
-}
-
-function renderRealTab() {
-  const state = quizStates.real;
-  if (!state) {
-    $("#real-tab").innerHTML = `
-      <section class="mode-card mode-card--real">
-        <div>
-          <p class="section-kicker">Modo prova real</p>
-          <h2>120 itens · 3 horas sugeridas.</h2>
-          <p>Distribuição: 40 básicos, 30 complementares e 50 específicos. Ao iniciar, o cronômetro opcional começa a contar.</p>
-          <div class="score-rule"><span>+1 acerto</span><span>−1 erro</span><span>0 em branco</span></div>
-        </div>
-        <button class="button button--primary button--large" data-action="start-real" type="button">Iniciar prova real</button>
-      </section>
-    `;
-    return;
+  function getScope(store = loadStore(), contestId = state.activeContestId, roleId = state.activeRoleId) {
+    const user = currentUserRecord(store);
+    const key = scopeKey(contestId, roleId);
+    user.scopes[key] = user.scopes[key] || makeScope();
+    return user.scopes[key];
   }
-  $("#real-tab").innerHTML = `
-    <section class="mode-card mode-card--real">
-      <div><p class="section-kicker">Cronômetro opcional</p><h2 id="real-timer">${formatTimer(getRemainingSeconds(state))}</h2><p>Finalize quando quiser. O relatório calcula mínimos configuráveis e risco de eliminação.</p></div>
-      <button class="button button--ghost" data-action="restart-real" type="button">Recomeçar prova real</button>
-    </section>
-    ${renderQuiz(state)}
-  `;
-}
 
-function difficultyOptions(selected) {
-  return Object.entries(DIFFICULTY_LABELS).map(([value, label]) => `<option value="${value}" ${selected === value ? "selected" : ""}>${label}</option>`).join("");
-}
-
-function renderQuiz(state) {
-  const answered = Object.keys(state.answers).length;
-  const percent = Math.round((answered / state.questions.length) * 100);
-  const groups = state.questions.reduce((acc, question, index) => {
-    (acc[question.bloco] ||= []).push({ ...question, displayNumber: index + 1 });
-    return acc;
-  }, {});
-
-  return `
-    <form class="quiz-form" data-quiz="${state.type}">
-      <div class="progress-shell">
-        <div class="progress-info"><span>${answered} de ${state.questions.length} respondidas</span><span>${percent}%</span></div>
-        <div class="progress-track"><span style="width:${percent}%"></span></div>
-      </div>
-      ${Object.entries(groups).map(([block, questions]) => `
-        <section class="question-block">
-          <div class="block-heading"><h2>${escapeHtml(block)}</h2><span>${questions.length} itens</span></div>
-          ${questions.map((question) => renderQuestion(question, state)).join("")}
-        </section>
-      `).join("")}
-      <div class="exam-actions">
-        <button class="button button--primary" type="submit" ${state.finished ? "disabled" : ""}>Finalizar ${state.type === "real" ? "prova" : "simulado"}</button>
-        <button class="button button--ghost" data-action="reset-answers" data-quiz="${state.type}" type="button">Reiniciar respostas</button>
-        ${state.type === "extra" ? `<button class="button button--ghost" data-action="new-extra" type="button">Recomeçar com outras perguntas</button>` : ""}
-      </div>
-    </form>
-    ${state.finished ? renderResults(state) : ""}
-  `;
-}
-
-function renderQuestion(question, state) {
-  const name = `${state.type}-${question.id}`;
-  const current = state.answers[question.id] || "";
-  const finishedAnswer = state.result?.answers?.[question.id] || "B";
-  const selectedAnswer = state.finished ? finishedAnswer : current;
-  const status = state.finished ? getQuestionStatus(question, finishedAnswer) : null;
-  return `
-    <article class="question ${state.finished ? `question--review question--${status}` : ""}" ${state.finished ? "data-review-question=\"true\"" : ""}>
-      <div class="question__meta"><span class="question__number">${question.displayNumber}</span><span>${escapeHtml(question.disciplina)} · ${escapeHtml(question.assunto)} · ${escapeHtml(DIFFICULTY_LABELS[question.dificuldade])}</span></div>
-      ${state.finished ? `<div class="question-status question-status--${status}"><span>${statusEmoji(status)} ${statusLabel(status)}</span><small>Sua resposta: ${answerLabel(finishedAnswer)} · Gabarito: ${answerLabel(question.gabarito)}</small></div>` : ""}
-      <p class="question__text">${escapeHtml(question.enunciado)}</p>
-      <div class="choices" role="radiogroup" aria-label="Resposta do item ${question.displayNumber}">
-        ${[["C", "Certo"], ["E", "Errado"], ["B", "Em branco"]].map(([value, label]) => `
-          <input type="radio" id="${name}-${value}" name="${name}" value="${value}" ${selectedAnswer === value ? "checked" : ""} ${state.finished ? "disabled" : ""}>
-          <label for="${name}-${value}">${label}</label>
-        `).join("")}
-      </div>
-      ${state.finished ? `
-        <details class="question-explanation">
-          <summary>Ver explicação e links de estudo</summary>
-          <p>${escapeHtml(question.comentario)}</p>
-          ${renderQuestionSource(question)}
-          ${renderQuestionTraps(question)}
-          ${renderQuestionStudyLinks(question)}
-        </details>
-      ` : ""}
-    </article>
-  `;
-}
-
-function renderResults(state) {
-  const { result, reward } = state;
-  const weak = [...result.weakTopics.entries()].sort((a, b) => b[1].count - a[1].count).slice(0, 10);
-  return `
-    <section class="results">
-      <div class="results__heading">
-        <div><p class="section-kicker">Relatório final</p><h2>${escapeHtml(state.title)}</h2></div>
-        <div class="net-score"><span>Pontuação líquida</span><strong>${result.netScore}</strong><small>${result.securityPercent}% de segurança</small></div>
-      </div>
-      <div class="metric-grid">
-        ${metric("Acertos", result.correct, "correct")}
-        ${metric("Erros", result.wrong, "wrong")}
-        ${metric("Em branco", result.blank, "blank")}
-      </div>
-      <div class="points-earned">
-        <div><span>Pontos ganhos</span><strong>+${reward.earnedPoints}</strong></div>
-        <p>${Math.max(0, result.netScore)} pela líquida + ${result.correct} pelos acertos + ${reward.streakBonus} pelo foguinho</p>
-        <div><span>Total acumulado</span><strong>${reward.stats.totalPoints}</strong></div>
-      </div>
-      ${renderQuadrixFidelity(state)}
-      ${renderOriginStats(state.questions)}
-      ${state.type === "real" ? renderEliminationRisk(result) : ""}
-      <h3>Desempenho por bloco</h3>
-      ${renderPerformance(result.blocks)}
-      <h3>Desempenho por disciplina</h3>
-      ${renderPerformance(result.disciplines)}
-      <div class="review-panel">
-        <div><p class="section-kicker">Revisão inteligente</p><h3>Assuntos para revisar</h3><p>Prioridade baseada em erros e respostas em branco.</p></div>
-        <ul>${weak.length ? weak.map(([topic, data]) => `<li><strong>${escapeHtml(topic)}</strong> — ${data.count} item(ns)</li>`).join("") : "<li>Nenhum tema pendente. Excelente.</li>"}</ul>
-      </div>
-      <div class="result-actions">
-        <button class="button button--primary" data-action="go-studies" type="button">Ir para Estudos</button>
-        <button class="button button--ghost" data-action="new-extra" type="button">Fazer outro questionário</button>
-      </div>
-      <div class="answer-key">
-        <p class="section-kicker">Correção detalhada</p>
-        <h3>Gabarito comentado</h3>
-        ${state.questions.map((question, index) => renderAnswerItem(question, index + 1, result.answers[question.id])).join("")}
-      </div>
-      ${renderOriginTable(state.questions)}
-    </section>
-  `;
-}
-
-function metric(label, value, kind) {
-  return `<article class="metric metric--${kind}"><span>${label}</span><strong>${value}</strong></article>`;
-}
-
-function renderPerformance(performance) {
-  return `<div class="block-results">${Object.entries(performance).map(([name, data]) => {
-    const percent = Math.round((data.correct / data.total) * 100);
-    return `<div class="block-result"><strong>${escapeHtml(name)}</strong><div class="block-result__track"><span style="width:${percent}%"></span></div><span>${percent}%</span><small>Líquida ${data.net}/${data.total}</small></div>`;
-  }).join("")}</div>`;
-}
-
-function renderEliminationRisk(result) {
-  const blockMap = {
-    basicos: result.blocks["Conhecimentos Básicos"]?.net || 0,
-    complementares: result.blocks["Conhecimentos Complementares"]?.net || 0,
-    especificos: result.blocks["Conhecimentos Específicos"]?.net || 0,
-    total: result.netScore,
-  };
-  const checks = Object.entries(MINIMOS_PROVA_REAL).map(([key, min]) => ({ key, min, value: blockMap[key], ok: blockMap[key] >= min }));
-  const failed = checks.filter((item) => !item.ok).length;
-  const status = failed === 0 ? "Dentro da zona segura" : failed <= 1 ? "Atenção" : "Risco de eliminação";
-  return `
-    <div class="risk-panel risk-panel--${failed === 0 ? "safe" : failed <= 1 ? "warn" : "danger"}">
-      <div><p class="section-kicker">Mínimos eliminatórios configuráveis</p><h3>${status}</h3></div>
-      <ul>${checks.map((item) => `<li>${escapeHtml(item.key)}: <strong>${item.value}</strong> / mínimo ${item.min} ${item.ok ? "✅" : "⚠️"}</li>`).join("")}</ul>
-    </div>
-  `;
-}
-
-function renderAnswerItem(question, number, answer) {
-  const status = getQuestionStatus(question, answer);
-  return `
-    <article class="answer-item answer-item--${status}">
-      <p class="answer-item__meta">ITEM ${number} · ${escapeHtml(question.disciplina)} · ${escapeHtml(question.assunto)}</p>
-      <p><strong>Sua resposta:</strong> ${answerLabel(answer)} · <strong>Gabarito:</strong> ${answerLabel(question.gabarito)}</p>
-      <p class="answer-item__comment">${escapeHtml(question.comentario)}</p>
-      ${renderQuestionSource(question)}
-    </article>
-  `;
-}
-
-function renderStudyTab() {
-  const recs = getPersonalizedStudyRecommendations();
-  const dailySuggestion = getDailyStudySuggestion();
-  $("#studies-tab").innerHTML = `
-    <section class="mode-card">
-      <div><p class="section-kicker">Central de estudos</p><h2>Revisão com peso de edital.</h2><p>Use esta aba entre simulados: primeiro legislação do Sistema CFT/CRTs, depois rotinas, protocolo, atendimento e leis complementares.</p></div>
-      <div class="study-plan">
-        <strong>Sugestão de hoje: ${escapeHtml(dailySuggestion.title)}</strong>
-        <span><b>Foco:</b> ${escapeHtml(dailySuggestion.focus)}</span>
-        ${dailySuggestion.tasks.map((task) => `<span>• ${escapeHtml(task)}</span>`).join("")}
-      </div>
-    </section>
-    <section class="study-grid">
-      ${renderDailyLessonPanel()}
-      ${studyCard("A) Maior prioridade", ["Sistema CFT/CRT", "Lei 13.639/2018", "Lei 5.524/1968", "Decreto 90.922/1985", "Decreto 4.560/2002", "Regimento Interno CRT-SP", "Resoluções CFT", "rotinas administrativas", "protocolo", "atendimento", "redação oficial", "LAI", "LGPD", "Lei 9.784/1999", "improbidade administrativa"])}
-      ${studyCard("B) Resumo rápido", [
-        "Português: leia comando, procure generalizações e cuide de crase, concordância e pontuação.",
-        "RLM: treine porcentagem, lógica proposicional, negações e proporcionalidade.",
-        "Informática: segurança, planilhas, e-mail, nuvem e boas práticas.",
-        "Ética/Administração Pública: LIMPE, finalidade, moralidade, conflito de interesses e atendimento.",
-        "LAI/LGPD: publicidade como regra, proteção de dados e bases legais.",
-        "Processo Administrativo/Improbidade: motivação, competência, contraditório e dolo.",
-        "Administração Geral: planejamento, controle, qualidade, processos e projetos.",
-        "Materiais/estoques/logística: ABC, PEPS, lead time, ponto de pedido e inventário.",
-        "Licitações: planejamento, pregão, contratação direta, fiscalização e competitividade.",
-        "Redação/protocolo: clareza, autuação, tramitação, temporalidade e arquivo.",
-        "Sistema CFT/CRTs: leis, decretos, regimento e resoluções."
-      ])}
-      <article class="study-card"><h3>C) Links oficiais</h3><ul>${OFFICIAL_LINKS.map(([label, url]) => `<li><a href="${url}" target="_blank" rel="noreferrer">${escapeHtml(label)}</a></li>`).join("")}</ul></article>
-      <article class="study-card"><h3>D) Videoaulas gratuitas</h3><ul>${YOUTUBE_SEARCHES.map((term) => `<li><a href="https://www.youtube.com/results?search_query=${encodeURIComponent(term)}" target="_blank" rel="noreferrer">${escapeHtml(term)}</a></li>`).join("")}</ul></article>
-      <article class="study-card study-card--wide"><h3>E) Revisão personalizada</h3>${recs}</article>
-      ${renderIncidencePanel()}
-      ${renderSourcesUsedPanel()}
-      <article class="study-card study-card--wide"><h3>Dicas Quadrix</h3><p>Desconfie de “sempre”, “nunca”, “apenas” e “obrigatoriamente”. Em legislação, compare competência, prazo, finalidade e hierarquia normativa. Em administração, cuidado com troca entre descentralização/desconcentração, dispensa/inexigibilidade e processo/projeto.</p></article>
-    </section>
-  `;
-}
-
-function studyCard(title, items) {
-  return `<article class="study-card"><h3>${escapeHtml(title)}</h3><ul>${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul></article>`;
-}
-
-function getPersonalizedStudyRecommendations() {
-  const stats = loadUserStats();
-  if (!stats.history.length) return `<p>Faça pelo menos um simulado para liberar recomendações personalizadas.</p>`;
-  const weak = new Map();
-  stats.history.forEach((item) => (item.weakSubjects || []).forEach((subject) => {
-    weak.set(subject.assunto, (weak.get(subject.assunto) || 0) + subject.count);
-  }));
-  const top = [...weak.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8);
-  const accuracy = stats.correctCount + stats.wrongCount ? stats.correctCount / (stats.correctCount + stats.wrongCount) : 0;
-  const recommended = accuracy < 0.45 ? "fácil" : accuracy < 0.68 ? "médio" : "difícil";
-  return `
-    <p><strong>Treino recomendado hoje:</strong> ${recommended}.</p>
-    <p><strong>Matérias/assuntos com mais erros ou brancos:</strong></p>
-    <ul>${top.map(([topic, count]) => `<li>${escapeHtml(topic)} — ${count} ocorrência(s)</li>`).join("")}</ul>
-  `;
-}
-
-function renderDashboardTab() {
-  const stats = loadUserStats();
-  $("#dashboard-tab").innerHTML = `
-    <section class="mode-card">
-      <div><p class="section-kicker">Histórico local</p><h2>Últimos resultados.</h2><p>Dados salvos somente neste navegador para ${escapeHtml(USERS[activeUserId].name)}.</p></div>
-    </section>
-    <div class="history-list">
-      ${stats.history.slice(0, 5).length ? stats.history.slice(0, 5).map((item) => `
-        <article class="history-item">
-          <strong>${escapeHtml(item.label)} · ${escapeHtml(DIFFICULTY_LABELS[item.difficulty] || "Misto")}</strong>
-          <span>${item.date} · líquida ${item.netScore} · ${item.correct} C / ${item.wrong} E / ${item.blank} B · +${item.earnedPoints} pts</span>
-        </article>
-      `).join("") : `<p class="empty-state">Nenhum resultado ainda. Faça o simulado diário para começar o histórico.</p>`}
-    </div>
-  `;
-}
-
-function renderActiveTab() {
-  renderTabs();
-  if (activeTab === "daily") renderDailyTab();
-  if (activeTab === "extra") renderExtraTab();
-  if (activeTab === "real") renderRealTab();
-  if (activeTab === "studies") renderStudyTab();
-  if (activeTab === "dashboard") renderDashboardTab();
-}
-
-function renderApp() {
-  renderDashboard();
-  renderRanking();
-  renderActiveTab();
-}
-
-function handleAnswerChange(event) {
-  const input = event.target;
-  if (!input.matches("input[type='radio']")) return;
-  const form = input.closest(".quiz-form");
-  const type = form?.dataset.quiz;
-  const state = quizStates[type];
-  if (!state || state.finished) return;
-  const questionId = input.name.replace(`${type}-`, "");
-  state.answers[questionId] = input.value;
-  renderActiveTab();
-}
-
-function finishQuiz(event) {
-  event.preventDefault();
-  const form = event.target.closest(".quiz-form");
-  const type = form.dataset.quiz;
-  const state = quizStates[type];
-  if (!state || state.finished) return;
-  state.result = calculateResult(state);
-  state.reward = updateStatsAfterExam(state, state.result);
-  state.finished = true;
-  if (type === "real" && realTimer) clearInterval(realTimer);
-  renderApp();
-  document.querySelector(`#${type}-tab .results`)?.scrollIntoView({ behavior: "smooth", block: "start" });
-}
-
-function resetAnswers(type) {
-  const state = quizStates[type];
-  if (!state || state.finished) return;
-  state.answers = {};
-  renderActiveTab();
-}
-
-function getRemainingSeconds(state) {
-  const elapsed = Math.floor((Date.now() - state.startedAt) / 1000);
-  return Math.max(0, state.durationSeconds - elapsed);
-}
-
-function formatTimer(seconds) {
-  const h = String(Math.floor(seconds / 3600)).padStart(2, "0");
-  const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, "0");
-  const s = String(seconds % 60).padStart(2, "0");
-  return `${h}:${m}:${s}`;
-}
-
-function startRealTimer() {
-  if (realTimer) clearInterval(realTimer);
-  realTimer = setInterval(() => {
-    const el = $("#real-timer");
-    if (!el || !quizStates.real || quizStates.real.finished) return;
-    el.textContent = formatTimer(getRemainingSeconds(quizStates.real));
-  }, 1000);
-}
-
-function handleDocumentClick(event) {
-  const reviewQuestion = event.target.closest("[data-review-question='true']");
-  if (reviewQuestion && !event.target.closest("a, button, input, label, summary, .question-explanation")) {
-    const details = reviewQuestion.querySelector(".question-explanation");
-    if (details) details.open = !details.open;
-    return;
+  function persistScope(mutator) {
+    return withStore((store) => {
+      const scope = getScope(store);
+      return mutator(scope, store);
+    });
   }
-  const action = event.target.closest("[data-action]")?.dataset.action;
-  if (!action) return;
-  if (action === "switch-user") renderUserSelection();
-  if (action === "clear-user") {
-    if (!window.confirm(`Zerar dados locais de ${USERS[activeUserId].name}?`)) return;
-    saveUserStats(activeUserId, { ...createDefaultStats(), name: USERS[activeUserId].name });
-    registerUserAccess(activeUserId);
+
+  function questionsFor(contestId = state.activeContestId, roleId = state.activeRoleId) {
+    return DATA.questoes.filter((question) => (
+      question.concurso_id === contestId
+      && question.cargos_compativeis.includes(roleId)
+      && !["redacao", "discursiva"].includes(question.tipo)
+    ));
+  }
+
+  function mattersFor(contestId = state.activeContestId, roleId = state.activeRoleId) {
+    const contest = contestById(contestId);
+    return (contest?.materias || []).filter((matter) => !matter.roleIds || matter.roleIds.includes(roleId));
+  }
+
+  function hashSeed(text) {
+    let hash = 2166136261;
+    for (let index = 0; index < text.length; index += 1) {
+      hash ^= text.charCodeAt(index);
+      hash = Math.imul(hash, 16777619);
+    }
+    return hash >>> 0;
+  }
+
+  function seededRandom(seedText) {
+    let stateValue = hashSeed(seedText);
+    return () => {
+      stateValue += 0x6D2B79F5;
+      let value = stateValue;
+      value = Math.imul(value ^ (value >>> 15), value | 1);
+      value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
+      return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function shuffle(items, seedText = String(Date.now())) {
+    const output = [...items];
+    const random = seededRandom(seedText);
+    for (let index = output.length - 1; index > 0; index -= 1) {
+      const swapIndex = Math.floor(random() * (index + 1));
+      [output[index], output[swapIndex]] = [output[swapIndex], output[index]];
+    }
+    return output;
+  }
+
+  function evaluateAnswer(question, answer) {
+    const role = roleById(question.concurso_id, state.activeRoleId);
+    const scoring = role?.exam?.scoring || { correct: 1, wrong: 0, blank: 0 };
+    const normalized = normalizeAnswer(answer);
+    if (normalized === BLANK) {
+      return {
+        answer: BLANK,
+        correct: false,
+        blank: true,
+        score: scoring.blank,
+        result: "blank",
+      };
+    }
+    const correct = normalized === question.resposta_correta;
+    return {
+      answer: normalized,
+      correct,
+      blank: false,
+      score: correct ? scoring.correct : scoring.wrong,
+      result: correct ? "correct" : "wrong",
+    };
+  }
+
+  function recordAnswer(question, answer, mode, startedAt, simuladoId = null) {
+    const evaluation = evaluateAnswer(question, answer);
+    const timeSpentMs = startedAt ? Math.max(0, Date.now() - startedAt) : 0;
+    const record = {
+      id: `${Date.now()}-${question.id}-${Math.random().toString(16).slice(2)}`,
+      user_id: state.currentUserId,
+      concurso_id: state.activeContestId,
+      cargo_id: state.activeRoleId,
+      questao_id: question.id,
+      materia_id: question.materia_id,
+      materia: question.materia,
+      assunto_id: question.assunto_id,
+      assunto: question.assunto,
+      subassunto: question.subassunto,
+      dificuldade: question.dificuldade,
+      resposta_marcada: evaluation.answer,
+      resposta_correta: question.resposta_correta,
+      correto: evaluation.correct,
+      em_branco: evaluation.blank,
+      pontuacao: evaluation.score,
+      tempo_ms: timeSpentMs,
+      data: nowIso(),
+      simulado_id: simuladoId,
+      modo: mode,
+    };
+
+    persistScope((scope) => {
+      const previous = scope.answers[question.id] || {
+        questao_id: question.id,
+        attempts: 0,
+        correctAttempts: 0,
+        wrongAttempts: 0,
+        blankAttempts: 0,
+        totalTimeMs: 0,
+        firstAnsweredAt: record.data,
+      };
+      previous.attempts += 1;
+      previous.correctAttempts += evaluation.correct ? 1 : 0;
+      previous.wrongAttempts += evaluation.result === "wrong" ? 1 : 0;
+      previous.blankAttempts += evaluation.blank ? 1 : 0;
+      previous.totalTimeMs += timeSpentMs;
+      previous.lastAnswer = evaluation.answer;
+      previous.lastCorrect = evaluation.correct;
+      previous.lastBlank = evaluation.blank;
+      previous.lastScore = evaluation.score;
+      previous.lastMode = mode;
+      previous.lastAnsweredAt = record.data;
+      previous.lastTimeMs = timeSpentMs;
+      scope.answers[question.id] = previous;
+      scope.history.unshift(record);
+      scope.history = scope.history.slice(0, 1500);
+    });
+
+    return record;
+  }
+
+  function summaryFromScope(scope, questionSet = questionsFor()) {
+    const answerValues = Object.values(scope.answers || {}).filter((answer) => questionSet.some((question) => question.id === answer.questao_id));
+    const uniqueAnswered = answerValues.length;
+    const history = (scope.history || []).filter((record) => record.concurso_id === state.activeContestId && record.cargo_id === state.activeRoleId);
+    const correct = history.filter((record) => record.correto).length;
+    const wrong = history.filter((record) => !record.correto && !record.em_branco).length;
+    const blank = history.filter((record) => record.em_branco).length;
+    const total = correct + wrong + blank;
+    const score = history.reduce((sum, record) => sum + safeNumber(record.pontuacao), 0);
+    return {
+      totalQuestions: questionSet.length,
+      uniqueAnswered,
+      progress: Number(percent(uniqueAnswered, questionSet.length, 1)),
+      correct,
+      wrong,
+      blank,
+      attempts: total,
+      accuracy: Number(percent(correct, correct + wrong, 1)),
+      score,
+      mocks: scope.mocks?.length || 0,
+      favorites: Object.keys(scope.favorites || {}).length,
+      avgTimeSeconds: total ? Math.round(history.reduce((sum, record) => sum + safeNumber(record.tempo_ms), 0) / total / 1000) : 0,
+    };
+  }
+
+  function performanceByMatter(scope, questionSet = questionsFor()) {
+    const matterMap = Object.fromEntries(mattersFor().map((matter) => [matter.id, {
+      id: matter.id,
+      nome: matter.nome,
+      bloco: matter.bloco,
+      total: questionSet.filter((question) => question.materia_id === matter.id).length,
+      answered: 0,
+      correct: 0,
+      wrong: 0,
+      blank: 0,
+      lastAt: null,
+    }]));
+
+    Object.values(scope.answers || {}).forEach((answer) => {
+      const question = questionSet.find((item) => item.id === answer.questao_id);
+      if (!question || !matterMap[question.materia_id]) return;
+      const matter = matterMap[question.materia_id];
+      matter.answered += 1;
+      matter.correct += answer.lastCorrect ? 1 : 0;
+      matter.wrong += !answer.lastCorrect && !answer.lastBlank ? 1 : 0;
+      matter.blank += answer.lastBlank ? 1 : 0;
+      matter.lastAt = answer.lastAnsweredAt;
+    });
+
+    return Object.values(matterMap).map((matter) => ({
+      ...matter,
+      progress: Number(percent(matter.answered, matter.total, 1)),
+      accuracy: Number(percent(matter.correct, matter.correct + matter.wrong, 1)),
+      priority: matter.answered === 0 ? "Alta" : matter.accuracy < 60 ? "Alta" : matter.accuracy < 75 ? "Média" : "Manutenção",
+    }));
+  }
+
+  function weakTopics(scope, limit = 8) {
+    const questionSet = questionsFor();
+    const buckets = {};
+    Object.values(scope.answers || {}).forEach((answer) => {
+      const question = questionSet.find((item) => item.id === answer.questao_id);
+      if (!question) return;
+      if (answer.lastCorrect) return;
+      const key = `${question.materia} — ${question.assunto}`;
+      buckets[key] = buckets[key] || { label: key, count: 0, blank: 0, wrong: 0 };
+      buckets[key].count += 1;
+      buckets[key].blank += answer.lastBlank ? 1 : 0;
+      buckets[key].wrong += !answer.lastBlank ? 1 : 0;
+    });
+    return Object.values(buckets).sort((a, b) => b.count - a.count).slice(0, limit);
+  }
+
+  function smartRevisionQuestions(scope, limit = 15) {
+    const questionSet = questionsFor();
+    const scored = questionSet.map((question) => {
+      const answer = scope.answers[question.id];
+      const favorite = Boolean(scope.favorites?.[question.id]);
+      const marked = Boolean(scope.revisionMarked?.[question.id]);
+      const notAnswered = !answer;
+      const wrong = answer && !answer.lastCorrect && !answer.lastBlank;
+      const blank = answer && answer.lastBlank;
+      const slow = answer && answer.lastTimeMs > 90000;
+      let score = 0;
+      if (wrong) score += 7;
+      if (blank) score += 5;
+      if (favorite) score += 4;
+      if (marked) score += 4;
+      if (slow) score += 3;
+      if (notAnswered) score += 2;
+      if (question.dificuldade === "dificil") score += 1;
+      return { question, score };
+    });
+    return scored
+      .filter((item) => item.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, limit)
+      .map((item) => item.question);
+  }
+
+  function init() {
+    renderProfiles();
+    bindEvents();
+    withStore(() => null);
+
+    const session = readSession();
+    if (session?.currentUserId && DATA.users.some((user) => user.id === session.currentUserId)) {
+      login(session.currentUserId, { silent: true });
+    } else {
+      showLogin();
+    }
+  }
+
+  function readSession() {
+    try {
+      return JSON.parse(localStorage.getItem(SESSION_KEY) || "null");
+    } catch {
+      return null;
+    }
+  }
+
+  function writeSession() {
+    localStorage.setItem(SESSION_KEY, JSON.stringify({
+      currentUserId: state.currentUserId,
+      activeContestId: state.activeContestId,
+      activeRoleId: state.activeRoleId,
+    }));
+  }
+
+  function showLogin() {
+    $("#login-screen").hidden = false;
+    $("#app-shell").hidden = true;
+    state.currentUserId = null;
+    state.activeContestId = null;
+    state.activeRoleId = null;
+    stopTimer();
+  }
+
+  function login(userId, options = {}) {
+    state.currentUserId = userId;
+    const store = loadStore();
+    const record = currentUserRecord(store);
+    const savedContestId = record.selectedContestId;
+    const session = readSession();
+    const contestId = session?.currentUserId === userId && session?.activeContestId ? session.activeContestId : savedContestId;
+    state.activeContestId = DATA.concursos.some((contest) => contest.id === contestId) ? contestId : null;
+    state.activeRoleId = state.activeContestId
+      ? record.selectedRoleByContest[state.activeContestId] || contestById(state.activeContestId).defaultRoleId
+      : null;
+    state.showContestPicker = !state.activeContestId;
+    $("#login-screen").hidden = true;
+    $("#app-shell").hidden = false;
+    writeSession();
+    resetTransientState();
+    renderApp();
+    if (!options.silent && !state.activeContestId) {
+      $("#contest-picker")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+
+  function resetTransientState() {
+    state.practice = { queueIds: [], answered: {}, startedAt: {}, mode: "modo-treino" };
+    state.mock = null;
+    stopTimer();
+  }
+
+  function selectContest(contestId) {
+    withStore((store) => {
+      const user = currentUserRecord(store);
+      const contest = contestById(contestId);
+      user.selectedContestId = contestId;
+      user.selectedRoleByContest[contestId] = user.selectedRoleByContest[contestId] || contest.defaultRoleId;
+      state.activeContestId = contestId;
+      state.activeRoleId = user.selectedRoleByContest[contestId];
+      getScope(store, state.activeContestId, state.activeRoleId);
+    });
+    state.activeTab = "dashboard";
+    state.showContestPicker = false;
+    resetTransientState();
+    writeSession();
     renderApp();
   }
-  if (action === "new-extra") {
-    const quantity = Number($("#extra-quantity")?.value || 20);
-    const difficulty = $("#extra-difficulty")?.value || "misto";
-    createExtraState(quantity, difficulty);
-    activeTab = "extra";
+
+  function changeRole(roleId) {
+    const contest = contestById();
+    if (!contest.roles.some((role) => role.id === roleId)) return;
+    withStore((store) => {
+      const user = currentUserRecord(store);
+      user.selectedRoleByContest[state.activeContestId] = roleId;
+      state.activeRoleId = roleId;
+      getScope(store, state.activeContestId, state.activeRoleId);
+    });
+    state.activeTab = "dashboard";
+    resetTransientState();
+    writeSession();
+    renderApp();
+  }
+
+  function renderProfiles() {
+    $("#profile-options").innerHTML = DATA.users.map((user) => `
+      <button class="profile-card" type="button" data-login-user="${escapeHtml(user.id)}">
+        <span class="profile-card__avatar profile-card__avatar--${escapeHtml(user.accent)}">${escapeHtml(user.initial)}</span>
+        <span><strong>${escapeHtml(user.displayName)}</strong><small>@${escapeHtml(user.username)} · Entrar no painel</small></span>
+        <span aria-hidden="true">→</span>
+      </button>
+    `).join("");
+  }
+
+  function renderApp() {
+    renderHeader();
+    renderContestPicker();
+    if (!state.activeContestId || state.showContestPicker) {
+      $("#workspace").hidden = true;
+      $("#contest-picker").hidden = false;
+      return;
+    }
+    $("#workspace").hidden = false;
+    $("#contest-picker").hidden = true;
+    renderTabs();
     renderActiveTab();
   }
-  if (action === "reset-answers") resetAnswers(event.target.dataset.quiz);
-  if (action === "start-real" || action === "restart-real") {
-    if (action === "restart-real" && !window.confirm("Recomeçar a prova real e apagar respostas desta tentativa?")) return;
-    createRealState();
-    renderActiveTab();
+
+  function renderHeader() {
+    const user = currentUserDef();
+    $("#top-user-name").textContent = user ? `Olá, ${user.displayName}` : "";
+    $("#change-contest").hidden = !state.activeContestId;
+
+    const contest = contestById();
+    const role = roleById();
+    if (!contest || state.showContestPicker) {
+      $("#hero-eyebrow").textContent = "Escolha seu concurso";
+      $("#hero-title").textContent = "Plataforma de estudos segmentada";
+      $("#hero-copy").textContent = "Selecione CRT-SP, IBGE ou Prefeitura de Santos para carregar matérias, formato da banca, questões, simulados e estatísticas independentes.";
+      $("#hero-notice").textContent = "Nada se mistura: usuário + concurso + cargo têm progresso próprio.";
+      $("#active-contest-card").innerHTML = `
+        <span class="chip">3 concursos</span>
+        <h2>Mapa de prova</h2>
+        <p>CRT-SP em prioridade máxima, IBGE em segundo plano e Santos como terceira trilha.</p>
+      `;
+      return;
+    }
+
+    const total = questionsFor().length;
+    const days = daysUntil(contest.dataProva);
+    $("#hero-eyebrow").textContent = `${contest.orgao} · ${contest.banca}`;
+    $("#hero-title").innerHTML = `${escapeHtml(contest.nome)}<br><span>${escapeHtml(role.nome)}</span>`;
+    $("#hero-copy").textContent = `${contest.edital}. Prova em ${formatDate(contest.dataProva)}. Banco atual com ${total} questões para este cargo e progresso separado do restante.`;
+    $("#hero-notice").textContent = contest.scoringDescription;
+    $("#active-contest-card").innerHTML = `
+      <span class="chip chip--active">Concurso ativo</span>
+      <h2>${escapeHtml(contest.nome)}</h2>
+      <p>${escapeHtml(role.nome)}</p>
+      <div class="mini-grid">
+        <span><strong>${total}</strong><small>questões</small></span>
+        <span><strong>${days >= 0 ? days : 0}</strong><small>dias</small></span>
+        <span><strong>${role.exam.totalQuestoes}</strong><small>itens/prova</small></span>
+      </div>
+      ${renderRoleSelector(contest, role)}
+    `;
   }
-  if (action === "go-studies") {
-    activeTab = "studies";
-    renderActiveTab();
-    $("#tabs").scrollIntoView({ behavior: "smooth" });
+
+  function renderRoleSelector(contest, activeRole) {
+    if (contest.roles.length < 2) return "";
+    return `
+      <label class="field field--compact">
+        <span>Cargo</span>
+        <select id="role-select">
+          ${contest.roles.map((role) => `<option value="${escapeHtml(role.id)}" ${role.id === activeRole.id ? "selected" : ""}>${escapeHtml(role.nome)}</option>`).join("")}
+        </select>
+      </label>
+    `;
   }
-}
 
-function handleTabClick(event) {
-  const button = event.target.closest("[data-tab]");
-  if (!button) return;
-  activeTab = button.dataset.tab;
-  renderActiveTab();
-}
+  function renderContestPicker() {
+    if (!state.currentUserId) return;
+    const store = loadStore();
+    const user = currentUserRecord(store);
+    const cards = [...DATA.concursos].sort((a, b) => a.priority - b.priority).map((contest) => {
+      const roleId = user.selectedRoleByContest[contest.id] || contest.defaultRoleId;
+      const role = roleById(contest.id, roleId);
+      const scope = getScope(store, contest.id, roleId);
+      const questionSet = questionsFor(contest.id, roleId);
+      const summary = summaryFromExternalScope(scope, questionSet, contest.id, roleId);
+      const active = state.activeContestId === contest.id && !state.showContestPicker;
+      return `
+        <article class="contest-card ${active ? "contest-card--active" : ""}">
+          <div class="contest-card__top">
+            <span class="priority">Prioridade ${contest.priority}</span>
+            <span class="chip">${escapeHtml(contest.status)}</span>
+          </div>
+          <h3>${escapeHtml(contest.nome)}</h3>
+          <p>${escapeHtml(contest.orgao)}</p>
+          <dl class="contest-facts">
+            <div><dt>Banca</dt><dd>${escapeHtml(contest.banca)}</dd></div>
+            <div><dt>Cargo</dt><dd>${escapeHtml(role.nome)}</dd></div>
+            <div><dt>Nível</dt><dd>${escapeHtml(role.escolaridade || contest.nivel)}</dd></div>
+            <div><dt>Prova</dt><dd>${formatDate(contest.dataProva)}</dd></div>
+          </dl>
+          <div class="contest-progress" aria-label="Progresso em ${escapeHtml(contest.nome)}">
+            <span style="width:${summary.progress}%"></span>
+          </div>
+          <div class="mini-grid">
+            <span><strong>${questionSet.length}</strong><small>questões</small></span>
+            <span><strong>${summary.progress}%</strong><small>progresso</small></span>
+            <span><strong>${summary.mocks}</strong><small>simulados</small></span>
+            <span><strong>${summary.accuracy}%</strong><small>acertos</small></span>
+          </div>
+          <button class="primary-button" type="button" data-select-contest="${escapeHtml(contest.id)}">${active ? "Continuar" : "Estudar este concurso"}</button>
+        </article>
+      `;
+    }).join("");
 
-function enterApp(userId) {
-  setCurrentUser(userId);
-  registerUserAccess(userId);
-  quizStates = {};
-  ensureDailyState();
-  activeTab = "daily";
-  $("#login-screen").hidden = true;
-  $("#app-shell").hidden = false;
-  renderApp();
-  window.scrollTo({ top: 0 });
-}
+    $("#contest-picker").innerHTML = `
+      <div class="section-heading">
+        <p class="eyebrow">Seleção independente</p>
+        <h2 id="contest-picker-title">Escolha o concurso</h2>
+        <p>Ao entrar em um card, dashboard, simulados, matérias, revisão e histórico passam a usar só aquele concurso e cargo.</p>
+      </div>
+      <div class="contest-grid">${cards}</div>
+    `;
+  }
 
-document.querySelectorAll("[data-user]").forEach((button) => {
-  button.addEventListener("click", () => enterApp(button.dataset.user));
-});
-$("#switch-user").addEventListener("click", renderUserSelection);
-$("#tabs").addEventListener("click", handleTabClick);
-document.addEventListener("click", handleDocumentClick);
-document.addEventListener("change", handleAnswerChange);
-document.addEventListener("submit", finishQuiz);
+  function summaryFromExternalScope(scope, questionSet, contestId, roleId) {
+    const answerValues = Object.values(scope.answers || {}).filter((answer) => questionSet.some((question) => question.id === answer.questao_id));
+    const history = (scope.history || []).filter((record) => record.concurso_id === contestId && record.cargo_id === roleId);
+    const correct = history.filter((record) => record.correto).length;
+    const wrong = history.filter((record) => !record.correto && !record.em_branco).length;
+    return {
+      progress: Number(percent(answerValues.length, questionSet.length, 0)),
+      accuracy: Number(percent(correct, correct + wrong, 0)),
+      mocks: scope.mocks?.length || 0,
+    };
+  }
 
-// Regra do projeto: sempre abrir na seleção, mesmo havendo usuário salvo.
-renderUserSelection();
+  function renderTabs() {
+    $("#tabs").innerHTML = TABS.map(([id, label]) => `
+      <button class="tab-button ${state.activeTab === id ? "is-active" : ""}" type="button" data-tab="${id}">${label}</button>
+    `).join("");
+  }
+
+  function renderActiveTab() {
+    const renderers = {
+      dashboard: renderDashboard,
+      treino: renderTreino,
+      simulado: renderSimulado,
+      revisao: renderRevisao,
+      materias: renderMaterias,
+      historico: renderHistorico,
+      metas: renderMetas,
+    };
+    renderDashboardStrip();
+    renderers[state.activeTab]?.();
+  }
+
+  function renderDashboardStrip() {
+    const contest = contestById();
+    const scope = getScope();
+    const questionSet = questionsFor();
+    const summary = summaryFromScope(scope, questionSet);
+    const days = daysUntil(contest.dataProva);
+
+    $("#dashboard").innerHTML = `
+      <div class="dashboard-grid">
+        ${metricCard("Progresso", `${summary.progress}%`, `${summary.uniqueAnswered}/${summary.totalQuestions} questões únicas`)}
+        ${metricCard("Acertos", `${summary.accuracy}%`, `${summary.correct} certas · ${summary.wrong} erradas`)}
+        ${metricCard("Pontuação líquida", summary.score, contest.scoringDescription)}
+        ${metricCard("Até a prova", days >= 0 ? `${days} dias` : "Prova passada", formatDate(contest.dataProva))}
+      </div>
+    `;
+  }
+
+  function renderDashboard() {
+    const contest = contestById();
+    const role = roleById();
+    const scope = getScope();
+    const questionSet = questionsFor();
+    const summary = summaryFromScope(scope, questionSet);
+    const performances = performanceByMatter(scope, questionSet);
+    const best = [...performances].filter((item) => item.answered).sort((a, b) => b.accuracy - a.accuracy).slice(0, 3);
+    const worst = [...performances].sort((a, b) => (a.answered ? a.accuracy : -1) - (b.answered ? b.accuracy : -1)).slice(0, 3);
+    const weak = weakTopics(scope, 6);
+
+    $("#tab-content").innerHTML = `
+      <div class="panel-grid panel-grid--wide">
+        <section class="panel">
+          <div class="section-heading section-heading--compact">
+            <p class="eyebrow">${escapeHtml(contest.banca)} · ${escapeHtml(role.exam.formato.replace("_", "/"))}</p>
+            <h2>${escapeHtml(contest.nome)} — ${escapeHtml(role.nome)}</h2>
+            <p>${escapeHtml(contest.edital)} · ${escapeHtml(contest.scoringDescription)}</p>
+          </div>
+          <div class="exam-map">
+            ${role.exam.distribution.map((item) => `
+              <div>
+                <span>${escapeHtml(item.label)}</span>
+                <strong>${item.count}</strong>
+              </div>
+            `).join("")}
+          </div>
+          <ul class="check-list">
+            ${contest.criterios.map((criterion) => `<li>${escapeHtml(criterion)}</li>`).join("")}
+          </ul>
+        </section>
+
+        <section class="panel">
+          <div class="section-heading section-heading--compact">
+            <p class="eyebrow">Revisão de hoje</p>
+            <h2>Estudo diário sugerido</h2>
+          </div>
+          ${renderDailyStudy(contest, weak)}
+        </section>
+      </div>
+
+      <div class="panel-grid">
+        <section class="panel">
+          <h3>Melhores matérias</h3>
+          ${renderPerformanceList(best, "Ainda não há matérias respondidas. Faça um treino rápido para começar.")}
+        </section>
+        <section class="panel">
+          <h3>Piores matérias / prioridade</h3>
+          ${renderPerformanceList(worst, "Sem dados suficientes. As matérias aparecem aqui depois das primeiras respostas.")}
+        </section>
+        <section class="panel">
+          <h3>Últimos simulados</h3>
+          ${renderMockList(scope.mocks?.slice(0, 5) || [])}
+        </section>
+      </div>
+    `;
+  }
+
+  function metricCard(label, value, hint) {
+    return `
+      <article class="metric-card">
+        <span>${escapeHtml(label)}</span>
+        <strong>${escapeHtml(value)}</strong>
+        <small>${escapeHtml(hint)}</small>
+      </article>
+    `;
+  }
+
+  function renderDailyStudy(contest, weak) {
+    const base = contest.studySuggestions || [];
+    const weakItems = weak.length
+      ? weak.map((item) => `<li>Revisar <strong>${escapeHtml(item.label)}</strong> (${item.wrong} erros, ${item.blank} em branco).</li>`).join("")
+      : "<li>Responder 20 questões novas e marcar dúvidas para revisão inteligente.</li>";
+    return `
+      <ol class="study-plan">
+        <li>20 min de teoria/lei seca do edital ativo.</li>
+        <li>30 min de questões no modo treino, com explicação aberta após responder.</li>
+        <li>15 min revisando erros e brancos.</li>
+        ${weakItems}
+      </ol>
+      <div class="tip-box">
+        ${base.map((item) => `<p>${escapeHtml(item)}</p>`).join("")}
+      </div>
+    `;
+  }
+
+  function renderPerformanceList(items, empty) {
+    if (!items.length) return `<p class="empty">${escapeHtml(empty)}</p>`;
+    return `
+      <div class="matter-list">
+        ${items.map((item) => `
+          <article class="matter-mini">
+            <div>
+              <strong>${escapeHtml(item.nome)}</strong>
+              <small>${escapeHtml(item.bloco)} · ${item.answered}/${item.total} respondidas</small>
+            </div>
+            <span>${item.accuracy}%</span>
+          </article>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  function renderMockList(mocks) {
+    if (!mocks.length) return `<p class="empty">Nenhum simulado finalizado neste concurso/cargo ainda.</p>`;
+    return `
+      <div class="history-list">
+        ${mocks.map((mock) => `
+          <article class="history-item">
+            <strong>${escapeHtml(mock.title)}</strong>
+            <span>${mock.correct} acertos · ${mock.wrong} erros · ${mock.blank} brancos · ${mock.score} pontos</span>
+            <small>${formatDate(mock.finishedAt.slice(0, 10))}</small>
+          </article>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  function renderTreino() {
+    const matters = mattersFor();
+    const subjects = [...new Set(questionsFor().map((question) => question.assunto))].sort();
+    if (!state.practice.queueIds.length) {
+      state.practice.queueIds = buildPracticeQueue({ mode: "modo-treino", quantity: 10 }).map((question) => question.id);
+      state.practice.startedAt = Object.fromEntries(state.practice.queueIds.map((id) => [id, Date.now()]));
+    }
+    const queue = state.practice.queueIds.map((id) => questionsFor().find((question) => question.id === id)).filter(Boolean);
+
+    $("#tab-content").innerHTML = `
+      <section class="panel">
+        <div class="section-heading section-heading--compact">
+          <p class="eyebrow">Modos de estudo</p>
+          <h2>Treino com correção imediata</h2>
+          <p>Depois de responder, o card mostra se você acertou, a explicação, a fonte, links de estudo, favorita, denúncia e anotação.</p>
+        </div>
+        <div class="filters">
+          <label class="field">
+            <span>Modo</span>
+            <select id="practice-mode">
+              <option value="modo-treino">Modo treino</option>
+              <option value="por-materia">Estudar por matéria</option>
+              <option value="por-assunto">Estudar por assunto</option>
+              <option value="aleatorias">Questões aleatórias</option>
+              <option value="nao-respondidas">Questões não respondidas</option>
+              <option value="erradas">Questões erradas</option>
+              <option value="favoritas">Questões favoritas</option>
+              <option value="revisao-rapida">Revisão rápida</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Matéria</span>
+            <select id="practice-matter">
+              <option value="">Todas</option>
+              ${matters.map((matter) => `<option value="${escapeHtml(matter.id)}">${escapeHtml(matter.nome)}</option>`).join("")}
+            </select>
+          </label>
+          <label class="field">
+            <span>Assunto</span>
+            <select id="practice-subject">
+              <option value="">Todos</option>
+              ${subjects.map((subject) => `<option value="${escapeHtml(subject)}">${escapeHtml(subject)}</option>`).join("")}
+            </select>
+          </label>
+          <label class="field">
+            <span>Dificuldade</span>
+            <select id="practice-difficulty">
+              <option value="">Mista</option>
+              <option value="facil">Fácil</option>
+              <option value="medio">Média</option>
+              <option value="dificil">Difícil</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Quantidade</span>
+            <input id="practice-quantity" type="number" min="1" max="50" value="10">
+          </label>
+          <button class="primary-button" type="button" data-generate-practice>Gerar lista</button>
+        </div>
+      </section>
+      <section class="question-stack">
+        ${queue.length ? queue.map((question, index) => renderQuestionCard(question, { context: "practice", index })).join("") : renderEmptyQuestions()}
+      </section>
+    `;
+    restorePracticeFilters();
+  }
+
+  function restorePracticeFilters() {
+    $("#practice-mode").value = state.practice.mode || "modo-treino";
+  }
+
+  function buildPracticeQueue(options = {}) {
+    const scope = getScope();
+    const mode = options.mode || $("#practice-mode")?.value || "modo-treino";
+    const matterId = options.matterId ?? $("#practice-matter")?.value ?? "";
+    const subject = options.subject ?? $("#practice-subject")?.value ?? "";
+    const difficulty = options.difficulty ?? $("#practice-difficulty")?.value ?? "";
+    const quantity = safeNumber(options.quantity ?? $("#practice-quantity")?.value, 10);
+    let list = questionsFor();
+
+    if (mode === "por-materia" && matterId) list = list.filter((question) => question.materia_id === matterId);
+    if (mode === "por-assunto" && subject) list = list.filter((question) => question.assunto === subject);
+    if (mode === "nao-respondidas") list = list.filter((question) => !scope.answers[question.id]);
+    if (mode === "erradas") list = list.filter((question) => scope.answers[question.id] && !scope.answers[question.id].lastCorrect && !scope.answers[question.id].lastBlank);
+    if (mode === "favoritas") list = list.filter((question) => scope.favorites[question.id]);
+    if (mode === "revisao-rapida") list = smartRevisionQuestions(scope, Math.max(quantity, 15));
+    if (mode === "aleatorias" || mode === "modo-treino") {
+      if (matterId) list = list.filter((question) => question.materia_id === matterId);
+      if (subject) list = list.filter((question) => question.assunto === subject);
+    }
+    if (difficulty) list = list.filter((question) => question.dificuldade === difficulty);
+
+    return shuffle(list, `${state.currentUserId}-${state.activeContestId}-${state.activeRoleId}-${mode}-${Date.now()}`).slice(0, Math.max(1, quantity));
+  }
+
+  function generatePracticeFromFilters() {
+    const mode = $("#practice-mode").value;
+    const queue = buildPracticeQueue({
+      mode,
+      matterId: $("#practice-matter").value,
+      subject: $("#practice-subject").value,
+      difficulty: $("#practice-difficulty").value,
+      quantity: $("#practice-quantity").value,
+    });
+    state.practice.mode = mode;
+    state.practice.queueIds = queue.map((question) => question.id);
+    state.practice.answered = {};
+    state.practice.startedAt = Object.fromEntries(queue.map((question) => [question.id, Date.now()]));
+    renderTreino();
+  }
+
+  function renderEmptyQuestions() {
+    return `
+      <article class="panel empty-state">
+        <h3>Nenhuma questão encontrada</h3>
+        <p>Troque o filtro ou responda mais questões para alimentar este modo.</p>
+      </article>
+    `;
+  }
+
+  function renderQuestionCard(question, options = {}) {
+    const scope = getScope();
+    const isPractice = options.context === "practice" || options.context === "revision";
+    const isMock = options.context === "mock";
+    const mockAnswer = isMock ? normalizeAnswer(state.mock?.answers?.[question.id]) : undefined;
+    const practiceAnswer = state.practice.answered[question.id];
+    const selected = isMock ? mockAnswer : normalizeAnswer(practiceAnswer);
+    const showCorrection = options.showCorrection || (!isMock && practiceAnswer !== undefined);
+    const evaluation = showCorrection ? evaluateAnswer(question, selected) : null;
+    const favorite = Boolean(scope.favorites?.[question.id]);
+    const note = scope.notes?.[question.id];
+    const answeredBefore = scope.answers?.[question.id];
+    const cardClass = showCorrection
+      ? evaluation.blank ? "question-card--blank" : evaluation.correct ? "question-card--correct" : "question-card--wrong"
+      : "";
+
+    return `
+      <article class="question-card ${cardClass}" id="q-${escapeHtml(question.id)}">
+        <button class="question-card__summary" type="button" data-toggle-question="${escapeHtml(question.id)}">
+          <span class="question-number">${escapeHtml(options.index !== undefined ? options.index + 1 : question.id)}</span>
+          <span>
+            <strong>${escapeHtml(question.materia)}</strong>
+            <small>${escapeHtml(question.assunto)} · ${escapeHtml(question.dificuldade)} · ${escapeHtml(question.tipo.replace("_", "/"))}</small>
+          </span>
+          ${showCorrection ? renderResultBadge(evaluation) : answeredBefore ? `<span class="badge badge--neutral">já respondida</span>` : `<span class="badge badge--neutral">nova</span>`}
+        </button>
+
+        <div class="question-card__body">
+          <p class="statement">${escapeHtml(question.enunciado)}</p>
+          <div class="meta-row">
+            <span>${escapeHtml(question.banca)}</span>
+            <span>${escapeHtml(question.origem)}</span>
+            <span>${escapeHtml(question.fonte)}</span>
+          </div>
+          ${renderAnswerButtons(question, { isPractice, isMock, selected, showCorrection })}
+          <div class="question-actions">
+            <button class="ghost-button" type="button" data-toggle-favorite="${escapeHtml(question.id)}">${favorite ? "★ Favorita" : "☆ Favoritar"}</button>
+            <button class="ghost-button" type="button" data-mark-review="${escapeHtml(question.id)}">Marcar revisão</button>
+            <button class="ghost-button" type="button" data-add-note="${escapeHtml(question.id)}">Anotação</button>
+            <button class="ghost-button ghost-button--danger" type="button" data-report-question="${escapeHtml(question.id)}">Denunciar erro</button>
+          </div>
+          ${note ? `<p class="note-box"><strong>Sua anotação:</strong> ${escapeHtml(note)}</p>` : ""}
+          ${showCorrection ? renderExplanation(question, evaluation, isMock) : `<p class="locked-explanation">${isMock ? "Explicação bloqueada até finalizar o simulado." : "Responda para liberar explicação, fonte e links de estudo."}</p>`}
+        </div>
+      </article>
+    `;
+  }
+
+  function renderResultBadge(evaluation) {
+    if (evaluation.blank) return `<span class="badge badge--blank">Em branco</span>`;
+    if (evaluation.correct) return `<span class="badge badge--correct">Certa</span>`;
+    return `<span class="badge badge--wrong">Errada</span>`;
+  }
+
+  function renderAnswerButtons(question, context) {
+    if (question.tipo === "certo_errado" || question.tipo === "verdadeiro_falso") {
+      return `
+        <div class="answer-grid answer-grid--ce">
+          ${choiceButton(question, "C", "Certo", context)}
+          ${choiceButton(question, "E", "Errado", context)}
+          ${choiceButton(question, BLANK, "Em branco", context)}
+        </div>
+      `;
+    }
+
+    return `
+      <div class="answer-grid">
+        ${question.alternativas.map((option) => choiceButton(question, option.label, `${option.label}) ${option.text}`, context)).join("")}
+        ${choiceButton(question, BLANK, "Em branco", context)}
+      </div>
+    `;
+  }
+
+  function choiceButton(question, value, label, context) {
+    const selected = normalizeAnswer(context.selected) === value;
+    const correctChoice = value === question.resposta_correta;
+    const shouldMark = context.showCorrection;
+    const classes = [
+      "answer-button",
+      selected ? "is-selected" : "",
+      shouldMark && correctChoice ? "is-correct-choice" : "",
+      shouldMark && selected && !correctChoice && value !== BLANK ? "is-wrong-choice" : "",
+      shouldMark && selected && value === BLANK ? "is-blank-choice" : "",
+    ].filter(Boolean).join(" ");
+    const attr = context.isMock ? `data-mock-answer="${escapeHtml(question.id)}" data-answer="${escapeHtml(value)}"` : `data-practice-answer="${escapeHtml(question.id)}" data-answer="${escapeHtml(value)}"`;
+    const disabled = context.showCorrection && !context.isMock ? "disabled" : "";
+    return `<button class="${classes}" type="button" ${attr} ${disabled}>${escapeHtml(label)}</button>`;
+  }
+
+  function renderExplanation(question, evaluation, compact = false) {
+    const links = studyLinks(question);
+    return `
+      <details class="explanation" ${compact ? "" : "open"}>
+        <summary>${compact ? "Ver explicação e fonte" : "Explicação"}</summary>
+        <p>${escapeHtml(question.explicacao)}</p>
+        <p><strong>Gabarito:</strong> ${escapeHtml(question.resposta_correta)} · <strong>Sua resposta:</strong> ${escapeHtml(evaluation.answer === BLANK ? "Em branco" : evaluation.answer)} · <strong>Pontuação:</strong> ${evaluation.score}</p>
+        <div class="study-links">
+          ${links.map((link) => `<a href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(link.label)}</a>`).join("")}
+        </div>
+      </details>
+    `;
+  }
+
+  function studyLinks(question) {
+    const links = [{ label: question.fonte, url: question.link }];
+    const contest = contestById(question.concurso_id);
+    if (contest?.editalUrl && contest.editalUrl !== question.link) {
+      links.push({ label: `Edital ${contest.nome}`, url: contest.editalUrl });
+    }
+    if (question.tags.includes("portugues")) links.push({ label: "Manual de Redação oficial", url: DATA.sources.manual_redacao.url });
+    if (question.tags.includes("lgpd")) links.push({ label: "Lei 13.709/2018", url: DATA.sources.lgpd.url });
+    if (question.tags.includes("lai")) links.push({ label: "Lei 12.527/2011", url: DATA.sources.lai.url });
+    if (question.tags.includes("sistema-cft-crt") || question.tags.includes("lei-13639")) links.push({ label: "Lei 13.639/2018", url: DATA.sources.lei_13639.url });
+    return links.slice(0, 4);
+  }
+
+  function renderSimulado() {
+    const contest = contestById();
+    const role = roleById();
+    if (state.mock) {
+      renderActiveMock();
+      return;
+    }
+
+    const matters = mattersFor();
+    $("#tab-content").innerHTML = `
+      <div class="panel-grid panel-grid--wide">
+        <section class="panel">
+          <div class="section-heading section-heading--compact">
+            <p class="eyebrow">Simulado completo</p>
+            <h2>Modelo do edital ativo</h2>
+            <p>${escapeHtml(contest.nome)} · ${escapeHtml(role.nome)} · ${role.exam.totalQuestoes} questões · ${role.exam.duracaoMinutos} minutos.</p>
+          </div>
+          <div class="exam-map">
+            ${role.exam.distribution.map((item) => `<div><span>${escapeHtml(item.label)}</span><strong>${item.count}</strong></div>`).join("")}
+          </div>
+          <div class="button-row">
+            <button class="primary-button" type="button" data-start-mock="complete" data-mock-mode="prova">Iniciar modo prova</button>
+            <button class="secondary-button" type="button" data-start-mock="complete" data-mock-mode="treino">Completo com correção no fim</button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="section-heading section-heading--compact">
+            <p class="eyebrow">Simulado personalizado</p>
+            <h2>Escolha filtros</h2>
+            <p>Permite concurso/cargo ativo, matérias, quantidade, dificuldade, novas, erradas, favoritas, tempo e modo de correção.</p>
+          </div>
+          <div class="filters filters--compact">
+            <label class="field">
+              <span>Matéria</span>
+              <select id="custom-matter">
+                <option value="">Todas</option>
+                ${matters.map((matter) => `<option value="${escapeHtml(matter.id)}">${escapeHtml(matter.nome)}</option>`).join("")}
+              </select>
+            </label>
+            <label class="field">
+              <span>Fonte de questões</span>
+              <select id="custom-source">
+                <option value="todas">Todas</option>
+                <option value="novas">Novas</option>
+                <option value="erradas">Erradas</option>
+                <option value="favoritas">Favoritas</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Dificuldade</span>
+              <select id="custom-difficulty">
+                <option value="">Mista</option>
+                <option value="facil">Fácil</option>
+                <option value="medio">Média</option>
+                <option value="dificil">Difícil</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Quantidade</span>
+              <input id="custom-quantity" type="number" min="5" max="${questionsFor().length}" value="20">
+            </label>
+            <label class="field">
+              <span>Tempo em minutos</span>
+              <input id="custom-time" type="number" min="5" value="${Math.min(60, role.exam.duracaoMinutos)}">
+            </label>
+            <label class="field">
+              <span>Correção</span>
+              <select id="custom-mode">
+                <option value="prova">Modo prova</option>
+                <option value="treino">Modo treino</option>
+              </select>
+            </label>
+            <button class="primary-button" type="button" data-start-mock="custom">Iniciar personalizado</button>
+          </div>
+        </section>
+      </div>
+      ${renderWritingBox(role)}
+    `;
+  }
+
+  function renderWritingBox(role) {
+    if (!role.exam.writing) return "";
+    return `
+      <section class="panel">
+        <div class="section-heading section-heading--compact">
+          <p class="eyebrow">Redação prevista no edital</p>
+          <h2>Treino manual de redação</h2>
+          <p>O site não corrige redação automaticamente. Use as propostas abaixo para treinar ${escapeHtml(role.exam.writing.linhas)} e conferir coesão, clareza e fuga ao tema.</p>
+        </div>
+        <div class="writing-prompts">
+          ${role.exam.writing.propostas.map((prompt) => `<article>${escapeHtml(prompt)}</article>`).join("")}
+        </div>
+      </section>
+    `;
+  }
+
+  function buildExamQueue() {
+    const role = roleById();
+    const selected = [];
+    const all = questionsFor();
+    role.exam.distribution.forEach((item) => {
+      const pool = all.filter((question) => (
+        item.kind === "bloco" ? question.bloco === item.id : question.materia_id === item.id
+      ) && !selected.includes(question));
+      selected.push(...shuffle(pool, `${state.currentUserId}-${item.id}-${Date.now()}`).slice(0, item.count));
+    });
+    if (selected.length < role.exam.totalQuestoes) {
+      const fill = shuffle(all.filter((question) => !selected.includes(question)), `${state.currentUserId}-fill-${Date.now()}`)
+        .slice(0, role.exam.totalQuestoes - selected.length);
+      selected.push(...fill);
+    }
+    return selected.slice(0, role.exam.totalQuestoes);
+  }
+
+  function buildCustomMockQueue() {
+    const scope = getScope();
+    const matterId = $("#custom-matter").value;
+    const source = $("#custom-source").value;
+    const difficulty = $("#custom-difficulty").value;
+    const quantity = safeNumber($("#custom-quantity").value, 20);
+    let pool = questionsFor();
+    if (matterId) pool = pool.filter((question) => question.materia_id === matterId);
+    if (difficulty) pool = pool.filter((question) => question.dificuldade === difficulty);
+    if (source === "novas") pool = pool.filter((question) => !scope.answers[question.id]);
+    if (source === "erradas") pool = pool.filter((question) => scope.answers[question.id] && !scope.answers[question.id].lastCorrect && !scope.answers[question.id].lastBlank);
+    if (source === "favoritas") pool = pool.filter((question) => scope.favorites[question.id]);
+    return shuffle(pool, `${state.currentUserId}-custom-${Date.now()}`).slice(0, quantity);
+  }
+
+  function startMock(kind, mode) {
+    const role = roleById();
+    const queue = kind === "complete" ? buildExamQueue() : buildCustomMockQueue();
+    if (!queue.length) {
+      alert("Nenhuma questão encontrada para esse simulado. Ajuste os filtros.");
+      return;
+    }
+    const durationMinutes = kind === "complete" ? role.exam.duracaoMinutos : safeNumber($("#custom-time")?.value, role.exam.duracaoMinutos);
+    state.mock = {
+      id: `sim-${Date.now()}`,
+      title: kind === "complete" ? "Simulado completo" : "Simulado personalizado",
+      kind,
+      mode,
+      queueIds: queue.map((question) => question.id),
+      answers: {},
+      startedAt: Date.now(),
+      durationSeconds: durationMinutes * 60,
+      finished: false,
+      result: null,
+    };
+    startTimer();
+    renderActiveMock();
+  }
+
+  function startTimer() {
+    stopTimer();
+    state.timerInterval = window.setInterval(() => {
+      const timer = $("#timer");
+      if (!timer || !state.mock || state.mock.finished) return;
+      timer.textContent = formatRemaining();
+      if (remainingSeconds() <= 0) {
+        finishMock();
+      }
+    }, 1000);
+  }
+
+  function stopTimer() {
+    if (state.timerInterval) {
+      window.clearInterval(state.timerInterval);
+      state.timerInterval = null;
+    }
+  }
+
+  function remainingSeconds() {
+    if (!state.mock) return 0;
+    const elapsed = Math.floor((Date.now() - state.mock.startedAt) / 1000);
+    return Math.max(0, state.mock.durationSeconds - elapsed);
+  }
+
+  function formatRemaining() {
+    const seconds = state.mock?.finished ? state.mock.remainingAtFinish ?? 0 : remainingSeconds();
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  }
+
+  function renderActiveMock() {
+    const queue = state.mock.queueIds.map((id) => questionsFor().find((question) => question.id === id)).filter(Boolean);
+    const answered = Object.keys(state.mock.answers).length;
+    const resultHtml = state.mock.finished ? renderMockResult(queue) : "";
+    $("#tab-content").innerHTML = `
+      <section class="panel mock-bar">
+        <div>
+          <p class="eyebrow">${escapeHtml(state.mock.title)} · ${escapeHtml(state.mock.mode === "prova" ? "Modo prova" : "Modo treino")}</p>
+          <h2>${answered}/${queue.length} respondidas</h2>
+          <p>${state.mock.finished ? "Simulado finalizado. Clique em cada questão para abrir a explicação." : "As explicações ficam bloqueadas até finalizar."}</p>
+        </div>
+        <div class="timer" id="timer">${formatRemaining()}</div>
+        <div class="button-row">
+          ${state.mock.finished ? `<button class="secondary-button" type="button" data-reset-mock>Novo simulado</button>` : `<button class="primary-button" type="button" data-finish-mock>Finalizar simulado</button>`}
+          <button class="ghost-button" type="button" data-reset-mock>Reiniciar</button>
+        </div>
+      </section>
+      ${resultHtml}
+      <section class="question-stack">
+        ${queue.map((question, index) => renderQuestionCard(question, { context: "mock", index, showCorrection: state.mock.finished })).join("")}
+      </section>
+    `;
+  }
+
+  function finishMock() {
+    if (!state.mock || state.mock.finished) return;
+    const queue = state.mock.queueIds.map((id) => questionsFor().find((question) => question.id === id)).filter(Boolean);
+    const simuladoId = state.mock.id;
+    const startedAt = state.mock.startedAt;
+    const records = queue.map((question) => {
+      const answer = state.mock.answers[question.id] || BLANK;
+      return recordAnswer(question, answer, `simulado-${state.mock.mode}`, startedAt, simuladoId);
+    });
+    const result = calculateMockResult(queue, records);
+    state.mock.finished = true;
+    state.mock.remainingAtFinish = remainingSeconds();
+    state.mock.result = result;
+    stopTimer();
+    persistScope((scope) => {
+      scope.mocks.unshift({
+        id: simuladoId,
+        title: state.mock.title,
+        kind: state.mock.kind,
+        mode: state.mock.mode,
+        concurso_id: state.activeContestId,
+        cargo_id: state.activeRoleId,
+        total: result.total,
+        correct: result.correct,
+        wrong: result.wrong,
+        blank: result.blank,
+        score: result.score,
+        accuracy: result.accuracy,
+        finishedAt: nowIso(),
+      });
+      scope.mocks = scope.mocks.slice(0, 100);
+    });
+    renderDashboardStrip();
+    renderActiveMock();
+  }
+
+  function calculateMockResult(queue, records) {
+    const byQuestion = Object.fromEntries(records.map((record) => [record.questao_id, record]));
+    const totals = queue.reduce((acc, question) => {
+      const record = byQuestion[question.id];
+      if (record.correto) acc.correct += 1;
+      else if (record.em_branco) acc.blank += 1;
+      else acc.wrong += 1;
+      acc.score += safeNumber(record.pontuacao);
+      const key = question.bloco || question.materia;
+      acc.byBlock[key] = acc.byBlock[key] || { label: key, total: 0, correct: 0, wrong: 0, blank: 0, score: 0 };
+      acc.byBlock[key].total += 1;
+      acc.byBlock[key].correct += record.correto ? 1 : 0;
+      acc.byBlock[key].wrong += !record.correto && !record.em_branco ? 1 : 0;
+      acc.byBlock[key].blank += record.em_branco ? 1 : 0;
+      acc.byBlock[key].score += safeNumber(record.pontuacao);
+      return acc;
+    }, { total: queue.length, correct: 0, wrong: 0, blank: 0, score: 0, byBlock: {} });
+    totals.accuracy = Number(percent(totals.correct, totals.correct + totals.wrong, 1));
+    return totals;
+  }
+
+  function renderMockResult(queue) {
+    const result = state.mock.result || calculateMockResult(queue, []);
+    const blocks = Object.values(result.byBlock || {});
+    const weak = queue
+      .filter((question) => {
+        const answer = normalizeAnswer(state.mock.answers[question.id]);
+        const evaluation = evaluateAnswer(question, answer);
+        return !evaluation.correct;
+      })
+      .reduce((acc, question) => {
+        const key = `${question.materia} — ${question.assunto}`;
+        acc[key] = (acc[key] || 0) + 1;
+        return acc;
+      }, {});
+    const weakList = Object.entries(weak).sort((a, b) => b[1] - a[1]).slice(0, 8);
+
+    return `
+      <section class="panel result-panel">
+        <div class="section-heading section-heading--compact">
+          <p class="eyebrow">Resultado do simulado</p>
+          <h2>${result.correct} acertos · ${result.wrong} erros · ${result.blank} em branco</h2>
+          <p>Pontuação líquida total: <strong>${result.score}</strong> · Aproveitamento: <strong>${result.accuracy}%</strong></p>
+        </div>
+        <div class="dashboard-grid">
+          ${metricCard("Acertos", result.correct, "itens corretos")}
+          ${metricCard("Erros", result.wrong, "itens incorretos")}
+          ${metricCard("Em branco", result.blank, "sem penalização quando aplicável")}
+          ${metricCard("Pontuação", result.score, "conforme edital ativo")}
+        </div>
+        <h3>Desempenho por bloco/matéria</h3>
+        <div class="result-table">
+          ${blocks.map((block) => `
+            <div>
+              <strong>${escapeHtml(block.label)}</strong>
+              <span>${block.correct}/${block.total} acertos · ${block.wrong} erros · ${block.blank} brancos · ${block.score} pts</span>
+            </div>
+          `).join("")}
+        </div>
+        <h3>Assuntos para revisar</h3>
+        ${weakList.length ? `<ul class="check-list">${weakList.map(([label, count]) => `<li>${escapeHtml(label)} — ${count} questão(ões)</li>`).join("")}</ul>` : `<p class="empty">Sem erros ou brancos neste simulado. Brabo.</p>`}
+      </section>
+    `;
+  }
+
+  function renderRevisao() {
+    const scope = getScope();
+    const queue = smartRevisionQuestions(scope, 20);
+    state.practice.startedAt = Object.fromEntries(queue.map((question) => [question.id, Date.now()]));
+    $("#tab-content").innerHTML = `
+      <section class="panel">
+        <div class="section-heading section-heading--compact">
+          <p class="eyebrow">Revisão inteligente</p>
+          <h2>Erros, brancos, favoritas, lentas e difíceis</h2>
+          <p>A seleção respeita apenas ${escapeHtml(contestById().nome)} · ${escapeHtml(roleById().nome)}.</p>
+        </div>
+      </section>
+      <section class="question-stack">
+        ${queue.length ? queue.map((question, index) => renderQuestionCard(question, { context: "revision", index })).join("") : renderEmptyQuestions()}
+      </section>
+    `;
+  }
+
+  function renderMaterias() {
+    const scope = getScope();
+    const performances = performanceByMatter(scope, questionsFor());
+    $("#tab-content").innerHTML = `
+      <section class="panel">
+        <div class="section-heading section-heading--compact">
+          <p class="eyebrow">Conteúdo programático</p>
+          <h2>Matérias do concurso ativo</h2>
+          <p>Lista derivada do edital do concurso/cargo selecionado. Cada card tem progresso e prioridade próprios.</p>
+        </div>
+        <div class="matter-grid">
+          ${performances.map((matter) => `
+            <article class="matter-card">
+              <span class="chip">${escapeHtml(matter.bloco)}</span>
+              <h3>${escapeHtml(matter.nome)}</h3>
+              <div class="contest-progress"><span style="width:${matter.progress}%"></span></div>
+              <dl class="contest-facts">
+                <div><dt>Questões</dt><dd>${matter.total}</dd></div>
+                <div><dt>Concluído</dt><dd>${matter.progress}%</dd></div>
+                <div><dt>Acertos</dt><dd>${matter.accuracy}%</dd></div>
+                <div><dt>Prioridade</dt><dd>${escapeHtml(matter.priority)}</dd></div>
+              </dl>
+              <p><strong>Assuntos:</strong> ${escapeHtml((mattersFor().find((item) => item.id === matter.id)?.assuntos || []).join(", "))}</p>
+              <p><strong>Último estudo:</strong> ${matter.lastAt ? formatDate(matter.lastAt.slice(0, 10)) : "ainda não estudado"}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+      <section class="panel">
+        <h3>Fontes utilizadas neste concurso</h3>
+        <div class="study-links">
+          ${sourceLinksForContest().map((link) => `<a href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(link.label)}</a>`).join("")}
+        </div>
+      </section>
+    `;
+  }
+
+  function sourceLinksForContest() {
+    const contest = contestById();
+    const sources = [
+      { label: contest.edital, url: contest.editalUrl },
+    ];
+    if (contest.id === "crt-sp") {
+      sources.push(
+        { label: "Edital PDF CRT-SP", url: DATA.sources.crt_pdf.url },
+        { label: "Lei 13.639/2018", url: DATA.sources.lei_13639.url },
+        { label: "Lei 5.524/1968", url: DATA.sources.lei_5524.url },
+        { label: "Decreto 90.922/1985", url: DATA.sources.decreto_90922.url },
+        { label: "Resoluções CFT", url: DATA.sources.cft_resolucoes.url },
+      );
+    }
+    if (contest.id === "ibge") {
+      sources.push(
+        { label: "Edital PDF IBGE", url: DATA.sources.ibge_pdf.url },
+        { label: "Conteúdo programático IBGE", url: DATA.sources.ibge_conteudo.url },
+      );
+    }
+    if (contest.id === "santos-oficial") {
+      sources.push(
+        { label: "Edital PDF Santos", url: DATA.sources.santos_pdf.url },
+        { label: "Notícia oficial Santos", url: DATA.sources.santos_noticia.url },
+      );
+    }
+    return sources;
+  }
+
+  function renderHistorico() {
+    const scope = getScope();
+    const history = (scope.history || []).slice(0, 120);
+    $("#tab-content").innerHTML = `
+      <section class="panel">
+        <div class="section-heading section-heading--compact">
+          <p class="eyebrow">Histórico independente</p>
+          <h2>${history.length} registros neste concurso/cargo</h2>
+          <p>Não aparecem respostas de outros concursos, cargos ou usuários.</p>
+        </div>
+        ${history.length ? `
+          <div class="history-list">
+            ${history.map((record) => `
+              <article class="history-item">
+                <strong>${escapeHtml(record.materia)} — ${escapeHtml(record.assunto)}</strong>
+                <span>${record.correto ? "Certa" : record.em_branco ? "Em branco" : "Errada"} · marcada: ${escapeHtml(record.resposta_marcada === BLANK ? "Em branco" : record.resposta_marcada)} · gabarito: ${escapeHtml(record.resposta_correta)}</span>
+                <small>${new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" }).format(new Date(record.data))} · ${escapeHtml(record.modo)}</small>
+              </article>
+            `).join("")}
+          </div>
+        ` : `<p class="empty">Sem histórico neste escopo ainda.</p>`}
+      </section>
+    `;
+  }
+
+  function renderMetas() {
+    const scope = getScope();
+    const goals = scope.goals || makeScope().goals;
+    const summary = summaryFromScope(scope);
+    $("#tab-content").innerHTML = `
+      <section class="panel">
+        <div class="section-heading section-heading--compact">
+          <p class="eyebrow">Metas separadas</p>
+          <h2>Metas para ${escapeHtml(contestById().nome)} · ${escapeHtml(roleById().nome)}</h2>
+          <p>Alterar estas metas não afeta outros concursos nem outros usuários.</p>
+        </div>
+        <div class="filters">
+          <label class="field">
+            <span>Questões por dia</span>
+            <input id="goal-daily" type="number" min="1" value="${escapeHtml(goals.dailyQuestions)}">
+          </label>
+          <label class="field">
+            <span>Simulados por semana</span>
+            <input id="goal-weekly" type="number" min="0" value="${escapeHtml(goals.weeklyMocks)}">
+          </label>
+          <label class="field">
+            <span>Erradas para revisar</span>
+            <input id="goal-review" type="number" min="0" value="${escapeHtml(goals.reviewWrong)}">
+          </label>
+          <label class="field">
+            <span>Meta de acertos (%)</span>
+            <input id="goal-accuracy" type="number" min="0" max="100" value="${escapeHtml(goals.targetAccuracy)}">
+          </label>
+          <button class="primary-button" type="button" data-save-goals>Salvar metas</button>
+        </div>
+      </section>
+      <section class="panel">
+        <h3>Status das metas</h3>
+        <div class="dashboard-grid">
+          ${metricCard("Questões únicas", summary.uniqueAnswered, `meta diária: ${goals.dailyQuestions}`)}
+          ${metricCard("Simulados", summary.mocks, `meta semanal: ${goals.weeklyMocks}`)}
+          ${metricCard("Favoritas", summary.favorites, "revisão manual")}
+          ${metricCard("Acertos", `${summary.accuracy}%`, `meta: ${goals.targetAccuracy}%`)}
+        </div>
+      </section>
+    `;
+  }
+
+  function bindEvents() {
+    document.addEventListener("click", (event) => {
+      const target = event.target.closest("button");
+      if (!target) return;
+
+      const loginUser = target.dataset.loginUser;
+      if (loginUser) {
+        login(loginUser);
+        return;
+      }
+
+      if (target.id === "switch-user") {
+        localStorage.removeItem(SESSION_KEY);
+        showLogin();
+        return;
+      }
+
+      if (target.id === "change-contest") {
+        state.showContestPicker = true;
+        stopTimer();
+        renderApp();
+        return;
+      }
+
+      const contestId = target.dataset.selectContest;
+      if (contestId) {
+        selectContest(contestId);
+        return;
+      }
+
+      const tab = target.dataset.tab;
+      if (tab) {
+        state.activeTab = tab;
+        stopTimer();
+        renderTabs();
+        renderActiveTab();
+        return;
+      }
+
+      if (target.dataset.generatePractice !== undefined) {
+        generatePracticeFromFilters();
+        return;
+      }
+
+      const practiceQuestionId = target.dataset.practiceAnswer;
+      if (practiceQuestionId) {
+        const question = questionsFor().find((item) => item.id === practiceQuestionId);
+        state.practice.answered[practiceQuestionId] = target.dataset.answer;
+        recordAnswer(question, target.dataset.answer, state.practice.mode || "modo-treino", state.practice.startedAt[practiceQuestionId]);
+        renderActiveTab();
+        return;
+      }
+
+      const mockQuestionId = target.dataset.mockAnswer;
+      if (mockQuestionId && state.mock && !state.mock.finished) {
+        state.mock.answers[mockQuestionId] = target.dataset.answer;
+        renderActiveMock();
+        return;
+      }
+
+      const startMockKind = target.dataset.startMock;
+      if (startMockKind) {
+        const mode = target.dataset.mockMode || $("#custom-mode")?.value || "prova";
+        startMock(startMockKind, mode);
+        return;
+      }
+
+      if (target.dataset.finishMock !== undefined) {
+        finishMock();
+        return;
+      }
+
+      if (target.dataset.resetMock !== undefined) {
+        state.mock = null;
+        stopTimer();
+        renderSimulado();
+        return;
+      }
+
+      const favoriteId = target.dataset.toggleFavorite;
+      if (favoriteId) {
+        persistScope((scope) => {
+          scope.favorites[favoriteId] = !scope.favorites[favoriteId];
+          if (!scope.favorites[favoriteId]) delete scope.favorites[favoriteId];
+        });
+        renderActiveTab();
+        return;
+      }
+
+      const markId = target.dataset.markReview;
+      if (markId) {
+        persistScope((scope) => {
+          scope.revisionMarked[markId] = true;
+        });
+        target.textContent = "Marcada";
+        return;
+      }
+
+      const noteId = target.dataset.addNote;
+      if (noteId) {
+        const scope = getScope();
+        const previous = scope.notes?.[noteId] || "";
+        const note = window.prompt("Anotação para esta questão:", previous);
+        if (note !== null) {
+          persistScope((innerScope) => {
+            if (note.trim()) innerScope.notes[noteId] = note.trim();
+            else delete innerScope.notes[noteId];
+          });
+          renderActiveTab();
+        }
+        return;
+      }
+
+      const reportId = target.dataset.reportQuestion;
+      if (reportId) {
+        persistScope((scope) => {
+          scope.reports[reportId] = scope.reports[reportId] || [];
+          scope.reports[reportId].push({ at: nowIso(), reason: "Marcada pelo usuário" });
+        });
+        target.textContent = "Erro denunciado";
+        return;
+      }
+    });
+
+    document.addEventListener("change", (event) => {
+      if (event.target.id === "role-select") {
+        changeRole(event.target.value);
+      }
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", init);
+})();

@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "start": "python -m http.server 8080"
+    "export:data": "node scripts/export-question-json.mjs",
+    "start": "python -m http.server 8080 -d dist"
   }
 }

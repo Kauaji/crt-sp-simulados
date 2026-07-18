@@ -1,178 +1,1051 @@
-// Banco autoral. Não copia questões reais; usa afirmações inéditas inspiradas no estilo Certo/Errado.
+// Banco autoral e estático. As questões são inéditas, não copiam provas reais e
+// foram estruturadas a partir de editais, legislação oficial e padrão das bancas.
 "use strict";
 
-const BLOCOS = {
-  BASICOS: "Conhecimentos Básicos",
-  COMPLEMENTARES: "Conhecimentos Complementares",
-  ESPECIFICOS: "Conhecimentos Específicos",
-};
+(function bootstrapStudyData() {
+  const LETTERS = ["A", "B", "C", "D", "E"];
+  const CREATED_AT = "2026-07-18";
 
-const MINIMOS_PROVA_REAL = {
-  basicos: 10,
-  complementares: 8,
-  especificos: 17,
-  total: 36,
-};
+  const SOURCES = {
+    crt_edital: {
+      title: "Edital CRT-SP 2026 — Quadrix",
+      url: "https://quadrix.org.br/informacoes/3048/",
+      type: "edital",
+    },
+    crt_pdf: {
+      title: "Edital nº 1/2026 CRT-SP — PDF oficial Quadrix",
+      url: "https://anexos.cdn.selecao.net.br/uploads/861/concursos/3048/anexos/112a19c5-d933-4299-9095-18ea5a82758e.pdf",
+      type: "edital",
+    },
+    ibge_edital: {
+      title: "PSS IBGE Censo 2026 — Instituto Avalia",
+      url: "https://www.avalia.org.br/concursos/618",
+      type: "edital",
+    },
+    ibge_pdf: {
+      title: "Edital IBGE PSS Censo Agropecuário, Florestal e Aquícola 2026",
+      url: "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Edital_de_Abertura.pdf",
+      type: "edital",
+    },
+    ibge_conteudo: {
+      title: "Conteúdos programáticos IBGE PSS 2026",
+      url: "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      type: "edital",
+    },
+    santos_edital: {
+      title: "Concurso Prefeitura de Santos 71/2026 — IBAM",
+      url: "https://www.ibamsp-concursos.org.br/informacoes/176/",
+      type: "edital",
+    },
+    santos_pdf: {
+      title: "Edital nº 71/2026 Prefeitura de Santos — PDF oficial IBAM",
+      url: "https://anexos-r2.selecao.net.br/uploads/810/concursos/176/anexos/8f64e592-4e52-4aca-877c-f7e1179684e1.pdf",
+      type: "edital",
+    },
+    santos_noticia: {
+      title: "Prefeitura de Santos — notícia oficial do concurso 2026",
+      url: "https://www.santos.sp.gov.br/?q=noticia%2Fsantos-abre-concurso-com-226-vagas-para-niveis-fundamental-medio-e-superior",
+      type: "orgao",
+    },
+    lei_13639: {
+      title: "Lei 13.639/2018",
+      url: "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13639.htm",
+      type: "legislacao",
+    },
+    lei_5524: {
+      title: "Lei 5.524/1968",
+      url: "https://www.planalto.gov.br/ccivil_03/leis/l5524.htm",
+      type: "legislacao",
+    },
+    decreto_90922: {
+      title: "Decreto 90.922/1985",
+      url: "https://www.planalto.gov.br/ccivil_03/decreto/antigos/d90922.htm",
+      type: "legislacao",
+    },
+    decreto_4560: {
+      title: "Decreto 4.560/2002",
+      url: "https://www.planalto.gov.br/ccivil_03/decreto/2002/D4560.htm",
+      type: "legislacao",
+    },
+    lei_9784: {
+      title: "Lei 9.784/1999",
+      url: "https://www.planalto.gov.br/ccivil_03/leis/l9784.htm",
+      type: "legislacao",
+    },
+    lai: {
+      title: "Lei 12.527/2011 — LAI",
+      url: "https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2011/lei/l12527.htm",
+      type: "legislacao",
+    },
+    lgpd: {
+      title: "Lei 13.709/2018 — LGPD",
+      url: "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm",
+      type: "legislacao",
+    },
+    improbidade: {
+      title: "Lei 8.429/1992 — Improbidade Administrativa",
+      url: "https://www.planalto.gov.br/ccivil_03/leis/l8429.htm",
+      type: "legislacao",
+    },
+    crt_sp: {
+      title: "Portal oficial CRT-SP",
+      url: "https://crtsp.gov.br/",
+      type: "orgao",
+    },
+    cft_resolucoes: {
+      title: "Resoluções oficiais do CFT",
+      url: "https://cft.org.br/category/resolucoes/",
+      type: "norma",
+    },
+    manual_redacao: {
+      title: "Manual de Redação da Presidência da República",
+      url: "https://www4.planalto.gov.br/centrodeestudos/assuntos/manual-de-redacao-da-presidencia-da-republica/manual-de-redacao.pdf",
+      type: "manual",
+    },
+  };
 
-function q(id, bloco, disciplina, assunto, dificuldade, gabarito, enunciado, comentario, tags = []) {
-  return { id, bloco, disciplina, assunto, dificuldade, gabarito, enunciado, comentario, tags };
-}
+  const USERS = [
+    { id: "kaua", username: "kaua", displayName: "Kauã", initial: "K", accent: "verde" },
+    { id: "vitoria", username: "vitoria", displayName: "Vitória", initial: "V", accent: "coral" },
+    { id: "caio", username: "caio", displayName: "Caio", initial: "C", accent: "azul" },
+    { id: "mequis", username: "mequis", displayName: "Mequis", initial: "M", accent: "roxo" },
+  ];
 
-const QUESTOES_BASE = [
-  // Conhecimentos Básicos — 44 itens
-  q("BAS-POR-001", BLOCOS.BASICOS, "Português", "Crase", "facil", "C", "No expediente “Encaminhou-se a solicitação à unidade de protocolo”, o sinal indicativo de crase decorre da fusão da preposição exigida por “encaminhar” com o artigo feminino de “unidade”.", "O verbo admite complemento introduzido por preposição e o termo feminino determinado aceita artigo; ocorre a fusão a + a.", ["portugues", "crase"]),
-  q("BAS-POR-002", BLOCOS.BASICOS, "Português", "Concordância", "facil", "E", "A forma “Houveram muitos requerimentos pendentes” está correta porque o verbo concorda com o sujeito plural “requerimentos”.", "Com sentido de existir, “haver” é impessoal e fica no singular: houve muitos requerimentos.", ["portugues", "concordancia"]),
-  q("BAS-POR-003", BLOCOS.BASICOS, "Português", "Pontuação", "medio", "E", "Em “O setor informou aos candidatos que a análise foi concluída”, a vírgula depois de “candidatos” é obrigatória.", "Não se separa por vírgula o verbo de seu complemento oracional.", ["portugues", "pontuacao"]),
-  q("BAS-POR-004", BLOCOS.BASICOS, "Português", "Voz passiva", "medio", "C", "Na frase “Os documentos foram conferidos pela comissão”, “pela comissão” exerce função de agente da passiva.", "Na voz passiva analítica, o termo introduzido por por/pelo/pela pode indicar quem pratica a ação.", ["portugues", "voz-passiva"]),
-  q("BAS-POR-005", BLOCOS.BASICOS, "Português", "Coesão", "medio", "C", "Em comunicação oficial, o emprego de conectivos adequados favorece a coesão e reduz ambiguidade entre etapas de um procedimento.", "Conectivos explicitam relações lógicas e ajudam o leitor a seguir a sequência do texto.", ["portugues", "coesao"]),
-  q("BAS-POR-006", BLOCOS.BASICOS, "Português", "Regência", "dificil", "E", "A construção “visou o cumprimento da exigência” é a única forma admitida pela norma-padrão quando “visar” tem sentido de objetivar.", "Com sentido de objetivar, é tradicionalmente admitida a regência transitiva indireta: visar ao cumprimento; o item erra ao falar em única forma.", ["portugues", "regencia"]),
-  q("BAS-POR-007", BLOCOS.BASICOS, "Português", "Pronome relativo", "dificil", "E", "Em “o processo cujo o prazo venceu”, o artigo após “cujo” é facultativo em textos administrativos.", "O pronome “cujo” não admite artigo posposto. A forma correta é “cujo prazo”.", ["portugues", "pronome"]),
-  q("BAS-POR-008", BLOCOS.BASICOS, "Português", "Concordância", "facil", "C", "Em “Seguem anexos os comprovantes”, o termo “anexos” concorda corretamente com “comprovantes”.", "Quando funciona como adjetivo, “anexo” varia em gênero e número.", ["portugues", "concordancia"]),
-  q("BAS-POR-009", BLOCOS.BASICOS, "Português", "Semântica", "medio", "C", "No período “Embora o sistema estivesse lento, o atendimento continuou”, a oração iniciada por “embora” tem valor concessivo.", "A concessão indica um obstáculo que não impede o fato principal.", ["portugues", "semantica"]),
-  q("BAS-POR-010", BLOCOS.BASICOS, "Português", "Redação", "facil", "C", "Clareza, precisão e objetividade são atributos desejáveis em avisos dirigidos a profissionais registrados no CRT-SP.", "Textos administrativos devem permitir compreensão rápida e uniforme.", ["portugues", "redacao"]),
-  q("BAS-POR-011", BLOCOS.BASICOS, "Português", "Ortografia", "medio", "E", "A palavra “excessão” está grafada corretamente quando usada no sentido de ressalva a uma regra.", "A grafia correta é “exceção”.", ["portugues", "ortografia"]),
-  q("BAS-POR-012", BLOCOS.BASICOS, "Português", "Interpretação", "dificil", "C", "Em item de prova, expressões como “sempre” e “nunca” tendem a exigir atenção especial, pois podem tornar uma afirmação absoluta e incorreta.", "Generalizações absolutas são pegadinhas comuns em itens de julgamento.", ["portugues", "interpretacao"]),
+  const CONCURSOS = [
+    {
+      id: "crt-sp",
+      priority: 1,
+      nome: "CRT-SP",
+      orgao: "Conselho Regional dos Técnicos Industriais do Estado de São Paulo",
+      banca: "Quadrix",
+      status: "Em andamento",
+      edital: "Edital nº 1/2026",
+      editalUrl: SOURCES.crt_edital.url,
+      dataPublicacao: "2026-05-18",
+      dataProva: "2026-08-02",
+      nivel: "Ensino médio",
+      cargoPrincipal: "Técnico Administrativo — Baixada Santista",
+      defaultRoleId: "crt-tecnico-administrativo-bs",
+      formatos: ["certo_errado"],
+      scoringDescription: "+1 por acerto, −1 por erro, 0 em branco",
+      criterios: [
+        "Prova objetiva no padrão Certo/Errado da Quadrix.",
+        "Pontuação líquida com penalização por erro.",
+        "Sem redação/prova discursiva para Técnico Administrativo e Fiscal no recorte implementado.",
+      ],
+      roles: [
+        {
+          id: "crt-tecnico-administrativo-bs",
+          nome: "Técnico Administrativo — Baixada Santista",
+          principal: true,
+          escolaridade: "Ensino médio",
+          exam: {
+            formato: "certo_errado",
+            totalQuestoes: 120,
+            duracaoMinutos: 180,
+            scoring: { correct: 1, wrong: -1, blank: 0 },
+            minima: { total: 36, "Conhecimentos básicos": 10, "Conhecimentos complementares": 8, "Conhecimentos específicos": 17 },
+            distribution: [
+              { kind: "bloco", id: "Conhecimentos básicos", label: "Conhecimentos básicos", count: 40 },
+              { kind: "bloco", id: "Conhecimentos complementares", label: "Conhecimentos complementares", count: 30 },
+              { kind: "bloco", id: "Conhecimentos específicos", label: "Conhecimentos específicos", count: 50 },
+            ],
+          },
+        },
+        {
+          id: "crt-fiscal-bs",
+          nome: "Fiscal — Baixada Santista",
+          principal: false,
+          escolaridade: "Ensino médio/técnico conforme edital",
+          exam: {
+            formato: "certo_errado",
+            totalQuestoes: 120,
+            duracaoMinutos: 180,
+            scoring: { correct: 1, wrong: -1, blank: 0 },
+            minima: { total: 36, "Conhecimentos básicos": 10, "Conhecimentos complementares": 8, "Conhecimentos específicos": 17 },
+            distribution: [
+              { kind: "bloco", id: "Conhecimentos básicos", label: "Conhecimentos básicos", count: 40 },
+              { kind: "bloco", id: "Conhecimentos complementares", label: "Conhecimentos complementares", count: 30 },
+              { kind: "bloco", id: "Conhecimentos específicos", label: "Conhecimentos específicos", count: 50 },
+            ],
+          },
+        },
+      ],
+      materias: [
+        { id: "crt-portugues", nome: "Português", bloco: "Conhecimentos básicos", assuntos: ["Interpretação", "Crase", "Concordância", "Regência", "Pontuação", "Coesão"] },
+        { id: "crt-rlm", nome: "Raciocínio Lógico/Matemática", bloco: "Conhecimentos básicos", assuntos: ["Porcentagem", "Proposições", "Conjuntos", "Sequências", "Regra de três"] },
+        { id: "crt-informatica", nome: "Informática", bloco: "Conhecimentos básicos", assuntos: ["Segurança da informação", "Pacote Office", "Internet", "Nuvem", "LGPD aplicada"] },
+        { id: "crt-etica", nome: "Ética", bloco: "Conhecimentos complementares", assuntos: ["Ética no serviço", "Conduta", "Integridade"] },
+        { id: "crt-adm-publica", nome: "Administração Pública", bloco: "Conhecimentos complementares", assuntos: ["Princípios", "Organização administrativa", "Atos administrativos"] },
+        { id: "crt-lai", nome: "LAI", bloco: "Conhecimentos complementares", assuntos: ["Transparência ativa", "Transparência passiva", "Sigilo"] },
+        { id: "crt-lgpd", nome: "LGPD", bloco: "Conhecimentos complementares", assuntos: ["Princípios", "Bases legais", "Dados sensíveis", "Poder público"] },
+        { id: "crt-improbidade", nome: "Lei 8.429/1992", bloco: "Conhecimentos complementares", assuntos: ["Dolo", "Sanções", "Atos de improbidade"] },
+        { id: "crt-processo-adm", nome: "Lei 9.784/1999", bloco: "Conhecimentos complementares", assuntos: ["Princípios", "Motivação", "Competência", "Recursos"] },
+        { id: "crt-adm-geral", nome: "Administração Geral e Pública", bloco: "Conhecimentos específicos", assuntos: ["Funções administrativas", "Planejamento", "Controle", "Qualidade"] },
+        { id: "crt-rotinas", nome: "Rotinas administrativas", bloco: "Conhecimentos específicos", assuntos: ["Checklists", "Triagem", "Fluxos", "Rastreabilidade"] },
+        { id: "crt-redacao", nome: "Redação oficial", bloco: "Conhecimentos específicos", assuntos: ["Clareza", "Impessoalidade", "Concisão", "Padronização"] },
+        { id: "crt-protocolo", nome: "Protocolo e arquivo", bloco: "Conhecimentos específicos", assuntos: ["Autuação", "Temporalidade", "Arquivo corrente", "Tramitação"] },
+        { id: "crt-atendimento", nome: "Atendimento ao público", bloco: "Conhecimentos específicos", assuntos: ["Escuta ativa", "Linguagem simples", "Inclusão", "Encaminhamento"] },
+        { id: "crt-materiais", nome: "Materiais e estoques", bloco: "Conhecimentos específicos", assuntos: ["Curva ABC", "PEPS", "Inventário", "Estoque de segurança"] },
+        { id: "crt-logistica", nome: "Logística", bloco: "Conhecimentos específicos", assuntos: ["Armazenagem", "Lead time", "Distribuição"] },
+        { id: "crt-licitacoes", nome: "Licitações e contratos", bloco: "Conhecimentos específicos", assuntos: ["Lei 14.133/2021", "Pregão", "Dispensa", "Fiscalização contratual"] },
+        { id: "crt-sistema", nome: "Sistema CFT/CRT-SP", bloco: "Conhecimentos específicos", assuntos: ["Lei 13.639/2018", "Lei 5.524/1968", "Decretos", "Regimento", "Resoluções CFT"] },
+      ],
+      studySuggestions: [
+        "Priorize lei seca do Sistema CFT/CRT-SP nos dias de baixa energia: é conteúdo de alta cobrança e baixo ruído.",
+        "Faça 40 itens Certo/Errado por dia e revise os erros antes de abrir matéria nova.",
+        "Em Português, corrija a justificativa: a Quadrix costuma cobrar a razão da regra, não só o resultado.",
+      ],
+    },
+    {
+      id: "ibge",
+      priority: 2,
+      nome: "IBGE",
+      orgao: "Instituto Brasileiro de Geografia e Estatística",
+      banca: "Instituto Avalia",
+      status: "Em andamento",
+      edital: "PSS Censo Agropecuário, Florestal e Aquícola 2026",
+      editalUrl: SOURCES.ibge_pdf.url,
+      dataPublicacao: "2026-07-07",
+      dataProva: "2026-08-30",
+      nivel: "Ensino médio e superior",
+      cargoPrincipal: "Agente Censitário de Qualidade",
+      defaultRoleId: "ibge-acq",
+      formatos: ["multipla_escolha"],
+      scoringDescription: "+1 por acerto, 0 por erro ou branco",
+      criterios: [
+        "Prova objetiva com 60 questões de múltipla escolha.",
+        "Critérios mínimos do edital devem ser acompanhados no PDF oficial.",
+        "Perfis separados para ACQ e Analista em TI/Dados.",
+      ],
+      roles: [
+        {
+          id: "ibge-acq",
+          nome: "Agente Censitário de Qualidade",
+          principal: true,
+          escolaridade: "Ensino médio",
+          exam: {
+            formato: "multipla_escolha",
+            totalQuestoes: 60,
+            duracaoMinutos: 240,
+            scoring: { correct: 1, wrong: 0, blank: 0 },
+            minima: { totalPercent: 40, disciplinaPercent: 30 },
+            distribution: [
+              { kind: "materia", id: "ibge-acq-portugues", label: "Língua Portuguesa", count: 15 },
+              { kind: "materia", id: "ibge-acq-rlm", label: "Raciocínio Lógico/Matemático", count: 10 },
+              { kind: "materia", id: "ibge-acq-geografia", label: "Geografia", count: 15 },
+              { kind: "materia", id: "ibge-acq-tecnicos", label: "Conhecimentos técnicos", count: 20 },
+            ],
+          },
+        },
+        {
+          id: "ibge-analista-ti-dados",
+          nome: "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+          principal: false,
+          escolaridade: "Ensino superior",
+          exam: {
+            formato: "multipla_escolha",
+            totalQuestoes: 60,
+            duracaoMinutos: 240,
+            scoring: { correct: 1, wrong: 0, blank: 0 },
+            minima: { totalPercent: 40, disciplinaPercent: 30 },
+            distribution: [
+              { kind: "materia", id: "ibge-ana-portugues", label: "Língua Portuguesa", count: 15 },
+              { kind: "materia", id: "ibge-ana-rlm", label: "Raciocínio Lógico/Matemático", count: 10 },
+              { kind: "materia", id: "ibge-ana-especificos", label: "Conhecimentos específicos de TI e Dados", count: 35 },
+            ],
+          },
+        },
+      ],
+      materias: [
+        { id: "ibge-acq-portugues", roleIds: ["ibge-acq"], nome: "Língua Portuguesa", bloco: "Conhecimentos gerais", assuntos: ["Interpretação", "Gramática", "Coesão", "Pontuação"] },
+        { id: "ibge-acq-rlm", roleIds: ["ibge-acq"], nome: "Raciocínio Lógico/Matemático", bloco: "Conhecimentos gerais", assuntos: ["Porcentagem", "Razões", "Probabilidade", "Lógica"] },
+        { id: "ibge-acq-geografia", roleIds: ["ibge-acq"], nome: "Geografia", bloco: "Conhecimentos gerais", assuntos: ["Território", "População", "Cartografia", "Brasil regional"] },
+        { id: "ibge-acq-tecnicos", roleIds: ["ibge-acq"], nome: "Conhecimentos técnicos", bloco: "Conhecimentos específicos", assuntos: ["Censos", "Coleta", "Qualidade", "Sigilo estatístico"] },
+        { id: "ibge-ana-portugues", roleIds: ["ibge-analista-ti-dados"], nome: "Língua Portuguesa", bloco: "Conhecimentos gerais", assuntos: ["Interpretação", "Coesão", "Sintaxe", "Pontuação"] },
+        { id: "ibge-ana-rlm", roleIds: ["ibge-analista-ti-dados"], nome: "Raciocínio Lógico/Matemático", bloco: "Conhecimentos gerais", assuntos: ["Lógica", "Probabilidade", "Análise combinatória", "Estatística básica"] },
+        { id: "ibge-ana-especificos", roleIds: ["ibge-analista-ti-dados"], nome: "Conhecimentos específicos de TI e Dados", bloco: "Conhecimentos específicos", assuntos: ["Algoritmos", "Banco de dados", "Engenharia de software", "APIs", "Segurança", "Ciência de dados", "LGPD/LAI"] },
+      ],
+      studySuggestions: [
+        "Para ACQ, alterne Geografia e Conhecimentos Técnicos: qualidade de coleta costuma exigir leitura atenta de contexto.",
+        "Para Analista, faça blocos curtos de banco de dados, algoritmos e segurança, sempre com revisão de erros.",
+        "Treine múltipla escolha eliminando alternativas: Instituto Avalia tende a cobrar precisão conceitual.",
+      ],
+    },
+    {
+      id: "santos-oficial",
+      priority: 3,
+      nome: "Prefeitura de Santos",
+      orgao: "Município de Santos",
+      banca: "IBAM",
+      status: "Em andamento",
+      edital: "Edital nº 71/2026",
+      editalUrl: SOURCES.santos_edital.url,
+      dataPublicacao: "2026-07-17",
+      dataProva: "2026-09-27",
+      nivel: "Ensino médio",
+      cargoPrincipal: "Oficial de Administração",
+      defaultRoleId: "santos-oficial-administracao",
+      formatos: ["multipla_escolha", "redacao"],
+      scoringDescription: "+1 por acerto na objetiva; redação avaliada separadamente",
+      criterios: [
+        "Prova objetiva em múltipla escolha.",
+        "Edital prevê redação de 20 a 30 linhas para cargos indicados; confira convocação e critérios no PDF.",
+        "Banco focado em Oficial de Administração, com Legislação Municipal e rotinas administrativas.",
+      ],
+      roles: [
+        {
+          id: "santos-oficial-administracao",
+          nome: "Oficial de Administração",
+          principal: true,
+          escolaridade: "Ensino médio",
+          exam: {
+            formato: "multipla_escolha",
+            totalQuestoes: 50,
+            duracaoMinutos: 240,
+            scoring: { correct: 1, wrong: 0, blank: 0 },
+            minima: { redacao: 20 },
+            distribution: [
+              { kind: "materia", id: "santos-portugues", label: "Língua Portuguesa", count: 15 },
+              { kind: "materia", id: "santos-matematica", label: "Matemática", count: 10 },
+              { kind: "materia", id: "santos-legislacao", label: "Legislação municipal e serviço público", count: 10 },
+              { kind: "materia", id: "santos-especificos", label: "Conhecimentos específicos administrativos", count: 15 },
+            ],
+            writing: {
+              tipo: "redacao",
+              linhas: "20 a 30 linhas",
+              minima: 20,
+              propostas: [
+                "Atendimento público eficiente e linguagem simples na administração municipal.",
+                "Uso responsável de dados pessoais na prestação de serviços públicos locais.",
+                "Organização documental como garantia de transparência e continuidade administrativa.",
+              ],
+            },
+          },
+        },
+      ],
+      materias: [
+        { id: "santos-portugues", nome: "Língua Portuguesa", bloco: "Conhecimentos gerais", assuntos: ["Interpretação", "Ortografia", "Concordância", "Regência", "Pontuação"] },
+        { id: "santos-matematica", nome: "Matemática", bloco: "Conhecimentos gerais", assuntos: ["Porcentagem", "Razões", "Problemas", "Juros simples", "Noções de estatística"] },
+        { id: "santos-legislacao", nome: "Legislação municipal e serviço público", bloco: "Legislação", assuntos: ["Administração municipal", "Serviço público", "Ética", "Direitos e deveres"] },
+        { id: "santos-especificos", nome: "Conhecimentos específicos administrativos", bloco: "Conhecimentos específicos", assuntos: ["Protocolo", "Arquivo", "Atendimento", "Redação oficial", "Material e patrimônio"] },
+      ],
+      studySuggestions: [
+        "No IBAM, leia a alternativa inteira: pequenas palavras mudam o sentido de afirmações administrativas.",
+        "Treine Português com interpretação e gramática aplicada, porque a banca mistura regra com texto.",
+        "Uma vez por semana, escreva redação de 20 a 30 linhas e corrija clareza, coesão e respeito ao tema.",
+      ],
+    },
+  ];
 
-  q("BAS-RLM-001", BLOCOS.BASICOS, "Raciocínio Lógico e Matemática", "Lógica proposicional", "facil", "C", "Se todo protocolo urgente recebe prioridade e o protocolo X não recebeu prioridade, é válido concluir, pela contrapositiva, que X não é urgente.", "Se P implica Q, então não Q implica não P.", ["rlm", "logica"]),
-  q("BAS-RLM-002", BLOCOS.BASICOS, "Raciocínio Lógico e Matemática", "Porcentagem", "facil", "E", "Um setor que passou de 80 para 100 processos analisados teve aumento de 20%.", "O aumento foi de 20 sobre base 80: 25%.", ["rlm", "porcentagem"]),
-  q("BAS-RLM-003", BLOCOS.BASICOS, "Raciocínio Lógico e Matemática", "Proporcionalidade", "medio", "C", "Se 3 servidores analisam 180 documentos em 2 horas, 5 servidores, no mesmo ritmo, analisam 300 documentos no mesmo período.", "Cada servidor analisa 30 documentos por hora; 5 × 2 × 30 = 300.", ["rlm", "proporcao"]),
-  q("BAS-RLM-004", BLOCOS.BASICOS, "Raciocínio Lógico e Matemática", "Negações", "facil", "C", "A negação de “todos os requerimentos foram respondidos” é “pelo menos um requerimento não foi respondido”.", "A negação de universal afirmativa é existencial negativa.", ["rlm", "negacao"]),
-  q("BAS-RLM-005", BLOCOS.BASICOS, "Raciocínio Lógico e Matemática", "Conjuntos", "medio", "C", "Se 18 dos 60 atendimentos de um dia foram presenciais, então 30% dos atendimentos foram presenciais.", "18/60 = 0,3 = 30%.", ["rlm", "porcentagem"]),
-  q("BAS-RLM-006", BLOCOS.BASICOS, "Raciocínio Lógico e Matemática", "Equivalência lógica", "dificil", "C", "“Se o cadastro está completo, então o pedido será analisado” equivale logicamente a “se o pedido não será analisado, então o cadastro não está completo”.", "É a contrapositiva da condicional.", ["rlm", "equivalencia"]),
-  q("BAS-RLM-007", BLOCOS.BASICOS, "Raciocínio Lógico e Matemática", "Porcentagem composta", "medio", "E", "Um desconto de 10% seguido de acréscimo de 10% sobre o novo valor retorna obrigatoriamente ao preço inicial.", "As bases são diferentes; o valor final fica 99% do inicial.", ["rlm", "porcentagem"]),
-  q("BAS-RLM-008", BLOCOS.BASICOS, "Raciocínio Lógico e Matemática", "Probabilidade", "facil", "C", "Em uma amostra de 24 processos, dos quais 6 são urgentes, a chance de escolher um urgente ao acaso é de 25%.", "6/24 = 1/4 = 25%.", ["rlm", "probabilidade"]),
-  q("BAS-RLM-009", BLOCOS.BASICOS, "Raciocínio Lógico e Matemática", "Sequências", "medio", "E", "Na sequência 3, 6, 12, 24, o próximo termo é 36, pois a razão é constante e igual a 12.", "A sequência dobra a cada termo; o próximo é 48.", ["rlm", "sequencias"]),
-  q("BAS-RLM-010", BLOCOS.BASICOS, "Raciocínio Lógico e Matemática", "Razão", "facil", "C", "A razão entre 15 processos deferidos e 45 processos analisados é equivalente a 1/3.", "15/45 simplifica para 1/3.", ["rlm", "razao"]),
-  q("BAS-RLM-011", BLOCOS.BASICOS, "Raciocínio Lógico e Matemática", "Tabela verdade", "dificil", "E", "Uma disjunção inclusiva só é verdadeira quando exatamente uma de suas proposições componentes é verdadeira.", "Na disjunção inclusiva, basta que pelo menos uma seja verdadeira; ambas verdadeiras também tornam a disjunção verdadeira.", ["rlm", "logica"]),
+  const CE_CONTEXTS = [
+    "No atendimento presencial de um conselho profissional",
+    "Durante a tramitação de processo administrativo",
+    "Em relatório interno encaminhado à chefia imediata",
+    "Na conferência de documentos recebidos por protocolo",
+    "Em ação de orientação ao público externo",
+    "Na preparação de comunicado oficial",
+    "Em rotina de fiscalização e apoio administrativo",
+    "No controle de demandas da unidade da Baixada Santista",
+  ];
 
-  q("BAS-INF-001", BLOCOS.BASICOS, "Informática", "Planilhas", "facil", "C", "Em uma planilha, a fórmula =SOMA(B2:B6) soma os valores de B2, B3, B4, B5 e B6.", "Os dois-pontos indicam intervalo contínuo com as extremidades incluídas.", ["informatica", "planilhas"]),
-  q("BAS-INF-002", BLOCOS.BASICOS, "Informática", "Segurança", "facil", "E", "Backup salvo apenas no mesmo disco físico dos arquivos originais protege contra falha total desse disco.", "Se o disco falhar, originais e cópias podem ser perdidos.", ["informatica", "backup"]),
-  q("BAS-INF-003", BLOCOS.BASICOS, "Informática", "Segurança", "medio", "C", "Autenticação em dois fatores reduz o risco de acesso indevido mesmo que a senha seja descoberta por terceiro.", "O segundo fator acrescenta uma barreira de autenticação.", ["informatica", "seguranca"]),
-  q("BAS-INF-004", BLOCOS.BASICOS, "Informática", "E-mail", "facil", "C", "No e-mail, o campo Cco permite ocultar dos demais destinatários os endereços ali inseridos.", "Cco significa cópia oculta.", ["informatica", "email"]),
-  q("BAS-INF-005", BLOCOS.BASICOS, "Informática", "Phishing", "medio", "C", "Mensagem que simula identidade visual de órgão público e solicita credenciais por link urgente apresenta característica típica de phishing.", "Phishing usa engenharia social para capturar dados.", ["informatica", "phishing"]),
-  q("BAS-INF-006", BLOCOS.BASICOS, "Informática", "Arquivos", "medio", "E", "A extensão PDF garante, por si só, que o arquivo esteja livre de código malicioso.", "Extensão não garante segurança; PDFs podem conter links ou explorar vulnerabilidades.", ["informatica", "arquivos"]),
-  q("BAS-INF-007", BLOCOS.BASICOS, "Informática", "Nuvem", "facil", "C", "Serviços em nuvem podem facilitar acesso remoto e compartilhamento controlado de documentos administrativos.", "A nuvem permite sincronização e controle de acesso quando bem configurada.", ["informatica", "nuvem"]),
-  q("BAS-INF-008", BLOCOS.BASICOS, "Informática", "Navegadores", "medio", "E", "O modo anônimo do navegador torna o usuário invisível para todos os sites e para a rede utilizada.", "Ele reduz rastros locais, mas não garante anonimato para sites, provedores ou rede.", ["informatica", "navegador"]),
-  q("BAS-INF-009", BLOCOS.BASICOS, "Informática", "Atalhos", "facil", "C", "Em editores de texto, Ctrl+F normalmente abre recurso de localização de termos no documento.", "É atalho comum para buscar texto.", ["informatica", "atalhos"]),
-  q("BAS-INF-010", BLOCOS.BASICOS, "Informática", "LGPD e sistemas", "dificil", "C", "Em sistema de atendimento, permissões por perfil ajudam a limitar acesso a dados pessoais conforme necessidade da função.", "Controle de acesso é medida compatível com segurança e necessidade.", ["informatica", "lgpd"]),
-  q("BAS-INF-011", BLOCOS.BASICOS, "Informática", "Malware", "medio", "E", "Antivírus atualizado elimina integralmente qualquer risco de infecção por malware.", "Antivírus reduz risco, mas não elimina todas as ameaças.", ["informatica", "malware"]),
-  q("BAS-POR-013", BLOCOS.BASICOS, "Português", "Concordância verbal", "medio", "C", "Em “Faz três dias que o protocolo recebeu a demanda”, o verbo “fazer” permanece no singular por indicar tempo decorrido.", "Com sentido temporal, “fazer” é impessoal e fica no singular.", ["portugues", "concordancia"]),
-  q("BAS-POR-014", BLOCOS.BASICOS, "Português", "Paralelismo", "dificil", "E", "Em listas de atribuições administrativas, a falta de paralelismo sintático melhora a precisão porque evita repetição de estruturas.", "Paralelismo favorece clareza e padronização; falta de paralelismo pode gerar ambiguidade.", ["portugues", "paralelismo"]),
-  q("BAS-RLM-012", BLOCOS.BASICOS, "Raciocínio Lógico e Matemática", "Regra de três", "facil", "C", "Se 4 atendentes concluem 120 triagens em uma manhã, mantendo-se a produtividade, 2 atendentes concluem 60 triagens no mesmo período.", "A quantidade é diretamente proporcional ao número de atendentes.", ["rlm", "regra-de-tres"]),
-  q("BAS-RLM-013", BLOCOS.BASICOS, "Raciocínio Lógico e Matemática", "Números inteiros", "medio", "E", "Na pontuação Quadrix, errar 12 itens e acertar 18 resulta em pontuação líquida 30.", "A líquida é acertos menos erros: 18 − 12 = 6.", ["rlm", "pontuacao"]),
-  q("BAS-INF-012", BLOCOS.BASICOS, "Informática", "Planilhas", "medio", "C", "Em planilhas, referência absoluta pode ser útil quando uma fórmula copiada deve manter fixa uma célula de parâmetro.", "O uso de $ fixa linha e/ou coluna, conforme o caso.", ["informatica", "planilhas"]),
-  q("BAS-INF-013", BLOCOS.BASICOS, "Informática", "Segurança da informação", "dificil", "E", "Compartilhar senha institucional com colega é aceitável quando a finalidade é dar continuidade ao atendimento público.", "Credenciais são pessoais; compartilhamento compromete rastreabilidade e segurança.", ["informatica", "seguranca"]),
+  const MC_CONTEXTS = [
+    "Considere uma situação administrativa realista",
+    "Em uma prova objetiva de nível médio",
+    "Durante o planejamento de uma atividade pública",
+    "Ao analisar documentos e rotinas de trabalho",
+    "Em contexto de atendimento ao cidadão",
+    "No acompanhamento de indicadores e informações oficiais",
+    "No exercício de função administrativa",
+    "Em uma demanda típica do edital",
+  ];
 
-  // Complementares — 36 itens
-  q("COM-ETI-001", BLOCOS.COMPLEMENTARES, "Ética no setor público", "Impessoalidade", "facil", "C", "Favorecer conhecido na fila de atendimento, ainda que sem vantagem financeira, viola a impessoalidade esperada na atuação pública.", "O tratamento deve ser isonômico e orientado por critérios objetivos.", ["etica", "impessoalidade"]),
-  q("COM-ETI-002", BLOCOS.COMPLEMENTARES, "Ética no setor público", "Conflito de interesses", "medio", "C", "Comunicar conflito de interesses à autoridade competente é conduta compatível com integridade pública.", "A comunicação permite prevenção e tratamento adequado do conflito.", ["etica", "integridade"]),
-  q("COM-ETI-003", BLOCOS.COMPLEMENTARES, "Ética no setor público", "Cortesia", "facil", "E", "A cortesia no atendimento autoriza o agente a prometer resultado que depende de análise técnica futura.", "Cortesia não permite criar expectativa indevida nem prometer decisão incerta.", ["etica", "atendimento"]),
-  q("COM-ETI-004", BLOCOS.COMPLEMENTARES, "Ética no setor público", "Sigilo", "medio", "C", "Informação funcional sigilosa conhecida em razão do cargo não deve ser compartilhada em grupo informal de mensagens.", "O dever de sigilo alcança canais não oficiais.", ["etica", "sigilo"]),
-  q("COM-ETI-005", BLOCOS.COMPLEMENTARES, "Ética no setor público", "Moralidade", "dificil", "C", "A moralidade administrativa exige conduta compatível não apenas com a lei formal, mas também com padrões de honestidade e boa-fé.", "Moralidade amplia o controle para padrões éticos da Administração.", ["etica", "moralidade"]),
-  q("COM-ADM-001", BLOCOS.COMPLEMENTARES, "Administração Pública", "Princípios", "facil", "C", "Legalidade, impessoalidade, moralidade, publicidade e eficiência são princípios constitucionais expressos da Administração Pública.", "É o conjunto conhecido como LIMPE.", ["administracao-publica", "principios"]),
-  q("COM-ADM-002", BLOCOS.COMPLEMENTARES, "Administração Pública", "Publicidade", "medio", "E", "O princípio da publicidade impõe divulgação integral de todo documento administrativo, sem exceção.", "Há restrições legítimas, como sigilo legal e proteção de dados pessoais.", ["administracao-publica", "publicidade"]),
-  q("COM-ADM-003", BLOCOS.COMPLEMENTARES, "Administração Pública", "Eficiência", "medio", "E", "A eficiência autoriza afastar requisito legal para acelerar atendimento.", "Eficiência deve operar dentro da legalidade.", ["administracao-publica", "eficiencia"]),
-  q("COM-ADM-004", BLOCOS.COMPLEMENTARES, "Administração Pública", "Autarquias", "medio", "C", "Conselhos profissionais podem possuir natureza autárquica e exercer fiscalização profissional nos limites da lei.", "Conselhos fiscalizadores são entidades administrativas com função pública típica.", ["administracao-publica", "autarquia"]),
-  q("COM-ADM-005", BLOCOS.COMPLEMENTARES, "Administração Pública", "Descentralização", "dificil", "E", "Na desconcentração, a Administração transfere atividade para pessoa jurídica distinta.", "Isso é descentralização; desconcentração distribui competências internamente.", ["administracao-publica", "organizacao"]),
-  q("COM-LAI-001", BLOCOS.COMPLEMENTARES, "LAI", "Diretriz", "facil", "C", "A Lei de Acesso à Informação adota a publicidade como regra e o sigilo como exceção.", "Essa é diretriz central da LAI.", ["lai", "transparencia"]),
-  q("COM-LAI-002", BLOCOS.COMPLEMENTARES, "LAI", "Pedido de acesso", "medio", "E", "O pedido de acesso à informação deve conter justificativa do motivo pelo qual o requerente deseja os dados.", "A LAI veda exigir motivos determinantes do pedido.", ["lai", "pedido"]),
-  q("COM-LAI-003", BLOCOS.COMPLEMENTARES, "LAI", "Transparência ativa", "facil", "C", "Transparência ativa ocorre quando o órgão divulga informações de interesse coletivo independentemente de solicitação.", "É divulgação espontânea; transparência passiva responde a pedidos.", ["lai", "transparencia"]),
-  q("COM-LAI-004", BLOCOS.COMPLEMENTARES, "LAI", "Sigilo", "dificil", "E", "Informação classificada como sigilosa torna-se permanentemente inacessível.", "A classificação possui prazos e possibilidade de reavaliação, conforme a lei.", ["lai", "sigilo"]),
-  q("COM-LAI-005", BLOCOS.COMPLEMENTARES, "LAI", "Responsabilidade", "medio", "C", "Negar informação pública sem fundamento legal pode ensejar responsabilização do agente público.", "A LAI prevê deveres e responsabilização por condutas ilícitas.", ["lai", "responsabilidade"]),
-  q("COM-LGPD-001", BLOCOS.COMPLEMENTARES, "LGPD", "Dado pessoal", "facil", "C", "Dado pessoal é informação relacionada a pessoa natural identificada ou identificável.", "Essa é a noção central da LGPD.", ["lgpd", "dados"]),
-  q("COM-LGPD-002", BLOCOS.COMPLEMENTARES, "LGPD", "Anonimização", "medio", "E", "Dado efetivamente anonimizado é sempre tratado como dado pessoal, mesmo quando a reversão não é razoável.", "Em regra, dado anonimizado não é dado pessoal se não puder ser revertido por meios razoáveis.", ["lgpd", "anonimizacao"]),
-  q("COM-LGPD-003", BLOCOS.COMPLEMENTARES, "LGPD", "Necessidade", "facil", "C", "O princípio da necessidade limita o tratamento ao mínimo necessário para cumprir a finalidade informada.", "O tratamento deve ser pertinente, proporcional e não excessivo.", ["lgpd", "necessidade"]),
-  q("COM-LGPD-004", BLOCOS.COMPLEMENTARES, "LGPD", "Poder público", "dificil", "E", "O poder público só pode tratar dados pessoais mediante consentimento expresso do titular.", "A LGPD prevê outras bases legais, como obrigação legal e execução de políticas públicas.", ["lgpd", "bases-legais"]),
-  q("COM-LGPD-005", BLOCOS.COMPLEMENTARES, "LGPD", "Segurança", "medio", "C", "Controle de acesso e registro de operações são medidas compatíveis com a segurança no tratamento de dados pessoais.", "Essas medidas ajudam a prevenir acessos indevidos e rastrear operações.", ["lgpd", "seguranca"]),
-  q("COM-L8429-001", BLOCOS.COMPLEMENTARES, "Lei 8.429/1992", "Dolo", "medio", "C", "Na redação vigente da Lei de Improbidade, os atos tipificados exigem conduta dolosa.", "A lei passou a enfatizar o dolo para configuração dos atos de improbidade.", ["improbidade", "dolo"]),
-  q("COM-L8429-002", BLOCOS.COMPLEMENTARES, "Lei 8.429/1992", "Mero exercício", "dificil", "C", "O mero exercício da função pública, sem ato doloso com fim ilícito, não basta para responsabilização por improbidade.", "A responsabilização exige elementos específicos previstos em lei.", ["improbidade", "responsabilidade"]),
-  q("COM-L8429-003", BLOCOS.COMPLEMENTARES, "Lei 8.429/1992", "Sanções", "medio", "E", "Sanções por improbidade podem ser aplicadas livremente pela Administração, sem necessidade de processo.", "A aplicação exige processo e observância de garantias.", ["improbidade", "sancoes"]),
-  q("COM-L8429-004", BLOCOS.COMPLEMENTARES, "Lei 8.429/1992", "Enriquecimento ilícito", "facil", "C", "Receber vantagem patrimonial indevida em razão da função pública relaciona-se ao núcleo de enriquecimento ilícito.", "É categoria clássica da improbidade administrativa.", ["improbidade", "enriquecimento"]),
-  q("COM-L9784-001", BLOCOS.COMPLEMENTARES, "Lei 9.784/1999", "Princípios", "facil", "C", "A Lei 9.784/1999 prevê princípios como motivação, razoabilidade, proporcionalidade, ampla defesa e contraditório.", "Tais princípios constam do regime do processo administrativo federal.", ["processo-administrativo", "principios"]),
-  q("COM-L9784-002", BLOCOS.COMPLEMENTARES, "Lei 9.784/1999", "Competência", "medio", "E", "A competência administrativa pode ser renunciada pelo agente quando considerar conveniente.", "A competência é irrenunciável, ressalvadas delegação e avocação previstas em lei.", ["processo-administrativo", "competencia"]),
-  q("COM-L9784-003", BLOCOS.COMPLEMENTARES, "Lei 9.784/1999", "Anulação e revogação", "medio", "C", "A Administração deve anular atos ilegais e pode revogar atos válidos por conveniência ou oportunidade, respeitados direitos adquiridos.", "A lei diferencia controle de legalidade e mérito administrativo.", ["processo-administrativo", "atos"]),
-  q("COM-L9784-004", BLOCOS.COMPLEMENTARES, "Lei 9.784/1999", "Motivação", "dificil", "C", "Decisões administrativas que afetem direitos ou interesses devem indicar pressupostos de fato e de direito.", "A motivação permite controle e compreensão da decisão.", ["processo-administrativo", "motivacao"]),
-  q("COM-L9784-005", BLOCOS.COMPLEMENTARES, "Lei 9.784/1999", "Prazos", "medio", "E", "A ausência de prazo legal autoriza a Administração a decidir sem limitação temporal razoável.", "A duração razoável e a eficiência impedem demora injustificada.", ["processo-administrativo", "prazos"]),
-  q("COM-ADM-006", BLOCOS.COMPLEMENTARES, "Administração Pública", "Controle", "dificil", "C", "Controle administrativo pode ocorrer de ofício ou por provocação, visando corrigir ilegalidades ou rever mérito quando cabível.", "A autotutela permite anulação e revogação nos limites jurídicos.", ["administracao-publica", "controle"]),
-  q("COM-ADM-007", BLOCOS.COMPLEMENTARES, "Administração Pública", "Finalidade", "medio", "E", "O agente pode usar competência pública para finalidade privada se o resultado também beneficiar a Administração.", "O desvio de finalidade invalida o ato.", ["administracao-publica", "finalidade"]),
-  q("COM-ETI-006", BLOCOS.COMPLEMENTARES, "Ética no setor público", "Urbanidade", "facil", "C", "Urbanidade e respeito no atendimento não eliminam o dever de cumprir normas e registrar adequadamente a demanda.", "Cortesia e formalidade administrativa devem caminhar juntas.", ["etica", "urbanidade"]),
-  q("COM-LGPD-006", BLOCOS.COMPLEMENTARES, "LGPD", "Compartilhamento", "dificil", "E", "Dados pessoais de profissionais registrados podem ser compartilhados com qualquer interessado quando constarem em sistema público.", "Publicidade deve respeitar finalidade, necessidade e bases legais.", ["lgpd", "compartilhamento"]),
-  q("COM-LAI-006", BLOCOS.COMPLEMENTARES, "LAI", "Dados pessoais", "dificil", "C", "Pedidos de acesso que envolvam dados pessoais exigem compatibilização entre transparência e proteção à intimidade.", "LAI e LGPD devem ser harmonizadas.", ["lai", "lgpd"]),
+  const CE_FACTS = {
+    portugues: [
+      {
+        certo: "o sinal indicativo de crase depende, em regra, da presença simultânea de preposição e artigo feminino.",
+        errado: "o sinal indicativo de crase é obrigatório antes de qualquer palavra feminina, ainda que não haja preposição exigida.",
+        exp: "A crase resulta da fusão de duas vogais 'a', normalmente preposição mais artigo ou pronome demonstrativo compatível.",
+      },
+      {
+        certo: "com sentido de existir, o verbo haver é impessoal e permanece no singular.",
+        errado: "com sentido de existir, o verbo haver concorda obrigatoriamente com o termo plural que o acompanha.",
+        exp: "O verbo haver existencial não possui sujeito e deve ficar na terceira pessoa do singular.",
+      },
+      {
+        certo: "não se separa por vírgula o verbo de seu complemento direto ou indireto sem justificativa sintática.",
+        errado: "a vírgula entre verbo e complemento é sempre recomendável para marcar pausa de leitura.",
+        exp: "Pontuação não se orienta por pausa psicológica; a vírgula não deve romper a relação verbo-complemento.",
+      },
+      {
+        certo: "coesão textual exige conexão clara entre ideias, evitando retomadas ambíguas.",
+        errado: "coesão textual é dispensável em documentos oficiais quando o assunto é simples.",
+        exp: "Documentos oficiais dependem de clareza, encadeamento lógico e retomadas precisas.",
+      },
+      {
+        certo: "a concordância nominal deve harmonizar determinantes e nomes quanto a gênero e número.",
+        errado: "a concordância nominal permite que artigos e adjetivos discordem livremente do substantivo em texto oficial.",
+        exp: "A norma-padrão exige concordância entre os termos do grupo nominal.",
+      },
+    ],
+    rlm: [
+      {
+        certo: "a negação de 'todos os protocolos foram conferidos' admite a existência de pelo menos um protocolo não conferido.",
+        errado: "a negação de 'todos os protocolos foram conferidos' é 'nenhum protocolo foi conferido'.",
+        exp: "A negação de uma proposição universal afirmativa é uma proposição particular negativa.",
+      },
+      {
+        certo: "aumento de 20% seguido de desconto de 20% não retorna, em regra, ao valor inicial.",
+        errado: "aumento de 20% seguido de desconto de 20% sempre devolve exatamente o valor inicial.",
+        exp: "As bases de cálculo são diferentes; 120 reduzido em 20% vira 96, não 100.",
+      },
+      {
+        certo: "em regra de três composta, deve-se identificar se cada grandeza é direta ou inversamente proporcional.",
+        errado: "todas as grandezas em regra de três composta são necessariamente diretamente proporcionais.",
+        exp: "A relação pode ser direta ou inversa, conforme o comportamento das variáveis.",
+      },
+      {
+        certo: "se A está contido em B, todo elemento de A também pertence a B.",
+        errado: "se A está contido em B, todo elemento de B também pertence necessariamente a A.",
+        exp: "A inclusão A ⊂ B não implica igualdade entre conjuntos.",
+      },
+    ],
+    informatica: [
+      {
+        certo: "autenticação em dois fatores reduz risco de acesso indevido mesmo quando a senha é comprometida.",
+        errado: "autenticação em dois fatores elimina totalmente qualquer risco de fraude digital.",
+        exp: "O segundo fator aumenta a segurança, mas não elimina todos os riscos.",
+      },
+      {
+        certo: "backup periódico deve ser testado para verificar possibilidade real de restauração.",
+        errado: "backup só precisa existir; testes de restauração são dispensáveis em ambiente administrativo.",
+        exp: "Backup sem restauração testada pode falhar no momento crítico.",
+      },
+      {
+        certo: "phishing pode ocorrer por e-mail, mensagens e páginas falsas que simulam serviços legítimos.",
+        errado: "phishing ocorre apenas por anexos executáveis enviados por e-mail.",
+        exp: "Golpes de engenharia social usam múltiplos canais e formatos.",
+      },
+      {
+        certo: "planilhas permitem fórmulas, filtros e validação, mas exigem controle para evitar erro de versão.",
+        errado: "planilhas compartilhadas não precisam de controle de versão por serem automaticamente corretas.",
+        exp: "Colaboração digital exige governança, permissões e rastreabilidade.",
+      },
+    ],
+    etica: [
+      {
+        certo: "ética no serviço público envolve finalidade pública, urbanidade, integridade e respeito ao usuário.",
+        errado: "ética administrativa se resume a cumprir ordens superiores, ainda que contrárias ao interesse público.",
+        exp: "Cumprimento de ordens não afasta legalidade, moralidade e finalidade pública.",
+      },
+      {
+        certo: "conflito de interesses deve ser prevenido, declarado e tratado com transparência.",
+        errado: "conflito de interesses só existe se houver prejuízo financeiro comprovado.",
+        exp: "O conflito pode comprometer imparcialidade mesmo antes de dano material.",
+      },
+    ],
+    administracaoPublica: [
+      {
+        certo: "a eficiência administrativa não autoriza afastar a legalidade.",
+        errado: "a eficiência permite descumprir formalidade legal sempre que o resultado parecer melhor.",
+        exp: "Princípios administrativos coexistem; eficiência não revoga legalidade.",
+      },
+      {
+        certo: "desconcentração distribui competências dentro da mesma pessoa jurídica.",
+        errado: "desconcentração cria nova pessoa jurídica autônoma, sempre com patrimônio próprio.",
+        exp: "Criação de pessoa jurídica relaciona-se à descentralização, não à desconcentração.",
+      },
+      {
+        certo: "ato administrativo deve atender competência, finalidade, forma, motivo e objeto.",
+        errado: "ato administrativo válido dispensa finalidade pública quando houver conveniência interna.",
+        exp: "Finalidade pública é elemento essencial da atuação administrativa.",
+      },
+    ],
+    lai: [
+      {
+        certo: "a LAI estabelece a publicidade como regra e o sigilo como exceção.",
+        errado: "a LAI transforma o sigilo em regra sempre que o documento estiver em órgão público.",
+        exp: "A lei promove transparência, preservadas hipóteses legais de sigilo.",
+      },
+      {
+        certo: "transparência ativa envolve divulgação de informações de interesse coletivo independentemente de solicitação.",
+        errado: "transparência ativa ocorre apenas depois que o cidadão apresenta pedido formal de acesso.",
+        exp: "A divulgação espontânea é marca da transparência ativa.",
+      },
+      {
+        certo: "pedido de acesso não deve exigir motivação do solicitante como condição geral de atendimento.",
+        errado: "todo pedido de acesso deve ser acompanhado de justificativa detalhada do interesse pessoal.",
+        exp: "A regra da LAI dispensa motivação para acesso à informação pública.",
+      },
+    ],
+    lgpd: [
+      {
+        certo: "dado pessoal é informação relacionada a pessoa natural identificada ou identificável.",
+        errado: "dado pessoal só existe quando há CPF completo no documento.",
+        exp: "A identificação pode ocorrer por vários elementos, não apenas CPF.",
+      },
+      {
+        certo: "o tratamento pelo poder público deve observar finalidade pública e base legal adequada.",
+        errado: "órgão público pode tratar qualquer dado sem finalidade definida por exercer função estatal.",
+        exp: "A LGPD exige finalidade, adequação, necessidade e base legal.",
+      },
+      {
+        certo: "dados pessoais sensíveis exigem cautela reforçada, especialmente em cadastros e atendimentos.",
+        errado: "dados sensíveis podem ser publicados livremente quando constam de processo administrativo.",
+        exp: "Publicidade administrativa deve ser conciliada com proteção de dados pessoais.",
+      },
+    ],
+    improbidade: [
+      {
+        certo: "a responsabilização por improbidade exige atenção ao elemento subjetivo previsto na legislação vigente.",
+        errado: "todo erro administrativo sem dolo configura automaticamente improbidade.",
+        exp: "A lei atual reforça a exigência de dolo para configuração dos atos de improbidade.",
+      },
+      {
+        certo: "sanções de improbidade podem envolver perda da função, suspensão de direitos políticos e ressarcimento, conforme o caso.",
+        errado: "sanções de improbidade restringem-se sempre a advertência verbal.",
+        exp: "A legislação prevê sanções severas, graduadas conforme o ato e decisão judicial.",
+      },
+    ],
+    processoAdministrativo: [
+      {
+        certo: "a Administração deve motivar atos que neguem, limitem ou afetem direitos ou interesses.",
+        errado: "atos que negam direitos dispensam motivação quando praticados por autoridade competente.",
+        exp: "A motivação é garantia de controle e transparência, especialmente em decisões restritivas.",
+      },
+      {
+        certo: "competência administrativa é irrenunciável, mas pode admitir delegação e avocação nos limites legais.",
+        errado: "competência pode ser renunciada livremente pelo agente para evitar responsabilidade.",
+        exp: "A Lei 9.784/1999 trata competência como irrenunciável, com delegação/avocação em hipóteses legais.",
+      },
+      {
+        certo: "o processo administrativo deve observar contraditório, ampla defesa e segurança jurídica quando aplicáveis.",
+        errado: "processo administrativo interno nunca precisa observar contraditório.",
+        exp: "Contraditório e ampla defesa são garantias em processos que possam afetar direitos.",
+      },
+    ],
+    administracaoGeral: [
+      {
+        certo: "planejamento define objetivos, meios e prioridades antes da execução.",
+        errado: "planejamento é etapa posterior ao controle, usada apenas para justificar resultados.",
+        exp: "Planejar antecede e orienta execução e controle.",
+      },
+      {
+        certo: "controle compara resultados obtidos com padrões ou metas previamente definidos.",
+        errado: "controle administrativo consiste apenas em fiscalizar pessoas, sem relação com metas.",
+        exp: "Controle também mede processos, indicadores, recursos e resultados.",
+      },
+      {
+        certo: "o ciclo PDCA envolve planejar, executar, verificar e agir corretivamente.",
+        errado: "no PDCA, a etapa Check corresponde à escolha inicial das metas.",
+        exp: "Check é verificação; definição de metas ocorre principalmente no planejamento.",
+      },
+    ],
+    rotinas: [
+      {
+        certo: "checklists reduzem esquecimentos, mas não substituem capacitação e julgamento profissional.",
+        errado: "checklist elimina integralmente erro humano e torna treinamento desnecessário.",
+        exp: "Ferramentas de padronização apoiam a rotina, mas não substituem preparo.",
+      },
+      {
+        certo: "rastreabilidade permite identificar responsável, data, etapa e providência adotada.",
+        errado: "rastreabilidade só é necessária em processos judiciais, não em rotinas administrativas.",
+        exp: "Rastreabilidade é útil para controle, continuidade e transparência administrativa.",
+      },
+    ],
+    redacao: [
+      {
+        certo: "redação oficial deve privilegiar clareza, precisão, impessoalidade, formalidade e padronização.",
+        errado: "redação oficial adequada deve usar linguagem rebuscada para demonstrar autoridade.",
+        exp: "O padrão oficial busca clareza e objetividade; rebuscamento prejudica compreensão.",
+      },
+      {
+        certo: "concisão significa dizer o necessário com economia, sem sacrificar informação essencial.",
+        errado: "concisão autoriza omitir elementos indispensáveis para encurtar o documento.",
+        exp: "Concisão elimina excessos, não informações necessárias.",
+      },
+    ],
+    protocolo: [
+      {
+        certo: "autuação formaliza documentos de um assunto em processo identificável e controlável.",
+        errado: "autuação é sinônimo de descarte imediato de documento recebido.",
+        exp: "Autuar é constituir processo, registrar e permitir tramitação.",
+      },
+      {
+        certo: "tabela de temporalidade orienta prazos de guarda e destinação documental.",
+        errado: "temporalidade documental é definida individualmente por cada atendente no momento do arquivamento.",
+        exp: "Prazos de guarda dependem de instrumentos arquivísticos e normas aplicáveis.",
+      },
+      {
+        certo: "documentos de uso frequente pela unidade produtora integram, em regra, o arquivo corrente.",
+        errado: "arquivo corrente reúne exclusivamente documentos históricos sem uso administrativo.",
+        exp: "Arquivo permanente guarda valor histórico/probatório; arquivo corrente atende uso frequente.",
+      },
+    ],
+    atendimento: [
+      {
+        certo: "escuta ativa envolve confirmar a demanda antes de orientar o usuário.",
+        errado: "atendimento eficiente exige responder rapidamente mesmo sem compreender a demanda.",
+        exp: "Compreender a demanda evita encaminhamentos errados e retrabalho.",
+      },
+      {
+        certo: "linguagem simples facilita compreensão sem afastar a formalidade necessária.",
+        errado: "linguagem simples é incompatível com atendimento em órgão público.",
+        exp: "Simplicidade, clareza e respeito podem conviver com formalidade.",
+      },
+    ],
+    materiais: [
+      {
+        certo: "curva ABC ajuda a priorizar controle de itens de maior impacto econômico.",
+        errado: "na curva ABC, todos os itens recebem o mesmo nível de controle independentemente de valor e criticidade.",
+        exp: "A classificação ABC diferencia itens conforme relevância.",
+      },
+      {
+        certo: "PEPS significa primeiro que entra, primeiro que sai.",
+        errado: "PEPS determina que o item mais recente saia obrigatoriamente antes do antigo.",
+        exp: "PEPS prioriza saída dos itens mais antigos.",
+      },
+      {
+        certo: "estoque de segurança reduz risco de ruptura diante de variação de demanda ou atraso de reposição.",
+        errado: "estoque de segurança serve apenas para aumentar custo de armazenagem, sem finalidade operacional.",
+        exp: "A reserva reduz risco de falta de materiais.",
+      },
+    ],
+    logistica: [
+      {
+        certo: "lead time deve ser considerado no ponto de pedido de materiais.",
+        errado: "prazo de reposição é irrelevante quando há registro em planilha.",
+        exp: "O tempo entre solicitação e entrega afeta risco de desabastecimento.",
+      },
+      {
+        certo: "layout de almoxarifado deve favorecer localização, segurança e conservação.",
+        errado: "armazenagem adequada considera apenas estética visual do espaço.",
+        exp: "A armazenagem busca eficiência, segurança, preservação e controle.",
+      },
+    ],
+    licitacoes: [
+      {
+        certo: "pregão é modalidade adequada para bens e serviços comuns, conforme regras da Lei 14.133/2021.",
+        errado: "pregão deve ser usado para qualquer contratação pública, inclusive objeto sem especificação comum.",
+        exp: "Pregão é ligado a bens e serviços comuns, com disputa objetiva.",
+      },
+      {
+        certo: "inexigibilidade pressupõe inviabilidade de competição.",
+        errado: "inexigibilidade é escolha discricionária quando a competição é ampla e viável.",
+        exp: "A inviabilidade de competição é elemento central da inexigibilidade.",
+      },
+      {
+        certo: "segregação de funções reduz risco de erro, fraude e concentração indevida de etapas críticas.",
+        errado: "segregação de funções é vedada porque sempre aumenta a eficiência.",
+        exp: "Controle interno busca equilibrar eficiência e mitigação de riscos.",
+      },
+    ],
+    sistemaCft: [
+      {
+        certo: "a Lei 13.639/2018 criou o Conselho Federal e os Conselhos Regionais dos Técnicos Industriais.",
+        errado: "a Lei 13.639/2018 extinguiu a fiscalização profissional dos técnicos industriais.",
+        exp: "A lei instituiu o Sistema CFT/CRTs e manteve finalidade fiscalizatória profissional.",
+      },
+      {
+        certo: "a Lei 5.524/1968 dispõe sobre o exercício da profissão de Técnico Industrial de nível médio.",
+        errado: "a Lei 5.524/1968 regula exclusivamente cargos de nível superior em engenharia.",
+        exp: "A lei trata dos técnicos industriais de nível médio.",
+      },
+      {
+        certo: "o Decreto 90.922/1985 regulamenta a Lei 5.524/1968 quanto ao exercício profissional técnico.",
+        errado: "o Decreto 90.922/1985 revogou integralmente a Lei 13.639/2018.",
+        exp: "O decreto regulamenta a lei profissional anterior; não revoga lei posterior de criação do CFT/CRTs.",
+      },
+      {
+        certo: "resoluções do CFT devem respeitar leis federais e decretos aplicáveis.",
+        errado: "resoluções do CFT podem contrariar lei federal quando aprovadas por maioria simples.",
+        exp: "Normas infralegais não podem contrariar leis hierarquicamente superiores.",
+      },
+    ],
+  };
 
-  // Específicos — 84 itens
-  q("ESP-ADM-001", BLOCOS.ESPECIFICOS, "Administração Geral", "Controle", "facil", "C", "A função controle compara resultados alcançados com padrões definidos e permite medidas corretivas.", "Controle mede, compara e corrige desvios.", ["administracao", "controle"]),
-  q("ESP-ADM-002", BLOCOS.ESPECIFICOS, "Administração Geral", "Planejamento", "facil", "C", "Planejamento define objetivos e caminhos antes da execução das atividades administrativas.", "Planejar antecede organizar, dirigir e controlar.", ["administracao", "planejamento"]),
-  q("ESP-ADM-003", BLOCOS.ESPECIFICOS, "Administração Geral", "Descentralização", "medio", "E", "Descentralizar decisões elimina a necessidade de coordenação entre unidades.", "A coordenação continua necessária para alinhar esforços.", ["administracao", "coordenacao"]),
-  q("ESP-ADM-004", BLOCOS.ESPECIFICOS, "Administração Pública", "Desconcentração", "medio", "C", "A desconcentração distribui competências dentro da mesma pessoa jurídica, criando órgãos sem personalidade própria.", "É repartição interna de competências.", ["administracao-publica", "desconcentracao"]),
-  q("ESP-ADM-005", BLOCOS.ESPECIFICOS, "Gestão da qualidade", "PDCA", "facil", "C", "No ciclo PDCA, a etapa Check envolve verificar resultados e compará-los com objetivos definidos.", "Check é a etapa de checagem.", ["qualidade", "pdca"]),
-  q("ESP-ADM-006", BLOCOS.ESPECIFICOS, "Gestão da qualidade", "Melhoria contínua", "medio", "C", "Indicadores de qualidade ajudam a identificar gargalos em atendimento, protocolo e tramitação de documentos.", "Indicadores transformam percepção em evidência gerencial.", ["qualidade", "indicadores"]),
-  q("ESP-ADM-007", BLOCOS.ESPECIFICOS, "Processos e projetos", "Projetos", "facil", "C", "Projeto é esforço temporário voltado a resultado único; processo tende a ser contínuo e repetível.", "Temporalidade e singularidade distinguem projetos.", ["processos", "projetos"]),
-  q("ESP-ADM-008", BLOCOS.ESPECIFICOS, "Processos e projetos", "Mapeamento", "medio", "C", "Mapear processos permite visualizar etapas, responsáveis e pontos de decisão.", "O mapeamento reduz ambiguidades e apoia melhoria.", ["processos", "mapeamento"]),
-  q("ESP-ADM-009", BLOCOS.ESPECIFICOS, "Trabalho em equipe", "Conflitos", "medio", "E", "Divergências em equipe implicam necessariamente queda de desempenho e devem sempre ser suprimidas.", "Conflitos bem geridos podem melhorar decisões.", ["equipe", "conflitos"]),
-  q("ESP-ADM-010", BLOCOS.ESPECIFICOS, "Trabalho em equipe", "Comunicação", "facil", "C", "Alinhar responsabilidades e prazos reduz retrabalho em rotinas administrativas.", "Clareza de papéis melhora execução.", ["equipe", "comunicacao"]),
+  const MC_FACTS = {
+    portugues: [
+      {
+        pergunta: "assinale a alternativa que apresenta uma característica de texto administrativo claro.",
+        correta: "Uso de frases objetivas, coesão entre as ideias e vocabulário preciso.",
+        distratores: ["Preferência por períodos longos e ambíguos.", "Uso de termos técnicos sem necessidade.", "Supressão de informações essenciais.", "Substituição de dados objetivos por opiniões pessoais."],
+        explicacao: "Textos administrativos exigem clareza, objetividade, precisão e encadeamento lógico.",
+      },
+      {
+        pergunta: "em relação à concordância verbal, assinale a opção correta.",
+        correta: "O verbo haver, com sentido de existir, permanece no singular.",
+        distratores: ["O verbo haver existencial concorda sempre com o plural seguinte.", "O sujeito composto posposto torna a concordância sempre proibida.", "Todo verbo impessoal deve ir para o plural.", "Concordância é facultativa em documentos oficiais."],
+        explicacao: "Haver existencial é impessoal e fica na terceira pessoa do singular.",
+      },
+      {
+        pergunta: "quanto à pontuação, é correto afirmar que",
+        correta: "não se separa verbo e complemento por vírgula sem justificativa sintática.",
+        distratores: ["a vírgula deve marcar qualquer pausa de leitura.", "a vírgula é obrigatória entre sujeito e predicado.", "orações coordenadas nunca admitem vírgula.", "aposto explicativo deve ficar sempre sem pontuação."],
+        explicacao: "A vírgula obedece à estrutura sintática e ao sentido, não apenas à pausa.",
+      },
+      {
+        pergunta: "a coesão textual é favorecida por",
+        correta: "retomadas claras, conectivos adequados e progressão lógica.",
+        distratores: ["repetição desordenada de termos.", "ausência de conectores.", "mudança brusca de referente.", "frases isoladas sem relação semântica."],
+        explicacao: "Coesão é a ligação formal e semântica entre partes do texto.",
+      },
+    ],
+    matematica: [
+      {
+        pergunta: "um setor recebeu 120 solicitações e concluiu 75%. O número de solicitações concluídas foi",
+        correta: "90.",
+        distratores: ["75.", "80.", "95.", "100."],
+        explicacao: "75% de 120 corresponde a 0,75 × 120 = 90.",
+      },
+      {
+        pergunta: "se três servidores conferem 90 processos em 6 horas, mantendo o ritmo, seis servidores conferem a mesma quantidade em",
+        correta: "3 horas.",
+        distratores: ["6 horas.", "9 horas.", "12 horas.", "18 horas."],
+        explicacao: "Dobrar o número de servidores reduz o tempo pela metade, em proporcionalidade inversa.",
+      },
+      {
+        pergunta: "a média aritmética de 8, 10, 12 e 14 é",
+        correta: "11.",
+        distratores: ["10.", "12.", "13.", "44."],
+        explicacao: "A soma é 44; dividindo por 4, obtém-se 11.",
+      },
+      {
+        pergunta: "a negação lógica de 'todos os formulários foram validados' é",
+        correta: "pelo menos um formulário não foi validado.",
+        distratores: ["nenhum formulário foi validado.", "todos os formulários não foram validados.", "alguns formulários foram validados.", "todo formulário foi validado duas vezes."],
+        explicacao: "A negação de universal afirmativa é particular negativa.",
+      },
+    ],
+    geografia: [
+      {
+        pergunta: "em estudos populacionais, densidade demográfica corresponde",
+        correta: "à relação entre população e área do território.",
+        distratores: ["ao crescimento vegetativo absoluto.", "à soma de nascimentos e migrações.", "ao total de domicílios particulares.", "à taxa de urbanização anual."],
+        explicacao: "Densidade demográfica é população dividida pela área.",
+      },
+      {
+        pergunta: "a cartografia temática é útil ao IBGE porque",
+        correta: "representa espacialmente fenômenos sociais, econômicos e ambientais.",
+        distratores: ["substitui integralmente a coleta de campo.", "elimina a necessidade de escala.", "impede comparação entre regiões.", "serve apenas para mapas físicos sem dados sociais."],
+        explicacao: "Mapas temáticos comunicam distribuição espacial de fenômenos.",
+      },
+      {
+        pergunta: "o processo de urbanização brasileira caracteriza-se historicamente por",
+        correta: "concentração populacional em áreas urbanas e metropolização em diversos períodos.",
+        distratores: ["ausência de desigualdades regionais.", "predomínio rural absoluto permanente.", "fim da rede urbana após 1980.", "ocupação homogênea do território nacional."],
+        explicacao: "A urbanização brasileira é marcada por concentração e desigualdades territoriais.",
+      },
+      {
+        pergunta: "o conceito de território envolve",
+        correta: "relações de poder, uso, apropriação e organização do espaço.",
+        distratores: ["apenas paisagens naturais sem ação humana.", "somente limites climáticos.", "exclusivamente dados meteorológicos.", "áreas sem população ou infraestrutura."],
+        explicacao: "Território envolve dimensão política, social e espacial.",
+      },
+    ],
+    ibgeTecnicos: [
+      {
+        pergunta: "no trabalho censitário, controle de qualidade tem como finalidade principal",
+        correta: "verificar consistência, completude e confiabilidade das informações coletadas.",
+        distratores: ["substituir toda coleta presencial.", "alterar respostas para melhorar indicadores.", "dispensar treinamento das equipes.", "eliminar o sigilo estatístico."],
+        explicacao: "Qualidade censitária depende de consistência, cobertura, completude e confidencialidade.",
+      },
+      {
+        pergunta: "o sigilo estatístico significa que",
+        correta: "informações individualizadas coletadas para fins estatísticos devem ser protegidas.",
+        distratores: ["todo resultado agregado deve ser mantido secreto.", "dados pessoais podem ser publicados integralmente.", "o recenseador pode divulgar respostas em redes sociais.", "a coleta não precisa de confiança do informante."],
+        explicacao: "O sigilo protege o informante e permite divulgação de resultados agregados.",
+      },
+      {
+        pergunta: "uma inconsistência em questionário censitário deve ser tratada por",
+        correta: "checagem conforme procedimento técnico, registro adequado e eventual correção autorizada.",
+        distratores: ["alteração informal sem registro.", "eliminação automática do domicílio.", "divulgação pública do caso.", "adivinhação da resposta provável."],
+        explicacao: "Rotinas de qualidade exigem procedimento, registro e rastreabilidade.",
+      },
+      {
+        pergunta: "em operação censitária, supervisão de campo busca",
+        correta: "acompanhar cobertura, produtividade, qualidade e cumprimento dos procedimentos.",
+        distratores: ["impedir comunicação entre equipes.", "trocar conceitos oficiais por critérios pessoais.", "excluir áreas de difícil acesso sem justificativa.", "substituir todos os instrumentos de controle."],
+        explicacao: "Supervisão garante aderência metodológica e qualidade da coleta.",
+      },
+    ],
+    tiDados: [
+      {
+        pergunta: "em banco de dados relacional, chave primária tem como função",
+        correta: "identificar unicamente cada registro de uma tabela.",
+        distratores: ["armazenar senhas em texto claro.", "duplicar registros obrigatoriamente.", "substituir todas as chaves estrangeiras.", "impedir consultas com filtros."],
+        explicacao: "A chave primária garante identidade única do registro.",
+      },
+      {
+        pergunta: "normalização de dados busca",
+        correta: "reduzir redundâncias e anomalias de inserção, atualização e exclusão.",
+        distratores: ["aumentar duplicidade deliberadamente.", "desligar integridade referencial.", "impedir modelagem lógica.", "trocar todos os dados por imagens."],
+        explicacao: "Normalização organiza tabelas e dependências para consistência.",
+      },
+      {
+        pergunta: "uma API RESTful tende a utilizar",
+        correta: "recursos identificáveis por URLs e métodos HTTP adequados.",
+        distratores: ["apenas arquivos locais sem protocolo.", "somente planilhas manuais.", "senhas no corpo de todas as respostas.", "métodos aleatórios sem semântica."],
+        explicacao: "REST organiza interação por recursos e métodos como GET, POST, PUT e DELETE.",
+      },
+      {
+        pergunta: "em ciência de dados, validação de modelo é importante para",
+        correta: "avaliar desempenho em dados não usados diretamente no ajuste.",
+        distratores: ["garantir acerto perfeito em qualquer cenário.", "eliminar necessidade de dados.", "substituir análise exploratória por opinião.", "publicar dados sensíveis sem anonimização."],
+        explicacao: "Validação ajuda a estimar generalização e reduzir overfitting.",
+      },
+      {
+        pergunta: "controle de versão em desenvolvimento de software permite",
+        correta: "registrar alterações, colaborar e recuperar estados anteriores do código.",
+        distratores: ["apagar histórico automaticamente.", "impedir revisão de alterações.", "eliminar testes.", "substituir documentação por nomes aleatórios."],
+        explicacao: "Sistemas como Git apoiam colaboração, rastreabilidade e reversão.",
+      },
+      {
+        pergunta: "criptografia em trânsito é normalmente usada para",
+        correta: "proteger dados durante comunicação entre cliente e servidor.",
+        distratores: ["publicar senhas em logs.", "dispensar autenticação.", "tornar dados pessoais sempre públicos.", "impedir backups."],
+        explicacao: "TLS/HTTPS protege confidencialidade e integridade na comunicação.",
+      },
+    ],
+    santosLegislacao: [
+      {
+        pergunta: "na administração municipal, o princípio da legalidade significa que",
+        correta: "o agente público deve atuar conforme a lei e a finalidade pública.",
+        distratores: ["a vontade pessoal do servidor prevalece sobre normas.", "a administração pode agir sem fundamento legal.", "apenas costumes internos importam.", "o princípio se aplica somente ao governo federal."],
+        explicacao: "A legalidade vincula toda a Administração Pública, inclusive municipal.",
+      },
+      {
+        pergunta: "o atendimento ao cidadão em serviço público municipal deve observar",
+        correta: "urbanidade, impessoalidade, clareza e respeito à dignidade do usuário.",
+        distratores: ["preferência pessoal sem critérios.", "informalidade absoluta e sem registros.", "tratamento desigual por conveniência.", "promessa de solução fora da competência."],
+        explicacao: "O atendimento público deve preservar isonomia, respeito e informação clara.",
+      },
+      {
+        pergunta: "o dever de guardar sigilo funcional alcança",
+        correta: "informações protegidas por lei ou cuja divulgação indevida cause prejuízo.",
+        distratores: ["todo dado público agregado.", "apenas conversas telefônicas privadas.", "informações publicadas oficialmente.", "somente documentos sem protocolo."],
+        explicacao: "Sigilo funcional protege informações legalmente restritas, sem afastar transparência legítima.",
+      },
+    ],
+    administracao: [
+      {
+        pergunta: "em protocolo administrativo, registrar data, origem e assunto do documento favorece",
+        correta: "rastreabilidade e controle da tramitação.",
+        distratores: ["eliminação imediata do documento.", "perda proposital de histórico.", "impedimento de consulta futura.", "duplicação desnecessária sem controle."],
+        explicacao: "Metadados básicos ajudam localizar, acompanhar e auditar documentos.",
+      },
+      {
+        pergunta: "arquivo corrente é composto, em regra, por documentos",
+        correta: "em uso frequente pela unidade produtora.",
+        distratores: ["sem valor administrativo e já eliminados.", "exclusivamente históricos e permanentes.", "produzidos apenas por particulares.", "sem relação com atividades do órgão."],
+        explicacao: "Arquivo corrente apoia atividades em andamento e consultas frequentes.",
+      },
+      {
+        pergunta: "gestão de materiais deve considerar",
+        correta: "consumo, estoque mínimo, reposição, armazenamento e controle patrimonial.",
+        distratores: ["apenas preferência pessoal do solicitante.", "compra sem planejamento.", "ausência de inventário.", "descarte sem registro."],
+        explicacao: "Materiais exigem planejamento, controle, conservação e prestação de contas.",
+      },
+      {
+        pergunta: "na redação oficial, impessoalidade significa",
+        correta: "priorizar a finalidade institucional, sem opiniões pessoais indevidas.",
+        distratores: ["usar linguagem hostil.", "omitir identificação do órgão sempre.", "escrever de modo vago.", "substituir fatos por impressões pessoais."],
+        explicacao: "A comunicação oficial representa o órgão e deve ser objetiva e institucional.",
+      },
+    ],
+  };
 
-  q("ESP-ROT-001", BLOCOS.ESPECIFICOS, "Rotinas administrativas", "Padronização", "facil", "C", "Registrar responsáveis, prazos e pontos de conferência favorece rastreabilidade da rotina administrativa.", "Rastreabilidade permite saber quem fez, quando e com qual evidência.", ["rotinas", "rastreabilidade"]),
-  q("ESP-ROT-002", BLOCOS.ESPECIFICOS, "Rotinas administrativas", "Checklist", "medio", "E", "Checklist substitui integralmente a capacitação dos responsáveis e elimina erro humano.", "Checklist reduz falhas, mas não substitui preparo nem elimina todo erro.", ["rotinas", "checklist"]),
-  q("ESP-ROT-003", BLOCOS.ESPECIFICOS, "Rotinas administrativas", "Triagem", "medio", "C", "Triagem documental ajuda a encaminhar demandas ao setor competente e evita tramitação desnecessária.", "Classificação inicial adequada aumenta eficiência.", ["rotinas", "triagem"]),
-  q("ESP-ROT-004", BLOCOS.ESPECIFICOS, "Atendimento", "Escuta ativa", "facil", "C", "Confirmar o entendimento da demanda antes de orientar o usuário é prática de escuta ativa.", "A confirmação reduz ruídos e melhora a orientação.", ["atendimento", "escuta"]),
-  q("ESP-ROT-005", BLOCOS.ESPECIFICOS, "Atendimento", "Inclusão", "medio", "E", "No atendimento inclusivo, deve-se falar exclusivamente com o acompanhante da pessoa com deficiência.", "O atendimento deve se dirigir à própria pessoa sempre que possível.", ["atendimento", "inclusao"]),
-  q("ESP-ROT-006", BLOCOS.ESPECIFICOS, "Atendimento", "Encaminhamento", "facil", "E", "Quando não souber responder a uma demanda, o atendente deve inventar solução provável para evitar espera.", "O correto é buscar informação confiável ou encaminhar ao setor competente.", ["atendimento", "orientacao"]),
-  q("ESP-ROT-007", BLOCOS.ESPECIFICOS, "Protocolo", "Autuação", "facil", "C", "Autuação reúne e formaliza documentos relacionados a um assunto, com identificação própria para tramitação e controle.", "Autuar é constituir formalmente o processo.", ["protocolo", "autuacao"]),
-  q("ESP-ROT-008", BLOCOS.ESPECIFICOS, "Protocolo", "Arquivo corrente", "medio", "E", "Documentos de uso frequente pela unidade produtora pertencem tipicamente ao arquivo permanente.", "Documentos em uso frequente integram o arquivo corrente.", ["protocolo", "arquivo"]),
-  q("ESP-ROT-009", BLOCOS.ESPECIFICOS, "Protocolo", "Temporalidade", "medio", "C", "Tabela de temporalidade define prazos de guarda e destinação dos documentos.", "O instrumento orienta eliminação ou recolhimento.", ["protocolo", "temporalidade"]),
-  q("ESP-ROT-010", BLOCOS.ESPECIFICOS, "Redação oficial", "Atributos", "facil", "C", "A redação oficial deve privilegiar clareza, precisão, objetividade, impessoalidade, formalidade e padronização.", "São atributos clássicos da comunicação oficial.", ["redacao-oficial", "atributos"]),
-  q("ESP-ROT-011", BLOCOS.ESPECIFICOS, "Redação oficial", "Linguagem", "facil", "E", "Linguagem rebuscada e opiniões pessoais tornam o ofício mais adequado ao padrão oficial.", "Rebuscamento e opinião pessoal prejudicam clareza e impessoalidade.", ["redacao-oficial", "linguagem"]),
-  q("ESP-ROT-012", BLOCOS.ESPECIFICOS, "Redação oficial", "Concisão", "medio", "C", "Concisão consiste em transmitir informação necessária com o mínimo de palavras, sem sacrificar clareza.", "Concisão elimina excessos, não conteúdo essencial.", ["redacao-oficial", "concisao"]),
+  const QUESTIONS = [];
+  const contestById = Object.fromEntries(CONCURSOS.map((contest) => [contest.id, contest]));
 
-  q("ESP-MAT-001", BLOCOS.ESPECIFICOS, "Materiais e estoques", "Estoque de segurança", "facil", "C", "Estoque de segurança reduz risco de falta diante de oscilações de consumo ou atraso de reposição.", "É reserva para incertezas de demanda e prazo.", ["materiais", "estoques"]),
-  q("ESP-MAT-002", BLOCOS.ESPECIFICOS, "Materiais e estoques", "PEPS", "medio", "E", "No método PEPS, os itens que entraram mais recentemente são os primeiros a sair.", "PEPS significa primeiro que entra, primeiro que sai.", ["materiais", "peps"]),
-  q("ESP-MAT-003", BLOCOS.ESPECIFICOS, "Materiais e estoques", "Curva ABC", "medio", "C", "Na curva ABC, itens da classe A costumam representar menor quantidade e maior parcela de valor.", "Poucos itens concentram maior relevância econômica.", ["materiais", "abc"]),
-  q("ESP-MAT-004", BLOCOS.ESPECIFICOS, "Logística", "Lead time", "facil", "C", "O prazo de reposição deve ser considerado para definir o momento de emitir novo pedido de material.", "O ponto de pedido deve cobrir consumo durante o lead time.", ["logistica", "lead-time"]),
-  q("ESP-MAT-005", BLOCOS.ESPECIFICOS, "Logística", "Unitização", "medio", "C", "Unitização de cargas pode facilitar movimentação e armazenagem ao agrupar volumes menores.", "Paletes e contêineres são exemplos.", ["logistica", "unitizacao"]),
-  q("ESP-MAT-006", BLOCOS.ESPECIFICOS, "Logística", "Inventário", "medio", "E", "Inventário físico é desnecessário quando o sistema informatizado aponta saldo positivo.", "Conferência física identifica perdas, erros e divergências.", ["logistica", "inventario"]),
+  function roleById(contestId, roleId) {
+    return contestById[contestId].roles.find((role) => role.id === roleId);
+  }
 
-  q("ESP-LIC-001", BLOCOS.ESPECIFICOS, "Licitações", "Pregão", "medio", "C", "Na Lei 14.133/2021, pregão é modalidade para bens e serviços comuns, com critério de menor preço ou maior desconto.", "É modalidade própria para objetos comuns.", ["licitacoes", "pregao"]),
-  q("ESP-LIC-002", BLOCOS.ESPECIFICOS, "Licitações", "Inexigibilidade", "medio", "E", "Inexigibilidade ocorre quando há competição viável, mas a Administração prefere contratar diretamente.", "Inexigibilidade pressupõe inviabilidade de competição.", ["licitacoes", "inexigibilidade"]),
-  q("ESP-LIC-003", BLOCOS.ESPECIFICOS, "Licitações", "Planejamento", "facil", "C", "O planejamento da contratação antecede a seleção do fornecedor e busca definir necessidade e solução adequada.", "A fase preparatória organiza demanda, justificativas e requisitos.", ["licitacoes", "planejamento"]),
-  q("ESP-LIC-004", BLOCOS.ESPECIFICOS, "Licitações", "Dispensa", "dificil", "E", "Dispensa e inexigibilidade são sinônimas, ambas sempre caracterizadas por inviabilidade de competição.", "Dispensa é hipótese legal; inexigibilidade decorre de inviabilidade de competição.", ["licitacoes", "dispensa"]),
-  q("ESP-LIC-005", BLOCOS.ESPECIFICOS, "Licitações", "Fiscalização contratual", "medio", "C", "A fiscalização contratual acompanha a execução do ajuste e registra ocorrências relevantes.", "Fiscalização controla cumprimento de obrigações.", ["licitacoes", "contratos"]),
-  q("ESP-LIC-006", BLOCOS.ESPECIFICOS, "Licitações", "Segregação de funções", "dificil", "C", "A segregação de funções busca reduzir risco de erros e fraudes ao evitar concentração indevida de etapas críticas.", "Separar funções fortalece controle interno.", ["licitacoes", "controle"]),
+  function pad(num) {
+    return String(num).padStart(3, "0");
+  }
 
-  q("ESP-CFT-001", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Lei 13.639/2018", "facil", "C", "A Lei 13.639/2018 criou o Conselho Federal dos Técnicos Industriais e os Conselhos Regionais dos Técnicos Industriais.", "A lei instituiu o Sistema CFT/CRTs.", ["cft", "lei-13639"]),
-  q("ESP-CFT-002", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Lei 13.639/2018", "medio", "C", "Orientar, disciplinar e fiscalizar o exercício profissional integram a finalidade dos conselhos do Sistema CFT/CRTs.", "A tríade corresponde à função típica dos conselhos profissionais.", ["cft", "lei-13639"]),
-  q("ESP-CFT-003", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Lei 13.639/2018", "dificil", "E", "Os CRTs são subordinados hierarquicamente às prefeituras dos municípios onde mantêm sede.", "CRTs integram sistema profissional próprio, não estrutura municipal.", ["cft", "lei-13639"]),
-  q("ESP-CFT-004", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Lei 13.639/2018", "medio", "C", "Os conselhos regionais possuem Diretoria Executiva e Plenário deliberativo, conforme a estrutura legal do sistema.", "A composição está na lei de criação do sistema.", ["cft", "lei-13639"]),
-  q("ESP-CFT-005", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Lei 13.639/2018", "dificil", "E", "O registro profissional no CRT tem natureza meramente decorativa e não se relaciona à fiscalização do exercício profissional.", "Registro e fiscalização são instrumentos centrais do sistema.", ["cft", "registro"]),
-  q("ESP-CFT-006", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Lei 5.524/1968", "facil", "C", "A Lei 5.524/1968 dispõe sobre o exercício da profissão de Técnico Industrial de nível médio.", "É a lei básica da profissão.", ["lei-5524", "tecnico-industrial"]),
-  q("ESP-CFT-007", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Lei 5.524/1968", "medio", "C", "A assistência técnica na compra, venda e utilização de produtos e equipamentos especializados integra o campo de atuação do técnico industrial de nível médio.", "A atividade é prevista no campo profissional da lei.", ["lei-5524", "atribuicoes"]),
-  q("ESP-CFT-008", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Lei 5.524/1968", "medio", "C", "A elaboração e execução de projetos compatíveis com a formação profissional podem integrar atribuições do técnico industrial.", "A lei contempla projetos compatíveis com formação.", ["lei-5524", "projetos"]),
-  q("ESP-CFT-009", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Lei 5.524/1968", "dificil", "E", "A Lei 5.524/1968 atribui ao técnico industrial competência ilimitada para qualquer projeto de engenharia.", "As atribuições são compatíveis com formação e limites regulamentares.", ["lei-5524", "limites"]),
-  q("ESP-CFT-010", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Decreto 90.922/1985", "facil", "C", "O Decreto 90.922/1985 regulamenta a Lei 5.524/1968 quanto ao exercício das profissões de técnico industrial e técnico agrícola de nível médio.", "Esse é o objeto central do decreto.", ["decreto-90922", "regulamentacao"]),
-  q("ESP-CFT-011", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Decreto 90.922/1985", "medio", "E", "O Decreto 90.922/1985 veda ao técnico industrial ministrar disciplinas técnicas de sua especialidade.", "O decreto admite essa atividade atendidos requisitos aplicáveis.", ["decreto-90922", "magisterio"]),
-  q("ESP-CFT-012", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Decreto 90.922/1985", "dificil", "C", "O decreto deve ser interpretado em conjunto com a Lei 5.524/1968 e com normas posteriores do Sistema CFT/CRTs.", "Regulamento não vive isolado; deve respeitar hierarquia e atualizações normativas.", ["decreto-90922", "hierarquia"]),
-  q("ESP-CFT-013", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Decreto 4.560/2002", "medio", "C", "O Decreto 4.560/2002 alterou o Decreto 90.922/1985, atualizando dispositivos do regulamento profissional.", "O decreto é ato alterador do regulamento de 1985.", ["decreto-4560", "alteracao"]),
-  q("ESP-CFT-014", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Decreto 4.560/2002", "dificil", "E", "O Decreto 4.560/2002 revogou integralmente a Lei 5.524/1968.", "Decreto não revoga integralmente lei; ele alterou decreto regulamentador.", ["decreto-4560", "hierarquia"]),
-  q("ESP-CFT-015", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Regimento Interno CRT-SP", "medio", "C", "O Regimento Interno do CRT-SP organiza competências e funcionamento interno, em harmonia com a Lei 13.639/2018 e atos do CFT.", "Regimento disciplina organização interna dentro do sistema normativo.", ["regimento-crtsp", "organizacao"]),
-  q("ESP-CFT-016", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Regimento Interno CRT-SP", "dificil", "C", "O Plenário do CRT-SP tem natureza deliberativa, não sendo mero setor executor de rotinas administrativas.", "Órgãos colegiados deliberam; a execução é da estrutura administrativa.", ["regimento-crtsp", "plenario"]),
-  q("ESP-CFT-017", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Regimento Interno CRT-SP", "dificil", "E", "O Regimento Interno pode afastar regra legal da Lei 13.639/2018 quando houver decisão administrativa local.", "Regimento é ato inferior e deve respeitar a lei.", ["regimento-crtsp", "hierarquia"]),
-  q("ESP-CFT-018", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Resolução CFT 206/2022", "medio", "C", "A Resolução CFT 206/2022 relaciona-se ao Código de Ética e Disciplina do Técnico Industrial.", "É norma de referência ética no Sistema CFT/CRTs.", ["resolucao-206", "etica"]),
-  q("ESP-CFT-019", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Resolução CFT 207/2022", "medio", "E", "O processo ético-disciplinar no Sistema CFT/CRTs resume-se sempre a instância federal única.", "Há atuação em instâncias regional e federal conforme a norma processual.", ["resolucao-207", "processo-etico"]),
-  q("ESP-CFT-020", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Resolução CFT 208/2023", "medio", "C", "A Resolução CFT 208/2023 trata de Código de Conduta Ética aplicável a membros eleitos do Sistema CFT/CRTs.", "A norma disciplina conduta de diretores e conselheiros.", ["resolucao-208", "conduta"]),
-  q("ESP-CFT-021", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Resolução CFT 288/2025", "medio", "C", "A Resolução CFT 288/2025 orienta a fiscalização profissional com ênfase preventiva e educativa, sem excluir medidas cabíveis diante de infrações.", "Fiscalização preventiva não elimina o poder fiscalizatório e sancionatório.", ["resolucao-288", "fiscalizacao"]),
-  q("ESP-CFT-022", BLOCOS.ESPECIFICOS, "Sistema CFT/CRTs", "Resoluções CFT", "dificil", "E", "Resoluções do CFT podem contrariar leis federais se aprovadas pelo Plenário Federal.", "Atos normativos infralegais devem respeitar a lei.", ["resolucoes-cft", "hierarquia"]),
+  function sourceFor(key) {
+    return SOURCES[key] || SOURCES.crt_edital;
+  }
 
-  q("ESP-QUA-001", BLOCOS.ESPECIFICOS, "Gestão da qualidade", "Padronização", "medio", "C", "Padronizar procedimentos de protocolo reduz variação indevida e facilita treinamento de novos servidores.", "Padrões tornam o processo mais previsível.", ["qualidade", "padronizacao"]),
-  q("ESP-QUA-002", BLOCOS.ESPECIFICOS, "Gestão da qualidade", "Indicadores", "dificil", "E", "Indicador de desempenho é útil apenas quando confirma percepção prévia da chefia.", "Indicadores devem apoiar decisões com evidência, inclusive contrariando percepções.", ["qualidade", "indicadores"]),
-  q("ESP-QUA-003", BLOCOS.ESPECIFICOS, "Processos e projetos", "Cronograma", "medio", "C", "Em projeto de implantação de atendimento digital, cronograma auxilia a controlar entregas e dependências.", "Cronogramas organizam sequência, prazos e marcos.", ["projetos", "cronograma"]),
-  q("ESP-QUA-004", BLOCOS.ESPECIFICOS, "Processos e projetos", "Escopo", "dificil", "E", "Mudança de escopo nunca afeta prazo, custo ou qualidade do projeto.", "Alterações de escopo podem afetar várias restrições do projeto.", ["projetos", "escopo"]),
-  q("ESP-ROT-013", BLOCOS.ESPECIFICOS, "Rotinas administrativas", "Controle de documentos", "medio", "C", "Numerar versões de documentos internos ajuda a evitar uso de instruções desatualizadas.", "Controle de versão reduz erro operacional.", ["rotinas", "documentos"]),
-  q("ESP-ROT-014", BLOCOS.ESPECIFICOS, "Atendimento", "Linguagem simples", "facil", "C", "No atendimento ao público, linguagem simples facilita compreensão sem reduzir formalidade necessária.", "Formalidade não exige obscuridade.", ["atendimento", "linguagem"]),
-  q("ESP-ROT-015", BLOCOS.ESPECIFICOS, "Protocolo", "Recebimento", "facil", "C", "Registrar data, origem e assunto no recebimento de documento favorece controle de tramitação.", "Metadados básicos permitem localizar e acompanhar documentos.", ["protocolo", "recebimento"]),
-  q("ESP-ROT-016", BLOCOS.ESPECIFICOS, "Redação oficial", "Pronomes de tratamento", "dificil", "E", "Em redação oficial contemporânea, o uso de pronomes de tratamento rebuscados é sempre obrigatório para demonstrar respeito.", "A tendência é simplificar e preservar clareza, respeitando normas vigentes.", ["redacao-oficial", "tratamento"]),
-  q("ESP-MAT-007", BLOCOS.ESPECIFICOS, "Materiais e estoques", "Ponto de pedido", "medio", "C", "Ponto de pedido considera consumo médio e prazo de reposição para evitar ruptura de estoque.", "Ele indica momento de solicitar reposição.", ["materiais", "ponto-pedido"]),
-  q("ESP-MAT-008", BLOCOS.ESPECIFICOS, "Logística", "Armazenagem", "facil", "C", "Organização física do almoxarifado deve favorecer localização, segurança e conservação dos materiais.", "Layout e identificação reduzem perdas e tempo de busca.", ["logistica", "armazenagem"]),
-  q("ESP-LIC-007", BLOCOS.ESPECIFICOS, "Licitações", "Termo de referência", "medio", "C", "Termo de referência bem elaborado descreve necessidade, objeto e critérios suficientes para orientar a contratação.", "Documento mal definido aumenta risco de contratação inadequada.", ["licitacoes", "termo-referencia"]),
-  q("ESP-LIC-008", BLOCOS.ESPECIFICOS, "Licitações", "Competitividade", "dificil", "E", "Exigências excessivas e sem pertinência com o objeto são desejáveis porque reduzem o número de propostas a analisar.", "Exigências indevidas restringem competitividade e podem viciar o certame.", ["licitacoes", "competitividade"]),
-];
+  function dificuldadeAt(index) {
+    return ["facil", "medio", "medio", "dificil"][index % 4];
+  }
 
-const BANCO_QUESTOES = QUESTOES_BASE;
+  function addQuestion(question) {
+    const contest = contestById[question.concurso_id];
+    const primaryRole = roleById(question.concurso_id, question.cargo_id);
+    const source = sourceFor(question.sourceKey);
+
+    QUESTIONS.push({
+      id: question.id,
+      concurso_id: question.concurso_id,
+      concurso: contest.nome,
+      orgao: contest.orgao,
+      cargo_id: question.cargo_id,
+      cargo: primaryRole.nome,
+      cargos_compativeis: question.cargos_compativeis || [question.cargo_id],
+      banca: contest.banca,
+      materia_id: question.materia_id,
+      materia: question.materia,
+      assunto_id: question.assunto_id,
+      assunto: question.assunto,
+      subassunto: question.subassunto,
+      bloco: question.bloco,
+      dificuldade: question.dificuldade,
+      tipo: question.tipo,
+      origem: "inédita",
+      ano: 2026,
+      fonte: source.title,
+      link: source.url,
+      fonte_tipo: source.type,
+      fonte_inspiracao: question.fonte_inspiracao,
+      enunciado: question.enunciado,
+      alternativas: question.alternativas || [],
+      resposta_correta: question.resposta_correta,
+      explicacao: question.explicacao,
+      status: "ativo",
+      tags: question.tags || [],
+      criado_em: CREATED_AT,
+      atualizado_em: CREATED_AT,
+    });
+  }
+
+  function generateCE(spec) {
+    for (let index = 0; index < spec.count; index += 1) {
+      const fact = spec.facts[index % spec.facts.length];
+      const isCorrect = index % 2 === 0;
+      const context = CE_CONTEXTS[index % CE_CONTEXTS.length];
+      const subassunto = spec.subassuntos[index % spec.subassuntos.length];
+      const resposta = isCorrect ? "C" : "E";
+      addQuestion({
+        id: `${spec.prefix}-${pad(index + 1)}`,
+        concurso_id: "crt-sp",
+        cargo_id: "crt-tecnico-administrativo-bs",
+        cargos_compativeis: spec.cargos || ["crt-tecnico-administrativo-bs"],
+        materia_id: spec.materia_id,
+        materia: spec.materia,
+        assunto_id: spec.assunto_id,
+        assunto: spec.assunto,
+        subassunto,
+        bloco: spec.bloco,
+        dificuldade: dificuldadeAt(index),
+        tipo: "certo_errado",
+        sourceKey: spec.sourceKey,
+        fonte_inspiracao: spec.inspiracao,
+        enunciado: `${context}, julgue o item a seguir. ${isCorrect ? fact.certo : fact.errado}`,
+        resposta_correta: resposta,
+        explicacao: `${fact.exp} ${isCorrect ? "Por isso, o item está certo." : "Por isso, o item está errado."}`,
+        tags: [spec.assunto_id, subassunto, ...(spec.tags || [])],
+      });
+    }
+  }
+
+  function generateMC(spec) {
+    for (let index = 0; index < spec.count; index += 1) {
+      const fact = spec.facts[index % spec.facts.length];
+      const context = MC_CONTEXTS[index % MC_CONTEXTS.length];
+      const subassunto = spec.subassuntos[index % spec.subassuntos.length];
+      const correctLabel = LETTERS[index % LETTERS.length];
+      const distractors = [...fact.distratores];
+      let distractorOffset = 0;
+      const alternativas = LETTERS.map((letter, altIndex) => {
+        if (letter === correctLabel) {
+          return { label: letter, text: fact.correta };
+        }
+        const distractorIndex = (distractorOffset + index) % distractors.length;
+        distractorOffset += 1;
+        return { label: letter, text: distractors[distractorIndex] };
+      });
+
+      addQuestion({
+        id: `${spec.prefix}-${pad(index + 1)}`,
+        concurso_id: spec.concurso_id,
+        cargo_id: spec.cargo_id,
+        cargos_compativeis: spec.cargos || [spec.cargo_id],
+        materia_id: spec.materia_id,
+        materia: spec.materia,
+        assunto_id: spec.assunto_id,
+        assunto: spec.assunto,
+        subassunto,
+        bloco: spec.bloco,
+        dificuldade: dificuldadeAt(index + 1),
+        tipo: "multipla_escolha",
+        sourceKey: spec.sourceKey,
+        fonte_inspiracao: spec.inspiracao,
+        enunciado: `${context}, ${fact.pergunta}`,
+        alternativas,
+        resposta_correta: correctLabel,
+        explicacao: fact.explicacao,
+        tags: [spec.assunto_id, subassunto, ...(spec.tags || [])],
+      });
+    }
+  }
+
+  [
+    { prefix: "CRT-POR", count: 20, materia_id: "crt-portugues", materia: "Português", assunto_id: "portugues", assunto: "Gramática e interpretação", subassuntos: ["crase", "concordancia", "pontuacao", "coesao", "regencia"], bloco: "Conhecimentos básicos", facts: CE_FACTS.portugues, sourceKey: "crt_edital", inspiracao: "Edital CRT-SP 2026 e padrão Quadrix em Conselhos Profissionais", cargos: ["crt-tecnico-administrativo-bs", "crt-fiscal-bs"] },
+    { prefix: "CRT-RLM", count: 15, materia_id: "crt-rlm", materia: "Raciocínio Lógico/Matemática", assunto_id: "rlm", assunto: "Lógica e matemática básica", subassuntos: ["proposicoes", "porcentagem", "regra-de-tres", "conjuntos"], bloco: "Conhecimentos básicos", facts: CE_FACTS.rlm, sourceKey: "crt_edital", inspiracao: "Edital CRT-SP 2026 e padrão Quadrix em conhecimentos básicos", cargos: ["crt-tecnico-administrativo-bs", "crt-fiscal-bs"] },
+    { prefix: "CRT-INF", count: 15, materia_id: "crt-informatica", materia: "Informática", assunto_id: "informatica", assunto: "Informática aplicada", subassuntos: ["seguranca", "backup", "internet", "planilhas"], bloco: "Conhecimentos básicos", facts: CE_FACTS.informatica, sourceKey: "crt_edital", inspiracao: "Edital CRT-SP 2026 e padrão Quadrix em conhecimentos básicos", cargos: ["crt-tecnico-administrativo-bs", "crt-fiscal-bs"] },
+    { prefix: "CRT-ETI", count: 6, materia_id: "crt-etica", materia: "Ética", assunto_id: "etica", assunto: "Ética no serviço público", subassuntos: ["integridade", "conflito-de-interesses"], bloco: "Conhecimentos complementares", facts: CE_FACTS.etica, sourceKey: "crt_edital", inspiracao: "Padrão Quadrix em Conselhos Profissionais", cargos: ["crt-tecnico-administrativo-bs", "crt-fiscal-bs"] },
+    { prefix: "CRT-ADP", count: 6, materia_id: "crt-adm-publica", materia: "Administração Pública", assunto_id: "administracao-publica", assunto: "Princípios e organização administrativa", subassuntos: ["principios", "desconcentracao", "atos"], bloco: "Conhecimentos complementares", facts: CE_FACTS.administracaoPublica, sourceKey: "crt_edital", inspiracao: "Padrão Quadrix em CREA, CRC e Conselhos", cargos: ["crt-tecnico-administrativo-bs", "crt-fiscal-bs"] },
+    { prefix: "CRT-LAI", count: 6, materia_id: "crt-lai", materia: "LAI", assunto_id: "lai", assunto: "Lei de Acesso à Informação", subassuntos: ["publicidade", "transparencia-ativa", "pedido-de-acesso"], bloco: "Conhecimentos complementares", facts: CE_FACTS.lai, sourceKey: "lai", inspiracao: "Base legal: Lei 12.527/2011", cargos: ["crt-tecnico-administrativo-bs", "crt-fiscal-bs"] },
+    { prefix: "CRT-LGP", count: 6, materia_id: "crt-lgpd", materia: "LGPD", assunto_id: "lgpd", assunto: "Proteção de dados pessoais", subassuntos: ["dado-pessoal", "poder-publico", "dados-sensiveis"], bloco: "Conhecimentos complementares", facts: CE_FACTS.lgpd, sourceKey: "lgpd", inspiracao: "Base legal: Lei 13.709/2018", cargos: ["crt-tecnico-administrativo-bs", "crt-fiscal-bs"] },
+    { prefix: "CRT-IMP", count: 6, materia_id: "crt-improbidade", materia: "Lei 8.429/1992", assunto_id: "improbidade", assunto: "Improbidade administrativa", subassuntos: ["dolo", "sancoes"], bloco: "Conhecimentos complementares", facts: CE_FACTS.improbidade, sourceKey: "improbidade", inspiracao: "Base legal: Lei 8.429/1992", cargos: ["crt-tecnico-administrativo-bs", "crt-fiscal-bs"] },
+    { prefix: "CRT-PAD", count: 8, materia_id: "crt-processo-adm", materia: "Lei 9.784/1999", assunto_id: "processo-administrativo", assunto: "Processo administrativo federal", subassuntos: ["motivacao", "competencia", "contraditorio"], bloco: "Conhecimentos complementares", facts: CE_FACTS.processoAdministrativo, sourceKey: "lei_9784", inspiracao: "Base legal: Lei 9.784/1999", cargos: ["crt-tecnico-administrativo-bs", "crt-fiscal-bs"] },
+    { prefix: "CRT-ADM", count: 7, materia_id: "crt-adm-geral", materia: "Administração Geral e Pública", assunto_id: "administracao-geral", assunto: "Funções administrativas", subassuntos: ["planejamento", "controle", "pdca"], bloco: "Conhecimentos específicos", facts: CE_FACTS.administracaoGeral, sourceKey: "crt_edital", inspiracao: "Padrão Quadrix em área administrativa de Conselhos", cargos: ["crt-tecnico-administrativo-bs", "crt-fiscal-bs"] },
+    { prefix: "CRT-ROT", count: 5, materia_id: "crt-rotinas", materia: "Rotinas administrativas", assunto_id: "rotinas", assunto: "Rotinas administrativas", subassuntos: ["checklist", "rastreabilidade"], bloco: "Conhecimentos específicos", facts: CE_FACTS.rotinas, sourceKey: "crt_edital", inspiracao: "Padrão Quadrix em Técnico Administrativo", cargos: ["crt-tecnico-administrativo-bs"] },
+    { prefix: "CRT-RED", count: 6, materia_id: "crt-redacao", materia: "Redação oficial", assunto_id: "redacao-oficial", assunto: "Comunicação oficial", subassuntos: ["clareza", "concisao"], bloco: "Conhecimentos específicos", facts: CE_FACTS.redacao, sourceKey: "manual_redacao", inspiracao: "Manual de Redação e padrão Quadrix", cargos: ["crt-tecnico-administrativo-bs"] },
+    { prefix: "CRT-PRO", count: 6, materia_id: "crt-protocolo", materia: "Protocolo e arquivo", assunto_id: "protocolo", assunto: "Protocolo e gestão documental", subassuntos: ["autuacao", "temporalidade", "arquivo-corrente"], bloco: "Conhecimentos específicos", facts: CE_FACTS.protocolo, sourceKey: "crt_edital", inspiracao: "Padrão Quadrix em rotinas administrativas", cargos: ["crt-tecnico-administrativo-bs", "crt-fiscal-bs"] },
+    { prefix: "CRT-ATE", count: 5, materia_id: "crt-atendimento", materia: "Atendimento ao público", assunto_id: "atendimento", assunto: "Atendimento e orientação", subassuntos: ["escuta-ativa", "linguagem-simples"], bloco: "Conhecimentos específicos", facts: CE_FACTS.atendimento, sourceKey: "crt_edital", inspiracao: "Padrão Quadrix em atendimento de Conselhos", cargos: ["crt-tecnico-administrativo-bs", "crt-fiscal-bs"] },
+    { prefix: "CRT-MAT", count: 8, materia_id: "crt-materiais", materia: "Materiais e estoques", assunto_id: "materiais", assunto: "Administração de materiais", subassuntos: ["curva-abc", "peps", "estoque-seguranca"], bloco: "Conhecimentos específicos", facts: CE_FACTS.materiais, sourceKey: "crt_edital", inspiracao: "Padrão Quadrix em administração de materiais", cargos: ["crt-tecnico-administrativo-bs"] },
+    { prefix: "CRT-LOG", count: 4, materia_id: "crt-logistica", materia: "Logística", assunto_id: "logistica", assunto: "Logística e armazenagem", subassuntos: ["lead-time", "armazenagem"], bloco: "Conhecimentos específicos", facts: CE_FACTS.logistica, sourceKey: "crt_edital", inspiracao: "Padrão Quadrix em logística administrativa", cargos: ["crt-tecnico-administrativo-bs"] },
+    { prefix: "CRT-LIC", count: 6, materia_id: "crt-licitacoes", materia: "Licitações e contratos", assunto_id: "licitacoes", assunto: "Contratações públicas", subassuntos: ["pregao", "inexigibilidade", "segregacao"], bloco: "Conhecimentos específicos", facts: CE_FACTS.licitacoes, sourceKey: "crt_edital", inspiracao: "Lei 14.133/2021 e padrão Quadrix", cargos: ["crt-tecnico-administrativo-bs", "crt-fiscal-bs"] },
+    { prefix: "CRT-SIS", count: 15, materia_id: "crt-sistema", materia: "Sistema CFT/CRT-SP", assunto_id: "sistema-cft-crt", assunto: "Legislação do Sistema CFT/CRTs", subassuntos: ["lei-13639", "lei-5524", "decretos", "resolucoes"], bloco: "Conhecimentos específicos", facts: CE_FACTS.sistemaCft, sourceKey: "lei_13639", inspiracao: "Lei 13.639/2018, Lei 5.524/1968, decretos e resoluções CFT", cargos: ["crt-tecnico-administrativo-bs", "crt-fiscal-bs"] },
+  ].forEach(generateCE);
+
+  [
+    { prefix: "IBGE-ACQ-POR", count: 30, concurso_id: "ibge", cargo_id: "ibge-acq", materia_id: "ibge-acq-portugues", materia: "Língua Portuguesa", assunto_id: "portugues", assunto: "Português para ACQ", subassuntos: ["interpretacao", "concordancia", "pontuacao", "coesao"], bloco: "Conhecimentos gerais", facts: MC_FACTS.portugues, sourceKey: "ibge_conteudo", inspiracao: "Edital IBGE 2026 e estilo Instituto Avalia", tags: ["ibge", "acq"] },
+    { prefix: "IBGE-ACQ-RLM", count: 20, concurso_id: "ibge", cargo_id: "ibge-acq", materia_id: "ibge-acq-rlm", materia: "Raciocínio Lógico/Matemático", assunto_id: "rlm", assunto: "Raciocínio lógico e matemática", subassuntos: ["porcentagem", "regra-de-tres", "media", "logica"], bloco: "Conhecimentos gerais", facts: MC_FACTS.matematica, sourceKey: "ibge_conteudo", inspiracao: "Edital IBGE 2026 e estilo Instituto Avalia", tags: ["ibge", "acq"] },
+    { prefix: "IBGE-ACQ-GEO", count: 30, concurso_id: "ibge", cargo_id: "ibge-acq", materia_id: "ibge-acq-geografia", materia: "Geografia", assunto_id: "geografia", assunto: "Geografia aplicada ao IBGE", subassuntos: ["populacao", "cartografia", "urbanizacao", "territorio"], bloco: "Conhecimentos gerais", facts: MC_FACTS.geografia, sourceKey: "ibge_conteudo", inspiracao: "Edital IBGE 2026 e conteúdo programático oficial", tags: ["ibge", "acq"] },
+    { prefix: "IBGE-ACQ-TEC", count: 40, concurso_id: "ibge", cargo_id: "ibge-acq", materia_id: "ibge-acq-tecnicos", materia: "Conhecimentos técnicos", assunto_id: "conhecimentos-tecnicos", assunto: "Operação censitária e qualidade", subassuntos: ["qualidade", "sigilo-estatistico", "consistencia", "supervisao"], bloco: "Conhecimentos específicos", facts: MC_FACTS.ibgeTecnicos, sourceKey: "ibge_pdf", inspiracao: "Edital IBGE 2026, metodologia censitária e estilo Instituto Avalia", tags: ["ibge", "acq"] },
+    { prefix: "IBGE-ANA-POR", count: 20, concurso_id: "ibge", cargo_id: "ibge-analista-ti-dados", materia_id: "ibge-ana-portugues", materia: "Língua Portuguesa", assunto_id: "portugues", assunto: "Português para Analista", subassuntos: ["interpretacao", "coesao", "sintaxe", "pontuacao"], bloco: "Conhecimentos gerais", facts: MC_FACTS.portugues, sourceKey: "ibge_conteudo", inspiracao: "Edital IBGE Analista 2026 e estilo Instituto Avalia", tags: ["ibge", "analista"] },
+    { prefix: "IBGE-ANA-RLM", count: 12, concurso_id: "ibge", cargo_id: "ibge-analista-ti-dados", materia_id: "ibge-ana-rlm", materia: "Raciocínio Lógico/Matemático", assunto_id: "rlm", assunto: "Lógica, probabilidade e estatística", subassuntos: ["logica", "probabilidade", "media", "proporcionalidade"], bloco: "Conhecimentos gerais", facts: MC_FACTS.matematica, sourceKey: "ibge_conteudo", inspiracao: "Edital IBGE Analista 2026 e estilo Instituto Avalia", tags: ["ibge", "analista"] },
+    { prefix: "IBGE-ANA-TI", count: 48, concurso_id: "ibge", cargo_id: "ibge-analista-ti-dados", materia_id: "ibge-ana-especificos", materia: "Conhecimentos específicos de TI e Dados", assunto_id: "ti-dados", assunto: "Tecnologia da informação e ciência de dados", subassuntos: ["banco-de-dados", "normalizacao", "apis", "modelos", "versionamento", "seguranca"], bloco: "Conhecimentos específicos", facts: MC_FACTS.tiDados, sourceKey: "ibge_conteudo", inspiracao: "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados", tags: ["ibge", "analista", "ti"] },
+    { prefix: "SAN-POR", count: 45, concurso_id: "santos-oficial", cargo_id: "santos-oficial-administracao", materia_id: "santos-portugues", materia: "Língua Portuguesa", assunto_id: "portugues", assunto: "Português para Oficial de Administração", subassuntos: ["interpretacao", "concordancia", "pontuacao", "coesao"], bloco: "Conhecimentos gerais", facts: MC_FACTS.portugues, sourceKey: "santos_pdf", inspiracao: "Edital Santos 71/2026 e padrão IBAM", tags: ["santos", "ibam"] },
+    { prefix: "SAN-MAT", count: 25, concurso_id: "santos-oficial", cargo_id: "santos-oficial-administracao", materia_id: "santos-matematica", materia: "Matemática", assunto_id: "matematica", assunto: "Matemática para Oficial de Administração", subassuntos: ["porcentagem", "regra-de-tres", "media", "logica"], bloco: "Conhecimentos gerais", facts: MC_FACTS.matematica, sourceKey: "santos_pdf", inspiracao: "Edital Santos 71/2026 e padrão IBAM", tags: ["santos", "ibam"] },
+    { prefix: "SAN-LEG", count: 35, concurso_id: "santos-oficial", cargo_id: "santos-oficial-administracao", materia_id: "santos-legislacao", materia: "Legislação municipal e serviço público", assunto_id: "legislacao-municipal", assunto: "Serviço público municipal", subassuntos: ["legalidade", "atendimento", "sigilo"], bloco: "Legislação", facts: MC_FACTS.santosLegislacao, sourceKey: "santos_pdf", inspiracao: "Edital Santos 71/2026, legislação municipal e padrão IBAM", tags: ["santos", "ibam"] },
+    { prefix: "SAN-ADM", count: 45, concurso_id: "santos-oficial", cargo_id: "santos-oficial-administracao", materia_id: "santos-especificos", materia: "Conhecimentos específicos administrativos", assunto_id: "administracao", assunto: "Rotinas administrativas municipais", subassuntos: ["protocolo", "arquivo", "materiais", "redacao"], bloco: "Conhecimentos específicos", facts: MC_FACTS.administracao, sourceKey: "santos_pdf", inspiracao: "Edital Santos 71/2026 e provas administrativas no padrão IBAM", tags: ["santos", "ibam"] },
+  ].forEach(generateMC);
+
+  const questionCountsByRole = QUESTIONS.reduce((acc, question) => {
+    question.cargos_compativeis.forEach((roleId) => {
+      const key = `${question.concurso_id}:${roleId}`;
+      acc[key] = (acc[key] || 0) + 1;
+    });
+    return acc;
+  }, {});
+
+  const questionCountsByContest = QUESTIONS.reduce((acc, question) => {
+    acc[question.concurso_id] = (acc[question.concurso_id] || 0) + 1;
+    return acc;
+  }, {});
+
+  window.STUDY_DATA = {
+    version: "2026.07.18-multiconcurso",
+    generatedAt: CREATED_AT,
+    users: USERS,
+    concursos: CONCURSOS,
+    sources: SOURCES,
+    questoes: QUESTIONS,
+    counts: {
+      byContest: questionCountsByContest,
+      byRole: questionCountsByRole,
+      total: QUESTIONS.length,
+    },
+  };
+
+  window.BANCO_QUESTOES = QUESTIONS.filter((question) => question.concurso_id === "crt-sp");
+  window.MINIMOS_PROVA_REAL = { basicos: 10, complementares: 8, especificos: 17, total: 36 };
+})();

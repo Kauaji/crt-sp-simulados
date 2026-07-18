@@ -3,35 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Simulados diários, prova real, ranking e estudos para Técnico Administrativo do CRT-SP.">
+  <meta name="description" content="Plataforma estática de estudos, questões e simulados para CRT-SP, IBGE e Prefeitura de Santos.">
   <meta name="theme-color" content="#12372a">
-  <title>Simulado CRT-SP — Técnico Administrativo</title>
+  <title>Simulados de Concursos — CRT-SP, IBGE e Santos</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2312372a'/%3E%3Cpath d='M18 33.5 27 42l19-21' fill='none' stroke='%23d7f4df' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <section id="login-screen" class="login-screen" aria-labelledby="login-title">
     <div class="login-card">
-      <p class="eyebrow">CRT-SP · Baixada Santista · 2026</p>
+      <p class="eyebrow">Simulados públicos · dados locais · sem senha</p>
       <h1 id="login-title">Quem vai estudar hoje?</h1>
-      <p>Escolha o perfil para registrar foguinho, pontos, histórico e ranking local. Sem senha e sem dados sensíveis.</p>
-      <div class="profile-options">
-        <button class="profile-card" type="button" data-user="kaua">
-          <span class="profile-card__avatar">K</span>
-          <span><strong>Kauã</strong><small>Entrar no painel</small></span>
-          <span aria-hidden="true">→</span>
-        </button>
-        <button class="profile-card" type="button" data-user="vitoria">
-          <span class="profile-card__avatar profile-card__avatar--coral">V</span>
-          <span><strong>Vitória</strong><small>Entrar no painel</small></span>
-          <span aria-hidden="true">→</span>
-        </button>
-        <button class="profile-card" type="button" data-user="caio">
-          <span class="profile-card__avatar profile-card__avatar--blue">C</span>
-          <span><strong>Caio</strong><small>Entrar no painel</small></span>
-          <span aria-hidden="true">→</span>
-        </button>
-      </div>
-      <p class="login-note">Os dados ficam neste navegador. Para ranking entre dispositivos, uma versão futura usará backend.</p>
+      <p>Escolha um perfil para separar histórico, progresso, favoritas, simulados e metas. Nada é misturado entre usuários, concursos ou cargos.</p>
+      <div id="profile-options" class="profile-options" aria-label="Perfis disponíveis"></div>
+      <p class="login-note">Os dados ficam salvos neste navegador via localStorage. Para sincronizar entre aparelhos, uma versão futura pode usar Supabase.</p>
     </div>
   </section>
 
@@ -39,34 +24,38 @@
     <header class="hero">
       <div class="hero__inner">
         <nav class="topbar" aria-label="Sessão">
-          <span class="brand-mark">CRT<span>/</span>120</span>
-          <div>
+          <span class="brand-mark">Prova<span>/</span>Mapa</span>
+          <div class="topbar__session">
             <span id="top-user-name"></span>
+            <button id="change-contest" class="text-button" type="button" hidden>Trocar concurso</button>
             <button id="switch-user" class="text-button" type="button">Trocar usuário</button>
           </div>
         </nav>
-        <p class="eyebrow">Sistema de treino Certo/Errado</p>
-        <h1>Simulado CRT-SP<br><span>Técnico Administrativo</span></h1>
-        <p class="hero__copy">Simulado diário de 40 itens, questionários extras, prova real de 120 itens e uma central de estudos para revisar o que mais pesa.</p>
-        <div class="hero-notice">+1 por acerto · −1 por erro · 0 em branco</div>
+
+        <div class="hero-grid">
+          <div>
+            <p id="hero-eyebrow" class="eyebrow">Escolha um concurso para começar</p>
+            <h1 id="hero-title">Simulados segmentados por concurso</h1>
+            <p id="hero-copy" class="hero__copy">CRT-SP, IBGE e Prefeitura de Santos em áreas independentes: banco de questões, simulados, revisão, progresso e estatísticas por usuário, concurso e cargo.</p>
+            <div id="hero-notice" class="hero-notice">Selecione um card abaixo para carregar o edital, o formato da prova e suas matérias.</div>
+          </div>
+          <aside id="active-contest-card" class="active-contest-card" aria-live="polite"></aside>
+        </div>
       </div>
     </header>
 
     <main>
-      <section id="dashboard" class="dashboard"></section>
-      <section id="ranking" class="ranking"></section>
+      <section id="contest-picker" class="contest-picker" aria-labelledby="contest-picker-title"></section>
 
-      <nav id="tabs" class="tabs" aria-label="Áreas de estudo"></nav>
-
-      <section id="daily-tab" class="tab-panel"></section>
-      <section id="extra-tab" class="tab-panel" hidden></section>
-      <section id="real-tab" class="tab-panel" hidden></section>
-      <section id="studies-tab" class="tab-panel" hidden></section>
-      <section id="dashboard-tab" class="tab-panel" hidden></section>
+      <section id="workspace" hidden>
+        <section id="dashboard" class="dashboard" aria-live="polite"></section>
+        <nav id="tabs" class="tabs" aria-label="Áreas de estudo"></nav>
+        <section id="tab-content" class="tab-panel" aria-live="polite"></section>
+      </section>
     </main>
 
     <footer>
-      <p>Material independente, gratuito e autoral. Sem vínculo oficial com o CRT-SP, CFT ou banca organizadora. Os dados de pontos, acessos e foguinho ficam salvos neste navegador.</p>
+      <p>Material independente, gratuito e autoral. Não há vínculo oficial com CRT-SP, CFT, IBGE, Prefeitura de Santos, Quadrix, Instituto Avalia ou IBAM. Questões inéditas criadas com base em editais e fontes públicas.</p>
     </footer>
   </div>
 

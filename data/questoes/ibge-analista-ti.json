@@ -1,0 +1,4855 @@
+{
+  "generatedAt": "2026-07-18T21:48:28.278Z",
+  "schemaVersion": "2026.07.18",
+  "total": 80,
+  "questoes": [
+    {
+      "id": "IBGE-ANA-POR-001",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-portugues",
+      "materia": "Língua Portuguesa",
+      "assunto_id": "portugues",
+      "assunto": "Português para Analista",
+      "subassunto": "interpretacao",
+      "bloco": "Conhecimentos gerais",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Edital IBGE Analista 2026 e estilo Instituto Avalia",
+      "enunciado": "Considere uma situação administrativa realista, assinale a alternativa que apresenta uma característica de texto administrativo claro.",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "Uso de frases objetivas, coesão entre as ideias e vocabulário preciso."
+        },
+        {
+          "label": "B",
+          "text": "Preferência por períodos longos e ambíguos."
+        },
+        {
+          "label": "C",
+          "text": "Uso de termos técnicos sem necessidade."
+        },
+        {
+          "label": "D",
+          "text": "Supressão de informações essenciais."
+        },
+        {
+          "label": "E",
+          "text": "Substituição de dados objetivos por opiniões pessoais."
+        }
+      ],
+      "resposta_correta": "A",
+      "explicacao": "Textos administrativos exigem clareza, objetividade, precisão e encadeamento lógico.",
+      "status": "ativo",
+      "tags": [
+        "portugues",
+        "interpretacao",
+        "ibge",
+        "analista"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-POR-002",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-portugues",
+      "materia": "Língua Portuguesa",
+      "assunto_id": "portugues",
+      "assunto": "Português para Analista",
+      "subassunto": "coesao",
+      "bloco": "Conhecimentos gerais",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Edital IBGE Analista 2026 e estilo Instituto Avalia",
+      "enunciado": "Em uma prova objetiva de nível médio, em relação à concordância verbal, assinale a opção correta.",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "O sujeito composto posposto torna a concordância sempre proibida."
+        },
+        {
+          "label": "B",
+          "text": "O verbo haver, com sentido de existir, permanece no singular."
+        },
+        {
+          "label": "C",
+          "text": "Todo verbo impessoal deve ir para o plural."
+        },
+        {
+          "label": "D",
+          "text": "Concordância é facultativa em documentos oficiais."
+        },
+        {
+          "label": "E",
+          "text": "O verbo haver existencial concorda sempre com o plural seguinte."
+        }
+      ],
+      "resposta_correta": "B",
+      "explicacao": "Haver existencial é impessoal e fica na terceira pessoa do singular.",
+      "status": "ativo",
+      "tags": [
+        "portugues",
+        "coesao",
+        "ibge",
+        "analista"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-POR-003",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-portugues",
+      "materia": "Língua Portuguesa",
+      "assunto_id": "portugues",
+      "assunto": "Português para Analista",
+      "subassunto": "sintaxe",
+      "bloco": "Conhecimentos gerais",
+      "dificuldade": "dificil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Edital IBGE Analista 2026 e estilo Instituto Avalia",
+      "enunciado": "Durante o planejamento de uma atividade pública, quanto à pontuação, é correto afirmar que",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "orações coordenadas nunca admitem vírgula."
+        },
+        {
+          "label": "B",
+          "text": "aposto explicativo deve ficar sempre sem pontuação."
+        },
+        {
+          "label": "C",
+          "text": "não se separa verbo e complemento por vírgula sem justificativa sintática."
+        },
+        {
+          "label": "D",
+          "text": "a vírgula deve marcar qualquer pausa de leitura."
+        },
+        {
+          "label": "E",
+          "text": "a vírgula é obrigatória entre sujeito e predicado."
+        }
+      ],
+      "resposta_correta": "C",
+      "explicacao": "A vírgula obedece à estrutura sintática e ao sentido, não apenas à pausa.",
+      "status": "ativo",
+      "tags": [
+        "portugues",
+        "sintaxe",
+        "ibge",
+        "analista"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-POR-004",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-portugues",
+      "materia": "Língua Portuguesa",
+      "assunto_id": "portugues",
+      "assunto": "Português para Analista",
+      "subassunto": "pontuacao",
+      "bloco": "Conhecimentos gerais",
+      "dificuldade": "facil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Edital IBGE Analista 2026 e estilo Instituto Avalia",
+      "enunciado": "Ao analisar documentos e rotinas de trabalho, a coesão textual é favorecida por",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "frases isoladas sem relação semântica."
+        },
+        {
+          "label": "B",
+          "text": "repetição desordenada de termos."
+        },
+        {
+          "label": "C",
+          "text": "ausência de conectores."
+        },
+        {
+          "label": "D",
+          "text": "retomadas claras, conectivos adequados e progressão lógica."
+        },
+        {
+          "label": "E",
+          "text": "mudança brusca de referente."
+        }
+      ],
+      "resposta_correta": "D",
+      "explicacao": "Coesão é a ligação formal e semântica entre partes do texto.",
+      "status": "ativo",
+      "tags": [
+        "portugues",
+        "pontuacao",
+        "ibge",
+        "analista"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-POR-005",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-portugues",
+      "materia": "Língua Portuguesa",
+      "assunto_id": "portugues",
+      "assunto": "Português para Analista",
+      "subassunto": "interpretacao",
+      "bloco": "Conhecimentos gerais",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Edital IBGE Analista 2026 e estilo Instituto Avalia",
+      "enunciado": "Em contexto de atendimento ao cidadão, assinale a alternativa que apresenta uma característica de texto administrativo claro.",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "Preferência por períodos longos e ambíguos."
+        },
+        {
+          "label": "B",
+          "text": "Uso de termos técnicos sem necessidade."
+        },
+        {
+          "label": "C",
+          "text": "Supressão de informações essenciais."
+        },
+        {
+          "label": "D",
+          "text": "Substituição de dados objetivos por opiniões pessoais."
+        },
+        {
+          "label": "E",
+          "text": "Uso de frases objetivas, coesão entre as ideias e vocabulário preciso."
+        }
+      ],
+      "resposta_correta": "E",
+      "explicacao": "Textos administrativos exigem clareza, objetividade, precisão e encadeamento lógico.",
+      "status": "ativo",
+      "tags": [
+        "portugues",
+        "interpretacao",
+        "ibge",
+        "analista"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-POR-006",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-portugues",
+      "materia": "Língua Portuguesa",
+      "assunto_id": "portugues",
+      "assunto": "Português para Analista",
+      "subassunto": "coesao",
+      "bloco": "Conhecimentos gerais",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Edital IBGE Analista 2026 e estilo Instituto Avalia",
+      "enunciado": "No acompanhamento de indicadores e informações oficiais, em relação à concordância verbal, assinale a opção correta.",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "O verbo haver, com sentido de existir, permanece no singular."
+        },
+        {
+          "label": "B",
+          "text": "O sujeito composto posposto torna a concordância sempre proibida."
+        },
+        {
+          "label": "C",
+          "text": "Todo verbo impessoal deve ir para o plural."
+        },
+        {
+          "label": "D",
+          "text": "Concordância é facultativa em documentos oficiais."
+        },
+        {
+          "label": "E",
+          "text": "O verbo haver existencial concorda sempre com o plural seguinte."
+        }
+      ],
+      "resposta_correta": "A",
+      "explicacao": "Haver existencial é impessoal e fica na terceira pessoa do singular.",
+      "status": "ativo",
+      "tags": [
+        "portugues",
+        "coesao",
+        "ibge",
+        "analista"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-POR-007",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-portugues",
+      "materia": "Língua Portuguesa",
+      "assunto_id": "portugues",
+      "assunto": "Português para Analista",
+      "subassunto": "sintaxe",
+      "bloco": "Conhecimentos gerais",
+      "dificuldade": "dificil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Edital IBGE Analista 2026 e estilo Instituto Avalia",
+      "enunciado": "No exercício de função administrativa, quanto à pontuação, é correto afirmar que",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "orações coordenadas nunca admitem vírgula."
+        },
+        {
+          "label": "B",
+          "text": "não se separa verbo e complemento por vírgula sem justificativa sintática."
+        },
+        {
+          "label": "C",
+          "text": "aposto explicativo deve ficar sempre sem pontuação."
+        },
+        {
+          "label": "D",
+          "text": "a vírgula deve marcar qualquer pausa de leitura."
+        },
+        {
+          "label": "E",
+          "text": "a vírgula é obrigatória entre sujeito e predicado."
+        }
+      ],
+      "resposta_correta": "B",
+      "explicacao": "A vírgula obedece à estrutura sintática e ao sentido, não apenas à pausa.",
+      "status": "ativo",
+      "tags": [
+        "portugues",
+        "sintaxe",
+        "ibge",
+        "analista"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-POR-008",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-portugues",
+      "materia": "Língua Portuguesa",
+      "assunto_id": "portugues",
+      "assunto": "Português para Analista",
+      "subassunto": "pontuacao",
+      "bloco": "Conhecimentos gerais",
+      "dificuldade": "facil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Edital IBGE Analista 2026 e estilo Instituto Avalia",
+      "enunciado": "Em uma demanda típica do edital, a coesão textual é favorecida por",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "frases isoladas sem relação semântica."
+        },
+        {
+          "label": "B",
+          "text": "repetição desordenada de termos."
+        },
+        {
+          "label": "C",
+          "text": "retomadas claras, conectivos adequados e progressão lógica."
+        },
+        {
+          "label": "D",
+          "text": "ausência de conectores."
+        },
+        {
+          "label": "E",
+          "text": "mudança brusca de referente."
+        }
+      ],
+      "resposta_correta": "C",
+      "explicacao": "Coesão é a ligação formal e semântica entre partes do texto.",
+      "status": "ativo",
+      "tags": [
+        "portugues",
+        "pontuacao",
+        "ibge",
+        "analista"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-POR-009",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-portugues",
+      "materia": "Língua Portuguesa",
+      "assunto_id": "portugues",
+      "assunto": "Português para Analista",
+      "subassunto": "interpretacao",
+      "bloco": "Conhecimentos gerais",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Edital IBGE Analista 2026 e estilo Instituto Avalia",
+      "enunciado": "Considere uma situação administrativa realista, assinale a alternativa que apresenta uma característica de texto administrativo claro.",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "Preferência por períodos longos e ambíguos."
+        },
+        {
+          "label": "B",
+          "text": "Uso de termos técnicos sem necessidade."
+        },
+        {
+          "label": "C",
+          "text": "Supressão de informações essenciais."
+        },
+        {
+          "label": "D",
+          "text": "Uso de frases objetivas, coesão entre as ideias e vocabulário preciso."
+        },
+        {
+          "label": "E",
+          "text": "Substituição de dados objetivos por opiniões pessoais."
+        }
+      ],
+      "resposta_correta": "D",
+      "explicacao": "Textos administrativos exigem clareza, objetividade, precisão e encadeamento lógico.",
+      "status": "ativo",
+      "tags": [
+        "portugues",
+        "interpretacao",
+        "ibge",
+        "analista"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-POR-010",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-portugues",
+      "materia": "Língua Portuguesa",
+      "assunto_id": "portugues",
+      "assunto": "Português para Analista",
+      "subassunto": "coesao",
+      "bloco": "Conhecimentos gerais",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Edital IBGE Analista 2026 e estilo Instituto Avalia",
+      "enunciado": "Em uma prova objetiva de nível médio, em relação à concordância verbal, assinale a opção correta.",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "O sujeito composto posposto torna a concordância sempre proibida."
+        },
+        {
+          "label": "B",
+          "text": "Todo verbo impessoal deve ir para o plural."
+        },
+        {
+          "label": "C",
+          "text": "Concordância é facultativa em documentos oficiais."
+        },
+        {
+          "label": "D",
+          "text": "O verbo haver existencial concorda sempre com o plural seguinte."
+        },
+        {
+          "label": "E",
+          "text": "O verbo haver, com sentido de existir, permanece no singular."
+        }
+      ],
+      "resposta_correta": "E",
+      "explicacao": "Haver existencial é impessoal e fica na terceira pessoa do singular.",
+      "status": "ativo",
+      "tags": [
+        "portugues",
+        "coesao",
+        "ibge",
+        "analista"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-POR-011",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-portugues",
+      "materia": "Língua Portuguesa",
+      "assunto_id": "portugues",
+      "assunto": "Português para Analista",
+      "subassunto": "sintaxe",
+      "bloco": "Conhecimentos gerais",
+      "dificuldade": "dificil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Edital IBGE Analista 2026 e estilo Instituto Avalia",
+      "enunciado": "Durante o planejamento de uma atividade pública, quanto à pontuação, é correto afirmar que",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "não se separa verbo e complemento por vírgula sem justificativa sintática."
+        },
+        {
+          "label": "B",
+          "text": "orações coordenadas nunca admitem vírgula."
+        },
+        {
+          "label": "C",
+          "text": "aposto explicativo deve ficar sempre sem pontuação."
+        },
+        {
+          "label": "D",
+          "text": "a vírgula deve marcar qualquer pausa de leitura."
+        },
+        {
+          "label": "E",
+          "text": "a vírgula é obrigatória entre sujeito e predicado."
+        }
+      ],
+      "resposta_correta": "A",
+      "explicacao": "A vírgula obedece à estrutura sintática e ao sentido, não apenas à pausa.",
+      "status": "ativo",
+      "tags": [
+        "portugues",
+        "sintaxe",
+        "ibge",
+        "analista"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-POR-012",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-portugues",
+      "materia": "Língua Portuguesa",
+      "assunto_id": "portugues",
+      "assunto": "Português para Analista",
+      "subassunto": "pontuacao",
+      "bloco": "Conhecimentos gerais",
+      "dificuldade": "facil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Edital IBGE Analista 2026 e estilo Instituto Avalia",
+      "enunciado": "Ao analisar documentos e rotinas de trabalho, a coesão textual é favorecida por",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "frases isoladas sem relação semântica."
+        },
+        {
+          "label": "B",
+          "text": "retomadas claras, conectivos adequados e progressão lógica."
+        },
+        {
+          "label": "C",
+          "text": "repetição desordenada de termos."
+        },
+        {
+          "label": "D",
+          "text": "ausência de conectores."
+        },
+        {
+          "label": "E",
+          "text": "mudança brusca de referente."
+        }
+      ],
+      "resposta_correta": "B",
+      "explicacao": "Coesão é a ligação formal e semântica entre partes do texto.",
+      "status": "ativo",
+      "tags": [
+        "portugues",
+        "pontuacao",
+        "ibge",
+        "analista"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-POR-013",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-portugues",
+      "materia": "Língua Portuguesa",
+      "assunto_id": "portugues",
+      "assunto": "Português para Analista",
+      "subassunto": "interpretacao",
+      "bloco": "Conhecimentos gerais",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Edital IBGE Analista 2026 e estilo Instituto Avalia",
+      "enunciado": "Em contexto de atendimento ao cidadão, assinale a alternativa que apresenta uma característica de texto administrativo claro.",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "Preferência por períodos longos e ambíguos."
+        },
+        {
+          "label": "B",
+          "text": "Uso de termos técnicos sem necessidade."
+        },
+        {
+          "label": "C",
+          "text": "Uso de frases objetivas, coesão entre as ideias e vocabulário preciso."
+        },
+        {
+          "label": "D",
+          "text": "Supressão de informações essenciais."
+        },
+        {
+          "label": "E",
+          "text": "Substituição de dados objetivos por opiniões pessoais."
+        }
+      ],
+      "resposta_correta": "C",
+      "explicacao": "Textos administrativos exigem clareza, objetividade, precisão e encadeamento lógico.",
+      "status": "ativo",
+      "tags": [
+        "portugues",
+        "interpretacao",
+        "ibge",
+        "analista"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-POR-014",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-portugues",
+      "materia": "Língua Portuguesa",
+      "assunto_id": "portugues",
+      "assunto": "Português para Analista",
+      "subassunto": "coesao",
+      "bloco": "Conhecimentos gerais",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Edital IBGE Analista 2026 e estilo Instituto Avalia",
+      "enunciado": "No acompanhamento de indicadores e informações oficiais, em relação à concordância verbal, assinale a opção correta.",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "O sujeito composto posposto torna a concordância sempre proibida."
+        },
+        {
+          "label": "B",
+          "text": "Todo verbo impessoal deve ir para o plural."
+        },
+        {
+          "label": "C",
+          "text": "Concordância é facultativa em documentos oficiais."
+        },
+        {
+          "label": "D",
+          "text": "O verbo haver, com sentido de existir, permanece no singular."
+        },
+        {
+          "label": "E",
+          "text": "O verbo haver existencial concorda sempre com o plural seguinte."
+        }
+      ],
+      "resposta_correta": "D",
+      "explicacao": "Haver existencial é impessoal e fica na terceira pessoa do singular.",
+      "status": "ativo",
+      "tags": [
+        "portugues",
+        "coesao",
+        "ibge",
+        "analista"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-POR-015",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-portugues",
+      "materia": "Língua Portuguesa",
+      "assunto_id": "portugues",
+      "assunto": "Português para Analista",
+      "subassunto": "sintaxe",
+      "bloco": "Conhecimentos gerais",
+      "dificuldade": "dificil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Edital IBGE Analista 2026 e estilo Instituto Avalia",
+      "enunciado": "No exercício de função administrativa, quanto à pontuação, é correto afirmar que",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "orações coordenadas nunca admitem vírgula."
+        },
+        {
+          "label": "B",
+          "text": "aposto explicativo deve ficar sempre sem pontuação."
+        },
+        {
+          "label": "C",
+          "text": "a vírgula deve marcar qualquer pausa de leitura."
+        },
+        {
+          "label": "D",
+          "text": "a vírgula é obrigatória entre sujeito e predicado."
+        },
+        {
+          "label": "E",
+          "text": "não se separa verbo e complemento por vírgula sem justificativa sintática."
+        }
+      ],
+      "resposta_correta": "E",
+      "explicacao": "A vírgula obedece à estrutura sintática e ao sentido, não apenas à pausa.",
+      "status": "ativo",
+      "tags": [
+        "portugues",
+        "sintaxe",
+        "ibge",
+        "analista"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-POR-016",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-portugues",
+      "materia": "Língua Portuguesa",
+      "assunto_id": "portugues",
+      "assunto": "Português para Analista",
+      "subassunto": "pontuacao",
+      "bloco": "Conhecimentos gerais",
+      "dificuldade": "facil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Edital IBGE Analista 2026 e estilo Instituto Avalia",
+      "enunciado": "Em uma demanda típica do edital, a coesão textual é favorecida por",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "retomadas claras, conectivos adequados e progressão lógica."
+        },
+        {
+          "label": "B",
+          "text": "frases isoladas sem relação semântica."
+        },
+        {
+          "label": "C",
+          "text": "repetição desordenada de termos."
+        },
+        {
+          "label": "D",
+          "text": "ausência de conectores."
+        },
+        {
+          "label": "E",
+          "text": "mudança brusca de referente."
+        }
+      ],
+      "resposta_correta": "A",
+      "explicacao": "Coesão é a ligação formal e semântica entre partes do texto.",
+      "status": "ativo",
+      "tags": [
+        "portugues",
+        "pontuacao",
+        "ibge",
+        "analista"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-POR-017",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-portugues",
+      "materia": "Língua Portuguesa",
+      "assunto_id": "portugues",
+      "assunto": "Português para Analista",
+      "subassunto": "interpretacao",
+      "bloco": "Conhecimentos gerais",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Edital IBGE Analista 2026 e estilo Instituto Avalia",
+      "enunciado": "Considere uma situação administrativa realista, assinale a alternativa que apresenta uma característica de texto administrativo claro.",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "Preferência por períodos longos e ambíguos."
+        },
+        {
+          "label": "B",
+          "text": "Uso de frases objetivas, coesão entre as ideias e vocabulário preciso."
+        },
+        {
+          "label": "C",
+          "text": "Uso de termos técnicos sem necessidade."
+        },
+        {
+          "label": "D",
+          "text": "Supressão de informações essenciais."
+        },
+        {
+          "label": "E",
+          "text": "Substituição de dados objetivos por opiniões pessoais."
+        }
+      ],
+      "resposta_correta": "B",
+      "explicacao": "Textos administrativos exigem clareza, objetividade, precisão e encadeamento lógico.",
+      "status": "ativo",
+      "tags": [
+        "portugues",
+        "interpretacao",
+        "ibge",
+        "analista"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-POR-018",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-portugues",
+      "materia": "Língua Portuguesa",
+      "assunto_id": "portugues",
+      "assunto": "Português para Analista",
+      "subassunto": "coesao",
+      "bloco": "Conhecimentos gerais",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Edital IBGE Analista 2026 e estilo Instituto Avalia",
+      "enunciado": "Em uma prova objetiva de nível médio, em relação à concordância verbal, assinale a opção correta.",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "O sujeito composto posposto torna a concordância sempre proibida."
+        },
+        {
+          "label": "B",
+          "text": "Todo verbo impessoal deve ir para o plural."
+        },
+        {
+          "label": "C",
+          "text": "O verbo haver, com sentido de existir, permanece no singular."
+        },
+        {
+          "label": "D",
+          "text": "Concordância é facultativa em documentos oficiais."
+        },
+        {
+          "label": "E",
+          "text": "O verbo haver existencial concorda sempre com o plural seguinte."
+        }
+      ],
+      "resposta_correta": "C",
+      "explicacao": "Haver existencial é impessoal e fica na terceira pessoa do singular.",
+      "status": "ativo",
+      "tags": [
+        "portugues",
+        "coesao",
+        "ibge",
+        "analista"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-POR-019",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-portugues",
+      "materia": "Língua Portuguesa",
+      "assunto_id": "portugues",
+      "assunto": "Português para Analista",
+      "subassunto": "sintaxe",
+      "bloco": "Conhecimentos gerais",
+      "dificuldade": "dificil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Edital IBGE Analista 2026 e estilo Instituto Avalia",
+      "enunciado": "Durante o planejamento de uma atividade pública, quanto à pontuação, é correto afirmar que",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "orações coordenadas nunca admitem vírgula."
+        },
+        {
+          "label": "B",
+          "text": "aposto explicativo deve ficar sempre sem pontuação."
+        },
+        {
+          "label": "C",
+          "text": "a vírgula deve marcar qualquer pausa de leitura."
+        },
+        {
+          "label": "D",
+          "text": "não se separa verbo e complemento por vírgula sem justificativa sintática."
+        },
+        {
+          "label": "E",
+          "text": "a vírgula é obrigatória entre sujeito e predicado."
+        }
+      ],
+      "resposta_correta": "D",
+      "explicacao": "A vírgula obedece à estrutura sintática e ao sentido, não apenas à pausa.",
+      "status": "ativo",
+      "tags": [
+        "portugues",
+        "sintaxe",
+        "ibge",
+        "analista"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-POR-020",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-portugues",
+      "materia": "Língua Portuguesa",
+      "assunto_id": "portugues",
+      "assunto": "Português para Analista",
+      "subassunto": "pontuacao",
+      "bloco": "Conhecimentos gerais",
+      "dificuldade": "facil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Edital IBGE Analista 2026 e estilo Instituto Avalia",
+      "enunciado": "Ao analisar documentos e rotinas de trabalho, a coesão textual é favorecida por",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "frases isoladas sem relação semântica."
+        },
+        {
+          "label": "B",
+          "text": "repetição desordenada de termos."
+        },
+        {
+          "label": "C",
+          "text": "ausência de conectores."
+        },
+        {
+          "label": "D",
+          "text": "mudança brusca de referente."
+        },
+        {
+          "label": "E",
+          "text": "retomadas claras, conectivos adequados e progressão lógica."
+        }
+      ],
+      "resposta_correta": "E",
+      "explicacao": "Coesão é a ligação formal e semântica entre partes do texto.",
+      "status": "ativo",
+      "tags": [
+        "portugues",
+        "pontuacao",
+        "ibge",
+        "analista"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-RLM-001",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-rlm",
+      "materia": "Raciocínio Lógico/Matemático",
+      "assunto_id": "rlm",
+      "assunto": "Lógica, probabilidade e estatística",
+      "subassunto": "logica",
+      "bloco": "Conhecimentos gerais",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Edital IBGE Analista 2026 e estilo Instituto Avalia",
+      "enunciado": "Considere uma situação administrativa realista, um setor recebeu 120 solicitações e concluiu 75%. O número de solicitações concluídas foi",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "90."
+        },
+        {
+          "label": "B",
+          "text": "75."
+        },
+        {
+          "label": "C",
+          "text": "80."
+        },
+        {
+          "label": "D",
+          "text": "95."
+        },
+        {
+          "label": "E",
+          "text": "100."
+        }
+      ],
+      "resposta_correta": "A",
+      "explicacao": "75% de 120 corresponde a 0,75 × 120 = 90.",
+      "status": "ativo",
+      "tags": [
+        "rlm",
+        "logica",
+        "ibge",
+        "analista"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-RLM-002",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-rlm",
+      "materia": "Raciocínio Lógico/Matemático",
+      "assunto_id": "rlm",
+      "assunto": "Lógica, probabilidade e estatística",
+      "subassunto": "probabilidade",
+      "bloco": "Conhecimentos gerais",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Edital IBGE Analista 2026 e estilo Instituto Avalia",
+      "enunciado": "Em uma prova objetiva de nível médio, se três servidores conferem 90 processos em 6 horas, mantendo o ritmo, seis servidores conferem a mesma quantidade em",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "9 horas."
+        },
+        {
+          "label": "B",
+          "text": "3 horas."
+        },
+        {
+          "label": "C",
+          "text": "12 horas."
+        },
+        {
+          "label": "D",
+          "text": "18 horas."
+        },
+        {
+          "label": "E",
+          "text": "6 horas."
+        }
+      ],
+      "resposta_correta": "B",
+      "explicacao": "Dobrar o número de servidores reduz o tempo pela metade, em proporcionalidade inversa.",
+      "status": "ativo",
+      "tags": [
+        "rlm",
+        "probabilidade",
+        "ibge",
+        "analista"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-RLM-003",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-rlm",
+      "materia": "Raciocínio Lógico/Matemático",
+      "assunto_id": "rlm",
+      "assunto": "Lógica, probabilidade e estatística",
+      "subassunto": "media",
+      "bloco": "Conhecimentos gerais",
+      "dificuldade": "dificil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Edital IBGE Analista 2026 e estilo Instituto Avalia",
+      "enunciado": "Durante o planejamento de uma atividade pública, a média aritmética de 8, 10, 12 e 14 é",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "13."
+        },
+        {
+          "label": "B",
+          "text": "44."
+        },
+        {
+          "label": "C",
+          "text": "11."
+        },
+        {
+          "label": "D",
+          "text": "10."
+        },
+        {
+          "label": "E",
+          "text": "12."
+        }
+      ],
+      "resposta_correta": "C",
+      "explicacao": "A soma é 44; dividindo por 4, obtém-se 11.",
+      "status": "ativo",
+      "tags": [
+        "rlm",
+        "media",
+        "ibge",
+        "analista"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-RLM-004",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-rlm",
+      "materia": "Raciocínio Lógico/Matemático",
+      "assunto_id": "rlm",
+      "assunto": "Lógica, probabilidade e estatística",
+      "subassunto": "proporcionalidade",
+      "bloco": "Conhecimentos gerais",
+      "dificuldade": "facil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Edital IBGE Analista 2026 e estilo Instituto Avalia",
+      "enunciado": "Ao analisar documentos e rotinas de trabalho, a negação lógica de 'todos os formulários foram validados' é",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "todo formulário foi validado duas vezes."
+        },
+        {
+          "label": "B",
+          "text": "nenhum formulário foi validado."
+        },
+        {
+          "label": "C",
+          "text": "todos os formulários não foram validados."
+        },
+        {
+          "label": "D",
+          "text": "pelo menos um formulário não foi validado."
+        },
+        {
+          "label": "E",
+          "text": "alguns formulários foram validados."
+        }
+      ],
+      "resposta_correta": "D",
+      "explicacao": "A negação de universal afirmativa é particular negativa.",
+      "status": "ativo",
+      "tags": [
+        "rlm",
+        "proporcionalidade",
+        "ibge",
+        "analista"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-RLM-005",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-rlm",
+      "materia": "Raciocínio Lógico/Matemático",
+      "assunto_id": "rlm",
+      "assunto": "Lógica, probabilidade e estatística",
+      "subassunto": "logica",
+      "bloco": "Conhecimentos gerais",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Edital IBGE Analista 2026 e estilo Instituto Avalia",
+      "enunciado": "Em contexto de atendimento ao cidadão, um setor recebeu 120 solicitações e concluiu 75%. O número de solicitações concluídas foi",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "75."
+        },
+        {
+          "label": "B",
+          "text": "80."
+        },
+        {
+          "label": "C",
+          "text": "95."
+        },
+        {
+          "label": "D",
+          "text": "100."
+        },
+        {
+          "label": "E",
+          "text": "90."
+        }
+      ],
+      "resposta_correta": "E",
+      "explicacao": "75% de 120 corresponde a 0,75 × 120 = 90.",
+      "status": "ativo",
+      "tags": [
+        "rlm",
+        "logica",
+        "ibge",
+        "analista"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-RLM-006",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-rlm",
+      "materia": "Raciocínio Lógico/Matemático",
+      "assunto_id": "rlm",
+      "assunto": "Lógica, probabilidade e estatística",
+      "subassunto": "probabilidade",
+      "bloco": "Conhecimentos gerais",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Edital IBGE Analista 2026 e estilo Instituto Avalia",
+      "enunciado": "No acompanhamento de indicadores e informações oficiais, se três servidores conferem 90 processos em 6 horas, mantendo o ritmo, seis servidores conferem a mesma quantidade em",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "3 horas."
+        },
+        {
+          "label": "B",
+          "text": "9 horas."
+        },
+        {
+          "label": "C",
+          "text": "12 horas."
+        },
+        {
+          "label": "D",
+          "text": "18 horas."
+        },
+        {
+          "label": "E",
+          "text": "6 horas."
+        }
+      ],
+      "resposta_correta": "A",
+      "explicacao": "Dobrar o número de servidores reduz o tempo pela metade, em proporcionalidade inversa.",
+      "status": "ativo",
+      "tags": [
+        "rlm",
+        "probabilidade",
+        "ibge",
+        "analista"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-RLM-007",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-rlm",
+      "materia": "Raciocínio Lógico/Matemático",
+      "assunto_id": "rlm",
+      "assunto": "Lógica, probabilidade e estatística",
+      "subassunto": "media",
+      "bloco": "Conhecimentos gerais",
+      "dificuldade": "dificil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Edital IBGE Analista 2026 e estilo Instituto Avalia",
+      "enunciado": "No exercício de função administrativa, a média aritmética de 8, 10, 12 e 14 é",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "13."
+        },
+        {
+          "label": "B",
+          "text": "11."
+        },
+        {
+          "label": "C",
+          "text": "44."
+        },
+        {
+          "label": "D",
+          "text": "10."
+        },
+        {
+          "label": "E",
+          "text": "12."
+        }
+      ],
+      "resposta_correta": "B",
+      "explicacao": "A soma é 44; dividindo por 4, obtém-se 11.",
+      "status": "ativo",
+      "tags": [
+        "rlm",
+        "media",
+        "ibge",
+        "analista"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-RLM-008",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-rlm",
+      "materia": "Raciocínio Lógico/Matemático",
+      "assunto_id": "rlm",
+      "assunto": "Lógica, probabilidade e estatística",
+      "subassunto": "proporcionalidade",
+      "bloco": "Conhecimentos gerais",
+      "dificuldade": "facil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Edital IBGE Analista 2026 e estilo Instituto Avalia",
+      "enunciado": "Em uma demanda típica do edital, a negação lógica de 'todos os formulários foram validados' é",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "todo formulário foi validado duas vezes."
+        },
+        {
+          "label": "B",
+          "text": "nenhum formulário foi validado."
+        },
+        {
+          "label": "C",
+          "text": "pelo menos um formulário não foi validado."
+        },
+        {
+          "label": "D",
+          "text": "todos os formulários não foram validados."
+        },
+        {
+          "label": "E",
+          "text": "alguns formulários foram validados."
+        }
+      ],
+      "resposta_correta": "C",
+      "explicacao": "A negação de universal afirmativa é particular negativa.",
+      "status": "ativo",
+      "tags": [
+        "rlm",
+        "proporcionalidade",
+        "ibge",
+        "analista"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-RLM-009",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-rlm",
+      "materia": "Raciocínio Lógico/Matemático",
+      "assunto_id": "rlm",
+      "assunto": "Lógica, probabilidade e estatística",
+      "subassunto": "logica",
+      "bloco": "Conhecimentos gerais",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Edital IBGE Analista 2026 e estilo Instituto Avalia",
+      "enunciado": "Considere uma situação administrativa realista, um setor recebeu 120 solicitações e concluiu 75%. O número de solicitações concluídas foi",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "75."
+        },
+        {
+          "label": "B",
+          "text": "80."
+        },
+        {
+          "label": "C",
+          "text": "95."
+        },
+        {
+          "label": "D",
+          "text": "90."
+        },
+        {
+          "label": "E",
+          "text": "100."
+        }
+      ],
+      "resposta_correta": "D",
+      "explicacao": "75% de 120 corresponde a 0,75 × 120 = 90.",
+      "status": "ativo",
+      "tags": [
+        "rlm",
+        "logica",
+        "ibge",
+        "analista"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-RLM-010",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-rlm",
+      "materia": "Raciocínio Lógico/Matemático",
+      "assunto_id": "rlm",
+      "assunto": "Lógica, probabilidade e estatística",
+      "subassunto": "probabilidade",
+      "bloco": "Conhecimentos gerais",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Edital IBGE Analista 2026 e estilo Instituto Avalia",
+      "enunciado": "Em uma prova objetiva de nível médio, se três servidores conferem 90 processos em 6 horas, mantendo o ritmo, seis servidores conferem a mesma quantidade em",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "9 horas."
+        },
+        {
+          "label": "B",
+          "text": "12 horas."
+        },
+        {
+          "label": "C",
+          "text": "18 horas."
+        },
+        {
+          "label": "D",
+          "text": "6 horas."
+        },
+        {
+          "label": "E",
+          "text": "3 horas."
+        }
+      ],
+      "resposta_correta": "E",
+      "explicacao": "Dobrar o número de servidores reduz o tempo pela metade, em proporcionalidade inversa.",
+      "status": "ativo",
+      "tags": [
+        "rlm",
+        "probabilidade",
+        "ibge",
+        "analista"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-RLM-011",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-rlm",
+      "materia": "Raciocínio Lógico/Matemático",
+      "assunto_id": "rlm",
+      "assunto": "Lógica, probabilidade e estatística",
+      "subassunto": "media",
+      "bloco": "Conhecimentos gerais",
+      "dificuldade": "dificil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Edital IBGE Analista 2026 e estilo Instituto Avalia",
+      "enunciado": "Durante o planejamento de uma atividade pública, a média aritmética de 8, 10, 12 e 14 é",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "11."
+        },
+        {
+          "label": "B",
+          "text": "13."
+        },
+        {
+          "label": "C",
+          "text": "44."
+        },
+        {
+          "label": "D",
+          "text": "10."
+        },
+        {
+          "label": "E",
+          "text": "12."
+        }
+      ],
+      "resposta_correta": "A",
+      "explicacao": "A soma é 44; dividindo por 4, obtém-se 11.",
+      "status": "ativo",
+      "tags": [
+        "rlm",
+        "media",
+        "ibge",
+        "analista"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-RLM-012",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-rlm",
+      "materia": "Raciocínio Lógico/Matemático",
+      "assunto_id": "rlm",
+      "assunto": "Lógica, probabilidade e estatística",
+      "subassunto": "proporcionalidade",
+      "bloco": "Conhecimentos gerais",
+      "dificuldade": "facil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Edital IBGE Analista 2026 e estilo Instituto Avalia",
+      "enunciado": "Ao analisar documentos e rotinas de trabalho, a negação lógica de 'todos os formulários foram validados' é",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "todo formulário foi validado duas vezes."
+        },
+        {
+          "label": "B",
+          "text": "pelo menos um formulário não foi validado."
+        },
+        {
+          "label": "C",
+          "text": "nenhum formulário foi validado."
+        },
+        {
+          "label": "D",
+          "text": "todos os formulários não foram validados."
+        },
+        {
+          "label": "E",
+          "text": "alguns formulários foram validados."
+        }
+      ],
+      "resposta_correta": "B",
+      "explicacao": "A negação de universal afirmativa é particular negativa.",
+      "status": "ativo",
+      "tags": [
+        "rlm",
+        "proporcionalidade",
+        "ibge",
+        "analista"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-001",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "banco-de-dados",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Considere uma situação administrativa realista, em banco de dados relacional, chave primária tem como função",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "identificar unicamente cada registro de uma tabela."
+        },
+        {
+          "label": "B",
+          "text": "armazenar senhas em texto claro."
+        },
+        {
+          "label": "C",
+          "text": "duplicar registros obrigatoriamente."
+        },
+        {
+          "label": "D",
+          "text": "substituir todas as chaves estrangeiras."
+        },
+        {
+          "label": "E",
+          "text": "impedir consultas com filtros."
+        }
+      ],
+      "resposta_correta": "A",
+      "explicacao": "A chave primária garante identidade única do registro.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "banco-de-dados",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-002",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "normalizacao",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Em uma prova objetiva de nível médio, normalização de dados busca",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "desligar integridade referencial."
+        },
+        {
+          "label": "B",
+          "text": "reduzir redundâncias e anomalias de inserção, atualização e exclusão."
+        },
+        {
+          "label": "C",
+          "text": "impedir modelagem lógica."
+        },
+        {
+          "label": "D",
+          "text": "trocar todos os dados por imagens."
+        },
+        {
+          "label": "E",
+          "text": "aumentar duplicidade deliberadamente."
+        }
+      ],
+      "resposta_correta": "B",
+      "explicacao": "Normalização organiza tabelas e dependências para consistência.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "normalizacao",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-003",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "apis",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "dificil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Durante o planejamento de uma atividade pública, uma API RESTful tende a utilizar",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "senhas no corpo de todas as respostas."
+        },
+        {
+          "label": "B",
+          "text": "métodos aleatórios sem semântica."
+        },
+        {
+          "label": "C",
+          "text": "recursos identificáveis por URLs e métodos HTTP adequados."
+        },
+        {
+          "label": "D",
+          "text": "apenas arquivos locais sem protocolo."
+        },
+        {
+          "label": "E",
+          "text": "somente planilhas manuais."
+        }
+      ],
+      "resposta_correta": "C",
+      "explicacao": "REST organiza interação por recursos e métodos como GET, POST, PUT e DELETE.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "apis",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-004",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "modelos",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "facil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Ao analisar documentos e rotinas de trabalho, em ciência de dados, validação de modelo é importante para",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "publicar dados sensíveis sem anonimização."
+        },
+        {
+          "label": "B",
+          "text": "garantir acerto perfeito em qualquer cenário."
+        },
+        {
+          "label": "C",
+          "text": "eliminar necessidade de dados."
+        },
+        {
+          "label": "D",
+          "text": "avaliar desempenho em dados não usados diretamente no ajuste."
+        },
+        {
+          "label": "E",
+          "text": "substituir análise exploratória por opinião."
+        }
+      ],
+      "resposta_correta": "D",
+      "explicacao": "Validação ajuda a estimar generalização e reduzir overfitting.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "modelos",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-005",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "versionamento",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Em contexto de atendimento ao cidadão, controle de versão em desenvolvimento de software permite",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "apagar histórico automaticamente."
+        },
+        {
+          "label": "B",
+          "text": "impedir revisão de alterações."
+        },
+        {
+          "label": "C",
+          "text": "eliminar testes."
+        },
+        {
+          "label": "D",
+          "text": "substituir documentação por nomes aleatórios."
+        },
+        {
+          "label": "E",
+          "text": "registrar alterações, colaborar e recuperar estados anteriores do código."
+        }
+      ],
+      "resposta_correta": "E",
+      "explicacao": "Sistemas como Git apoiam colaboração, rastreabilidade e reversão.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "versionamento",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-006",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "seguranca",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "No acompanhamento de indicadores e informações oficiais, criptografia em trânsito é normalmente usada para",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "proteger dados durante comunicação entre cliente e servidor."
+        },
+        {
+          "label": "B",
+          "text": "dispensar autenticação."
+        },
+        {
+          "label": "C",
+          "text": "tornar dados pessoais sempre públicos."
+        },
+        {
+          "label": "D",
+          "text": "impedir backups."
+        },
+        {
+          "label": "E",
+          "text": "publicar senhas em logs."
+        }
+      ],
+      "resposta_correta": "A",
+      "explicacao": "TLS/HTTPS protege confidencialidade e integridade na comunicação.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "seguranca",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-007",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "banco-de-dados",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "dificil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "No exercício de função administrativa, em banco de dados relacional, chave primária tem como função",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "substituir todas as chaves estrangeiras."
+        },
+        {
+          "label": "B",
+          "text": "identificar unicamente cada registro de uma tabela."
+        },
+        {
+          "label": "C",
+          "text": "impedir consultas com filtros."
+        },
+        {
+          "label": "D",
+          "text": "armazenar senhas em texto claro."
+        },
+        {
+          "label": "E",
+          "text": "duplicar registros obrigatoriamente."
+        }
+      ],
+      "resposta_correta": "B",
+      "explicacao": "A chave primária garante identidade única do registro.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "banco-de-dados",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-008",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "normalizacao",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "facil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Em uma demanda típica do edital, normalização de dados busca",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "trocar todos os dados por imagens."
+        },
+        {
+          "label": "B",
+          "text": "aumentar duplicidade deliberadamente."
+        },
+        {
+          "label": "C",
+          "text": "reduzir redundâncias e anomalias de inserção, atualização e exclusão."
+        },
+        {
+          "label": "D",
+          "text": "desligar integridade referencial."
+        },
+        {
+          "label": "E",
+          "text": "impedir modelagem lógica."
+        }
+      ],
+      "resposta_correta": "C",
+      "explicacao": "Normalização organiza tabelas e dependências para consistência.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "normalizacao",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-009",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "apis",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Considere uma situação administrativa realista, uma API RESTful tende a utilizar",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "apenas arquivos locais sem protocolo."
+        },
+        {
+          "label": "B",
+          "text": "somente planilhas manuais."
+        },
+        {
+          "label": "C",
+          "text": "senhas no corpo de todas as respostas."
+        },
+        {
+          "label": "D",
+          "text": "recursos identificáveis por URLs e métodos HTTP adequados."
+        },
+        {
+          "label": "E",
+          "text": "métodos aleatórios sem semântica."
+        }
+      ],
+      "resposta_correta": "D",
+      "explicacao": "REST organiza interação por recursos e métodos como GET, POST, PUT e DELETE.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "apis",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-010",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "modelos",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Em uma prova objetiva de nível médio, em ciência de dados, validação de modelo é importante para",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "eliminar necessidade de dados."
+        },
+        {
+          "label": "B",
+          "text": "substituir análise exploratória por opinião."
+        },
+        {
+          "label": "C",
+          "text": "publicar dados sensíveis sem anonimização."
+        },
+        {
+          "label": "D",
+          "text": "garantir acerto perfeito em qualquer cenário."
+        },
+        {
+          "label": "E",
+          "text": "avaliar desempenho em dados não usados diretamente no ajuste."
+        }
+      ],
+      "resposta_correta": "E",
+      "explicacao": "Validação ajuda a estimar generalização e reduzir overfitting.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "modelos",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-011",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "versionamento",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "dificil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Durante o planejamento de uma atividade pública, controle de versão em desenvolvimento de software permite",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "registrar alterações, colaborar e recuperar estados anteriores do código."
+        },
+        {
+          "label": "B",
+          "text": "eliminar testes."
+        },
+        {
+          "label": "C",
+          "text": "substituir documentação por nomes aleatórios."
+        },
+        {
+          "label": "D",
+          "text": "apagar histórico automaticamente."
+        },
+        {
+          "label": "E",
+          "text": "impedir revisão de alterações."
+        }
+      ],
+      "resposta_correta": "A",
+      "explicacao": "Sistemas como Git apoiam colaboração, rastreabilidade e reversão.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "versionamento",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-012",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "seguranca",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "facil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Ao analisar documentos e rotinas de trabalho, criptografia em trânsito é normalmente usada para",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "impedir backups."
+        },
+        {
+          "label": "B",
+          "text": "proteger dados durante comunicação entre cliente e servidor."
+        },
+        {
+          "label": "C",
+          "text": "publicar senhas em logs."
+        },
+        {
+          "label": "D",
+          "text": "dispensar autenticação."
+        },
+        {
+          "label": "E",
+          "text": "tornar dados pessoais sempre públicos."
+        }
+      ],
+      "resposta_correta": "B",
+      "explicacao": "TLS/HTTPS protege confidencialidade e integridade na comunicação.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "seguranca",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-013",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "banco-de-dados",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Em contexto de atendimento ao cidadão, em banco de dados relacional, chave primária tem como função",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "armazenar senhas em texto claro."
+        },
+        {
+          "label": "B",
+          "text": "duplicar registros obrigatoriamente."
+        },
+        {
+          "label": "C",
+          "text": "identificar unicamente cada registro de uma tabela."
+        },
+        {
+          "label": "D",
+          "text": "substituir todas as chaves estrangeiras."
+        },
+        {
+          "label": "E",
+          "text": "impedir consultas com filtros."
+        }
+      ],
+      "resposta_correta": "C",
+      "explicacao": "A chave primária garante identidade única do registro.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "banco-de-dados",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-014",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "normalizacao",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "No acompanhamento de indicadores e informações oficiais, normalização de dados busca",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "desligar integridade referencial."
+        },
+        {
+          "label": "B",
+          "text": "impedir modelagem lógica."
+        },
+        {
+          "label": "C",
+          "text": "trocar todos os dados por imagens."
+        },
+        {
+          "label": "D",
+          "text": "reduzir redundâncias e anomalias de inserção, atualização e exclusão."
+        },
+        {
+          "label": "E",
+          "text": "aumentar duplicidade deliberadamente."
+        }
+      ],
+      "resposta_correta": "D",
+      "explicacao": "Normalização organiza tabelas e dependências para consistência.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "normalizacao",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-015",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "apis",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "dificil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "No exercício de função administrativa, uma API RESTful tende a utilizar",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "senhas no corpo de todas as respostas."
+        },
+        {
+          "label": "B",
+          "text": "métodos aleatórios sem semântica."
+        },
+        {
+          "label": "C",
+          "text": "apenas arquivos locais sem protocolo."
+        },
+        {
+          "label": "D",
+          "text": "somente planilhas manuais."
+        },
+        {
+          "label": "E",
+          "text": "recursos identificáveis por URLs e métodos HTTP adequados."
+        }
+      ],
+      "resposta_correta": "E",
+      "explicacao": "REST organiza interação por recursos e métodos como GET, POST, PUT e DELETE.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "apis",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-016",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "modelos",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "facil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Em uma demanda típica do edital, em ciência de dados, validação de modelo é importante para",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "avaliar desempenho em dados não usados diretamente no ajuste."
+        },
+        {
+          "label": "B",
+          "text": "publicar dados sensíveis sem anonimização."
+        },
+        {
+          "label": "C",
+          "text": "garantir acerto perfeito em qualquer cenário."
+        },
+        {
+          "label": "D",
+          "text": "eliminar necessidade de dados."
+        },
+        {
+          "label": "E",
+          "text": "substituir análise exploratória por opinião."
+        }
+      ],
+      "resposta_correta": "A",
+      "explicacao": "Validação ajuda a estimar generalização e reduzir overfitting.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "modelos",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-017",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "versionamento",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Considere uma situação administrativa realista, controle de versão em desenvolvimento de software permite",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "apagar histórico automaticamente."
+        },
+        {
+          "label": "B",
+          "text": "registrar alterações, colaborar e recuperar estados anteriores do código."
+        },
+        {
+          "label": "C",
+          "text": "impedir revisão de alterações."
+        },
+        {
+          "label": "D",
+          "text": "eliminar testes."
+        },
+        {
+          "label": "E",
+          "text": "substituir documentação por nomes aleatórios."
+        }
+      ],
+      "resposta_correta": "B",
+      "explicacao": "Sistemas como Git apoiam colaboração, rastreabilidade e reversão.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "versionamento",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-018",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "seguranca",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Em uma prova objetiva de nível médio, criptografia em trânsito é normalmente usada para",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "dispensar autenticação."
+        },
+        {
+          "label": "B",
+          "text": "tornar dados pessoais sempre públicos."
+        },
+        {
+          "label": "C",
+          "text": "proteger dados durante comunicação entre cliente e servidor."
+        },
+        {
+          "label": "D",
+          "text": "impedir backups."
+        },
+        {
+          "label": "E",
+          "text": "publicar senhas em logs."
+        }
+      ],
+      "resposta_correta": "C",
+      "explicacao": "TLS/HTTPS protege confidencialidade e integridade na comunicação.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "seguranca",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-019",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "banco-de-dados",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "dificil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Durante o planejamento de uma atividade pública, em banco de dados relacional, chave primária tem como função",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "substituir todas as chaves estrangeiras."
+        },
+        {
+          "label": "B",
+          "text": "impedir consultas com filtros."
+        },
+        {
+          "label": "C",
+          "text": "armazenar senhas em texto claro."
+        },
+        {
+          "label": "D",
+          "text": "identificar unicamente cada registro de uma tabela."
+        },
+        {
+          "label": "E",
+          "text": "duplicar registros obrigatoriamente."
+        }
+      ],
+      "resposta_correta": "D",
+      "explicacao": "A chave primária garante identidade única do registro.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "banco-de-dados",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-020",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "normalizacao",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "facil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Ao analisar documentos e rotinas de trabalho, normalização de dados busca",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "trocar todos os dados por imagens."
+        },
+        {
+          "label": "B",
+          "text": "aumentar duplicidade deliberadamente."
+        },
+        {
+          "label": "C",
+          "text": "desligar integridade referencial."
+        },
+        {
+          "label": "D",
+          "text": "impedir modelagem lógica."
+        },
+        {
+          "label": "E",
+          "text": "reduzir redundâncias e anomalias de inserção, atualização e exclusão."
+        }
+      ],
+      "resposta_correta": "E",
+      "explicacao": "Normalização organiza tabelas e dependências para consistência.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "normalizacao",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-021",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "apis",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Em contexto de atendimento ao cidadão, uma API RESTful tende a utilizar",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "recursos identificáveis por URLs e métodos HTTP adequados."
+        },
+        {
+          "label": "B",
+          "text": "apenas arquivos locais sem protocolo."
+        },
+        {
+          "label": "C",
+          "text": "somente planilhas manuais."
+        },
+        {
+          "label": "D",
+          "text": "senhas no corpo de todas as respostas."
+        },
+        {
+          "label": "E",
+          "text": "métodos aleatórios sem semântica."
+        }
+      ],
+      "resposta_correta": "A",
+      "explicacao": "REST organiza interação por recursos e métodos como GET, POST, PUT e DELETE.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "apis",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-022",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "modelos",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "No acompanhamento de indicadores e informações oficiais, em ciência de dados, validação de modelo é importante para",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "eliminar necessidade de dados."
+        },
+        {
+          "label": "B",
+          "text": "avaliar desempenho em dados não usados diretamente no ajuste."
+        },
+        {
+          "label": "C",
+          "text": "substituir análise exploratória por opinião."
+        },
+        {
+          "label": "D",
+          "text": "publicar dados sensíveis sem anonimização."
+        },
+        {
+          "label": "E",
+          "text": "garantir acerto perfeito em qualquer cenário."
+        }
+      ],
+      "resposta_correta": "B",
+      "explicacao": "Validação ajuda a estimar generalização e reduzir overfitting.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "modelos",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-023",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "versionamento",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "dificil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "No exercício de função administrativa, controle de versão em desenvolvimento de software permite",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "eliminar testes."
+        },
+        {
+          "label": "B",
+          "text": "substituir documentação por nomes aleatórios."
+        },
+        {
+          "label": "C",
+          "text": "registrar alterações, colaborar e recuperar estados anteriores do código."
+        },
+        {
+          "label": "D",
+          "text": "apagar histórico automaticamente."
+        },
+        {
+          "label": "E",
+          "text": "impedir revisão de alterações."
+        }
+      ],
+      "resposta_correta": "C",
+      "explicacao": "Sistemas como Git apoiam colaboração, rastreabilidade e reversão.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "versionamento",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-024",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "seguranca",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "facil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Em uma demanda típica do edital, criptografia em trânsito é normalmente usada para",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "impedir backups."
+        },
+        {
+          "label": "B",
+          "text": "publicar senhas em logs."
+        },
+        {
+          "label": "C",
+          "text": "dispensar autenticação."
+        },
+        {
+          "label": "D",
+          "text": "proteger dados durante comunicação entre cliente e servidor."
+        },
+        {
+          "label": "E",
+          "text": "tornar dados pessoais sempre públicos."
+        }
+      ],
+      "resposta_correta": "D",
+      "explicacao": "TLS/HTTPS protege confidencialidade e integridade na comunicação.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "seguranca",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-025",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "banco-de-dados",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Considere uma situação administrativa realista, em banco de dados relacional, chave primária tem como função",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "armazenar senhas em texto claro."
+        },
+        {
+          "label": "B",
+          "text": "duplicar registros obrigatoriamente."
+        },
+        {
+          "label": "C",
+          "text": "substituir todas as chaves estrangeiras."
+        },
+        {
+          "label": "D",
+          "text": "impedir consultas com filtros."
+        },
+        {
+          "label": "E",
+          "text": "identificar unicamente cada registro de uma tabela."
+        }
+      ],
+      "resposta_correta": "E",
+      "explicacao": "A chave primária garante identidade única do registro.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "banco-de-dados",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-026",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "normalizacao",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Em uma prova objetiva de nível médio, normalização de dados busca",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "reduzir redundâncias e anomalias de inserção, atualização e exclusão."
+        },
+        {
+          "label": "B",
+          "text": "desligar integridade referencial."
+        },
+        {
+          "label": "C",
+          "text": "impedir modelagem lógica."
+        },
+        {
+          "label": "D",
+          "text": "trocar todos os dados por imagens."
+        },
+        {
+          "label": "E",
+          "text": "aumentar duplicidade deliberadamente."
+        }
+      ],
+      "resposta_correta": "A",
+      "explicacao": "Normalização organiza tabelas e dependências para consistência.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "normalizacao",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-027",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "apis",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "dificil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Durante o planejamento de uma atividade pública, uma API RESTful tende a utilizar",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "senhas no corpo de todas as respostas."
+        },
+        {
+          "label": "B",
+          "text": "recursos identificáveis por URLs e métodos HTTP adequados."
+        },
+        {
+          "label": "C",
+          "text": "métodos aleatórios sem semântica."
+        },
+        {
+          "label": "D",
+          "text": "apenas arquivos locais sem protocolo."
+        },
+        {
+          "label": "E",
+          "text": "somente planilhas manuais."
+        }
+      ],
+      "resposta_correta": "B",
+      "explicacao": "REST organiza interação por recursos e métodos como GET, POST, PUT e DELETE.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "apis",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-028",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "modelos",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "facil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Ao analisar documentos e rotinas de trabalho, em ciência de dados, validação de modelo é importante para",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "publicar dados sensíveis sem anonimização."
+        },
+        {
+          "label": "B",
+          "text": "garantir acerto perfeito em qualquer cenário."
+        },
+        {
+          "label": "C",
+          "text": "avaliar desempenho em dados não usados diretamente no ajuste."
+        },
+        {
+          "label": "D",
+          "text": "eliminar necessidade de dados."
+        },
+        {
+          "label": "E",
+          "text": "substituir análise exploratória por opinião."
+        }
+      ],
+      "resposta_correta": "C",
+      "explicacao": "Validação ajuda a estimar generalização e reduzir overfitting.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "modelos",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-029",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "versionamento",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Em contexto de atendimento ao cidadão, controle de versão em desenvolvimento de software permite",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "apagar histórico automaticamente."
+        },
+        {
+          "label": "B",
+          "text": "impedir revisão de alterações."
+        },
+        {
+          "label": "C",
+          "text": "eliminar testes."
+        },
+        {
+          "label": "D",
+          "text": "registrar alterações, colaborar e recuperar estados anteriores do código."
+        },
+        {
+          "label": "E",
+          "text": "substituir documentação por nomes aleatórios."
+        }
+      ],
+      "resposta_correta": "D",
+      "explicacao": "Sistemas como Git apoiam colaboração, rastreabilidade e reversão.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "versionamento",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-030",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "seguranca",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "No acompanhamento de indicadores e informações oficiais, criptografia em trânsito é normalmente usada para",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "dispensar autenticação."
+        },
+        {
+          "label": "B",
+          "text": "tornar dados pessoais sempre públicos."
+        },
+        {
+          "label": "C",
+          "text": "impedir backups."
+        },
+        {
+          "label": "D",
+          "text": "publicar senhas em logs."
+        },
+        {
+          "label": "E",
+          "text": "proteger dados durante comunicação entre cliente e servidor."
+        }
+      ],
+      "resposta_correta": "E",
+      "explicacao": "TLS/HTTPS protege confidencialidade e integridade na comunicação.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "seguranca",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-031",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "banco-de-dados",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "dificil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "No exercício de função administrativa, em banco de dados relacional, chave primária tem como função",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "identificar unicamente cada registro de uma tabela."
+        },
+        {
+          "label": "B",
+          "text": "substituir todas as chaves estrangeiras."
+        },
+        {
+          "label": "C",
+          "text": "impedir consultas com filtros."
+        },
+        {
+          "label": "D",
+          "text": "armazenar senhas em texto claro."
+        },
+        {
+          "label": "E",
+          "text": "duplicar registros obrigatoriamente."
+        }
+      ],
+      "resposta_correta": "A",
+      "explicacao": "A chave primária garante identidade única do registro.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "banco-de-dados",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-032",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "normalizacao",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "facil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Em uma demanda típica do edital, normalização de dados busca",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "trocar todos os dados por imagens."
+        },
+        {
+          "label": "B",
+          "text": "reduzir redundâncias e anomalias de inserção, atualização e exclusão."
+        },
+        {
+          "label": "C",
+          "text": "aumentar duplicidade deliberadamente."
+        },
+        {
+          "label": "D",
+          "text": "desligar integridade referencial."
+        },
+        {
+          "label": "E",
+          "text": "impedir modelagem lógica."
+        }
+      ],
+      "resposta_correta": "B",
+      "explicacao": "Normalização organiza tabelas e dependências para consistência.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "normalizacao",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-033",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "apis",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Considere uma situação administrativa realista, uma API RESTful tende a utilizar",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "apenas arquivos locais sem protocolo."
+        },
+        {
+          "label": "B",
+          "text": "somente planilhas manuais."
+        },
+        {
+          "label": "C",
+          "text": "recursos identificáveis por URLs e métodos HTTP adequados."
+        },
+        {
+          "label": "D",
+          "text": "senhas no corpo de todas as respostas."
+        },
+        {
+          "label": "E",
+          "text": "métodos aleatórios sem semântica."
+        }
+      ],
+      "resposta_correta": "C",
+      "explicacao": "REST organiza interação por recursos e métodos como GET, POST, PUT e DELETE.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "apis",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-034",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "modelos",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Em uma prova objetiva de nível médio, em ciência de dados, validação de modelo é importante para",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "eliminar necessidade de dados."
+        },
+        {
+          "label": "B",
+          "text": "substituir análise exploratória por opinião."
+        },
+        {
+          "label": "C",
+          "text": "publicar dados sensíveis sem anonimização."
+        },
+        {
+          "label": "D",
+          "text": "avaliar desempenho em dados não usados diretamente no ajuste."
+        },
+        {
+          "label": "E",
+          "text": "garantir acerto perfeito em qualquer cenário."
+        }
+      ],
+      "resposta_correta": "D",
+      "explicacao": "Validação ajuda a estimar generalização e reduzir overfitting.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "modelos",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-035",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "versionamento",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "dificil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Durante o planejamento de uma atividade pública, controle de versão em desenvolvimento de software permite",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "eliminar testes."
+        },
+        {
+          "label": "B",
+          "text": "substituir documentação por nomes aleatórios."
+        },
+        {
+          "label": "C",
+          "text": "apagar histórico automaticamente."
+        },
+        {
+          "label": "D",
+          "text": "impedir revisão de alterações."
+        },
+        {
+          "label": "E",
+          "text": "registrar alterações, colaborar e recuperar estados anteriores do código."
+        }
+      ],
+      "resposta_correta": "E",
+      "explicacao": "Sistemas como Git apoiam colaboração, rastreabilidade e reversão.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "versionamento",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-036",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "seguranca",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "facil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Ao analisar documentos e rotinas de trabalho, criptografia em trânsito é normalmente usada para",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "proteger dados durante comunicação entre cliente e servidor."
+        },
+        {
+          "label": "B",
+          "text": "impedir backups."
+        },
+        {
+          "label": "C",
+          "text": "publicar senhas em logs."
+        },
+        {
+          "label": "D",
+          "text": "dispensar autenticação."
+        },
+        {
+          "label": "E",
+          "text": "tornar dados pessoais sempre públicos."
+        }
+      ],
+      "resposta_correta": "A",
+      "explicacao": "TLS/HTTPS protege confidencialidade e integridade na comunicação.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "seguranca",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-037",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "banco-de-dados",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Em contexto de atendimento ao cidadão, em banco de dados relacional, chave primária tem como função",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "armazenar senhas em texto claro."
+        },
+        {
+          "label": "B",
+          "text": "identificar unicamente cada registro de uma tabela."
+        },
+        {
+          "label": "C",
+          "text": "duplicar registros obrigatoriamente."
+        },
+        {
+          "label": "D",
+          "text": "substituir todas as chaves estrangeiras."
+        },
+        {
+          "label": "E",
+          "text": "impedir consultas com filtros."
+        }
+      ],
+      "resposta_correta": "B",
+      "explicacao": "A chave primária garante identidade única do registro.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "banco-de-dados",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-038",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "normalizacao",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "No acompanhamento de indicadores e informações oficiais, normalização de dados busca",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "desligar integridade referencial."
+        },
+        {
+          "label": "B",
+          "text": "impedir modelagem lógica."
+        },
+        {
+          "label": "C",
+          "text": "reduzir redundâncias e anomalias de inserção, atualização e exclusão."
+        },
+        {
+          "label": "D",
+          "text": "trocar todos os dados por imagens."
+        },
+        {
+          "label": "E",
+          "text": "aumentar duplicidade deliberadamente."
+        }
+      ],
+      "resposta_correta": "C",
+      "explicacao": "Normalização organiza tabelas e dependências para consistência.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "normalizacao",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-039",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "apis",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "dificil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "No exercício de função administrativa, uma API RESTful tende a utilizar",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "senhas no corpo de todas as respostas."
+        },
+        {
+          "label": "B",
+          "text": "métodos aleatórios sem semântica."
+        },
+        {
+          "label": "C",
+          "text": "apenas arquivos locais sem protocolo."
+        },
+        {
+          "label": "D",
+          "text": "recursos identificáveis por URLs e métodos HTTP adequados."
+        },
+        {
+          "label": "E",
+          "text": "somente planilhas manuais."
+        }
+      ],
+      "resposta_correta": "D",
+      "explicacao": "REST organiza interação por recursos e métodos como GET, POST, PUT e DELETE.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "apis",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-040",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "modelos",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "facil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Em uma demanda típica do edital, em ciência de dados, validação de modelo é importante para",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "publicar dados sensíveis sem anonimização."
+        },
+        {
+          "label": "B",
+          "text": "garantir acerto perfeito em qualquer cenário."
+        },
+        {
+          "label": "C",
+          "text": "eliminar necessidade de dados."
+        },
+        {
+          "label": "D",
+          "text": "substituir análise exploratória por opinião."
+        },
+        {
+          "label": "E",
+          "text": "avaliar desempenho em dados não usados diretamente no ajuste."
+        }
+      ],
+      "resposta_correta": "E",
+      "explicacao": "Validação ajuda a estimar generalização e reduzir overfitting.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "modelos",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-041",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "versionamento",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Considere uma situação administrativa realista, controle de versão em desenvolvimento de software permite",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "registrar alterações, colaborar e recuperar estados anteriores do código."
+        },
+        {
+          "label": "B",
+          "text": "apagar histórico automaticamente."
+        },
+        {
+          "label": "C",
+          "text": "impedir revisão de alterações."
+        },
+        {
+          "label": "D",
+          "text": "eliminar testes."
+        },
+        {
+          "label": "E",
+          "text": "substituir documentação por nomes aleatórios."
+        }
+      ],
+      "resposta_correta": "A",
+      "explicacao": "Sistemas como Git apoiam colaboração, rastreabilidade e reversão.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "versionamento",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-042",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "seguranca",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Em uma prova objetiva de nível médio, criptografia em trânsito é normalmente usada para",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "dispensar autenticação."
+        },
+        {
+          "label": "B",
+          "text": "proteger dados durante comunicação entre cliente e servidor."
+        },
+        {
+          "label": "C",
+          "text": "tornar dados pessoais sempre públicos."
+        },
+        {
+          "label": "D",
+          "text": "impedir backups."
+        },
+        {
+          "label": "E",
+          "text": "publicar senhas em logs."
+        }
+      ],
+      "resposta_correta": "B",
+      "explicacao": "TLS/HTTPS protege confidencialidade e integridade na comunicação.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "seguranca",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-043",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "banco-de-dados",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "dificil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Durante o planejamento de uma atividade pública, em banco de dados relacional, chave primária tem como função",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "substituir todas as chaves estrangeiras."
+        },
+        {
+          "label": "B",
+          "text": "impedir consultas com filtros."
+        },
+        {
+          "label": "C",
+          "text": "identificar unicamente cada registro de uma tabela."
+        },
+        {
+          "label": "D",
+          "text": "armazenar senhas em texto claro."
+        },
+        {
+          "label": "E",
+          "text": "duplicar registros obrigatoriamente."
+        }
+      ],
+      "resposta_correta": "C",
+      "explicacao": "A chave primária garante identidade única do registro.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "banco-de-dados",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-044",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "normalizacao",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "facil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Ao analisar documentos e rotinas de trabalho, normalização de dados busca",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "trocar todos os dados por imagens."
+        },
+        {
+          "label": "B",
+          "text": "aumentar duplicidade deliberadamente."
+        },
+        {
+          "label": "C",
+          "text": "desligar integridade referencial."
+        },
+        {
+          "label": "D",
+          "text": "reduzir redundâncias e anomalias de inserção, atualização e exclusão."
+        },
+        {
+          "label": "E",
+          "text": "impedir modelagem lógica."
+        }
+      ],
+      "resposta_correta": "D",
+      "explicacao": "Normalização organiza tabelas e dependências para consistência.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "normalizacao",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-045",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "apis",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Em contexto de atendimento ao cidadão, uma API RESTful tende a utilizar",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "apenas arquivos locais sem protocolo."
+        },
+        {
+          "label": "B",
+          "text": "somente planilhas manuais."
+        },
+        {
+          "label": "C",
+          "text": "senhas no corpo de todas as respostas."
+        },
+        {
+          "label": "D",
+          "text": "métodos aleatórios sem semântica."
+        },
+        {
+          "label": "E",
+          "text": "recursos identificáveis por URLs e métodos HTTP adequados."
+        }
+      ],
+      "resposta_correta": "E",
+      "explicacao": "REST organiza interação por recursos e métodos como GET, POST, PUT e DELETE.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "apis",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-046",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "modelos",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "medio",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "No acompanhamento de indicadores e informações oficiais, em ciência de dados, validação de modelo é importante para",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "avaliar desempenho em dados não usados diretamente no ajuste."
+        },
+        {
+          "label": "B",
+          "text": "eliminar necessidade de dados."
+        },
+        {
+          "label": "C",
+          "text": "substituir análise exploratória por opinião."
+        },
+        {
+          "label": "D",
+          "text": "publicar dados sensíveis sem anonimização."
+        },
+        {
+          "label": "E",
+          "text": "garantir acerto perfeito em qualquer cenário."
+        }
+      ],
+      "resposta_correta": "A",
+      "explicacao": "Validação ajuda a estimar generalização e reduzir overfitting.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "modelos",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-047",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "versionamento",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "dificil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "No exercício de função administrativa, controle de versão em desenvolvimento de software permite",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "eliminar testes."
+        },
+        {
+          "label": "B",
+          "text": "registrar alterações, colaborar e recuperar estados anteriores do código."
+        },
+        {
+          "label": "C",
+          "text": "substituir documentação por nomes aleatórios."
+        },
+        {
+          "label": "D",
+          "text": "apagar histórico automaticamente."
+        },
+        {
+          "label": "E",
+          "text": "impedir revisão de alterações."
+        }
+      ],
+      "resposta_correta": "B",
+      "explicacao": "Sistemas como Git apoiam colaboração, rastreabilidade e reversão.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "versionamento",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    },
+    {
+      "id": "IBGE-ANA-TI-048",
+      "concurso_id": "ibge",
+      "concurso": "IBGE",
+      "orgao": "Instituto Brasileiro de Geografia e Estatística",
+      "cargo_id": "ibge-analista-ti-dados",
+      "cargo": "Analista Censitário — TI, Desenvolvimento e Ciência de Dados",
+      "cargos_compativeis": [
+        "ibge-analista-ti-dados"
+      ],
+      "banca": "Instituto Avalia",
+      "materia_id": "ibge-ana-especificos",
+      "materia": "Conhecimentos específicos de TI e Dados",
+      "assunto_id": "ti-dados",
+      "assunto": "Tecnologia da informação e ciência de dados",
+      "subassunto": "seguranca",
+      "bloco": "Conhecimentos específicos",
+      "dificuldade": "facil",
+      "tipo": "multipla_escolha",
+      "origem": "inédita",
+      "ano": 2026,
+      "fonte": "Conteúdos programáticos IBGE PSS 2026",
+      "link": "https://ftp.ibge.gov.br/edital/PSS_Censo_Agro/2026_02/Edital_2_2026_AC_ACQ_Conteudos_Programaticos.pdf",
+      "fonte_tipo": "edital",
+      "fonte_inspiracao": "Conteúdo programático oficial IBGE 2026 para TI, Desenvolvimento e Ciência de Dados",
+      "enunciado": "Em uma demanda típica do edital, criptografia em trânsito é normalmente usada para",
+      "alternativas": [
+        {
+          "label": "A",
+          "text": "impedir backups."
+        },
+        {
+          "label": "B",
+          "text": "publicar senhas em logs."
+        },
+        {
+          "label": "C",
+          "text": "proteger dados durante comunicação entre cliente e servidor."
+        },
+        {
+          "label": "D",
+          "text": "dispensar autenticação."
+        },
+        {
+          "label": "E",
+          "text": "tornar dados pessoais sempre públicos."
+        }
+      ],
+      "resposta_correta": "C",
+      "explicacao": "TLS/HTTPS protege confidencialidade e integridade na comunicação.",
+      "status": "ativo",
+      "tags": [
+        "ti-dados",
+        "seguranca",
+        "ibge",
+        "analista",
+        "ti"
+      ],
+      "criado_em": "2026-07-18",
+      "atualizado_em": "2026-07-18"
+    }
+  ]
+}

@@ -41,6 +41,8 @@ const config = `window.CRTSP_SUPABASE_CONFIG = ${JSON.stringify(
 
 writeFileSync(join(dist, "supabase-config.js"), config);
 
-if (existsSync(join(root, "assets"))) {
-  cpSync(join(root, "assets"), join(dist, "assets"), { recursive: true });
+for (const directory of ["assets"]) {
+  if (existsSync(join(root, directory))) {
+    cpSync(join(root, directory), join(dist, directory), { recursive: true, force: true });
+  }
 }
