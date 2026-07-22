@@ -6,7 +6,8 @@ Arquivos gerados automaticamente por:
 npm run export:data
 ```
 
-A fonte ativa do site é `simulados.js`. Estes JSONs servem para importação, auditoria e futura migração para Supabase.
+A fonte ativa do site é `data/questions`, carregada por `simulados.js`.
+Estes JSONs em `data/questoes` são cópias de compatibilidade para auditoria, importação e futura migração para Supabase.
 
 - `crt-sp.json`
 - `ibge-agente.json`

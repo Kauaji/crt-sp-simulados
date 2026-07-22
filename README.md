@@ -15,9 +15,14 @@ Não há backend obrigatório. O progresso fica salvo no navegador via `localSto
 
 - `index.html`: estrutura principal da aplicação.
 - `styles.css`: layout responsivo e identidade visual.
-- `simulados.js`: cadastro estático de usuários, concursos, cargos, matérias, fontes e banco de questões.
+- `simulados.js`: carregador modular que consolida fontes, concursos e questões canônicas no navegador.
 - `app.js`: estado da aplicação, login local, seleção de concurso, treino, simulados, revisão, histórico e metas.
+- `data/sources/`: fontes oficiais e referências públicas.
+- `data/contests/`: concursos, cargos, formatos, pontuação e distribuição por edital.
+- `data/questions/`: fonte de verdade das questões usadas pelo site.
+- `data/questoes/`: cópia exportada para compatibilidade, auditoria e futura importação.
 - `scripts/build.mjs`: build estático para `dist/`.
+- `scripts/audit-questions.mjs`: auditoria de duplicidade, fonte, explicação, alternativas e gabarito.
 - `docs/`: documentação de arquitetura e editais/fontes.
 
 ## Usuários locais
@@ -46,6 +51,20 @@ http://localhost:8080
 ```
 
 Se quiser abrir sem build, também é possível servir a raiz do projeto com qualquer servidor estático.
+
+## Comandos de validação
+
+```bash
+npm run lint
+npm test
+npm run audit:questions
+npm run build
+```
+
+A auditoria gera:
+
+- `reports/question-audit.json`
+- `reports/question-audit.md`
 
 ## Como publicar no Vercel
 
@@ -91,7 +110,7 @@ Quando fizer push na branch `main` do GitHub, o Vercel atualiza automaticamente 
 
 ## Como atualizar questões diariamente
 
-Edite `simulados.js`.
+Edite os arquivos canônicos em `data/questions/` e, quando necessário, os metadados em `data/contests/` e `data/sources/`.
 
 Cada questão precisa manter os campos:
 
@@ -118,13 +137,18 @@ Cada questão precisa manter os campos:
 Depois rode:
 
 ```bash
+npm run lint
+npm test
+npm run audit:questions
+npm run export:data
 npm run build
+git checkout -b fix/atualiza-questoes-do-dia
 git add .
 git commit -m "Atualiza questões do dia"
-git push origin main
+git push -u origin fix/atualiza-questoes-do-dia
 ```
 
-O Vercel fará o redeploy automaticamente no projeto conectado.
+Abra um Pull Request para `main`. Quando o PR for mesclado, o Vercel fará o redeploy automaticamente no projeto conectado.
 
 ## Quantidade inicial de questões
 
