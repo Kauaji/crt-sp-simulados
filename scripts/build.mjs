@@ -1,9 +1,22 @@
-import { copyFileSync, cpSync, existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const dist = join(root, "dist");
+
+function copyDirectory(sourceDir, targetDir) {
+  mkdirSync(targetDir, { recursive: true });
+  for (const entry of readdirSync(sourceDir)) {
+    const source = join(sourceDir, entry);
+    const target = join(targetDir, entry);
+    if (statSync(source).isDirectory()) {
+      copyDirectory(source, target);
+    } else {
+      copyFileSync(source, target);
+    }
+  }
+}
 
 const staticFiles = [
   "index.html",
@@ -41,8 +54,8 @@ const config = `window.CRTSP_SUPABASE_CONFIG = ${JSON.stringify(
 
 writeFileSync(join(dist, "supabase-config.js"), config);
 
-for (const directory of ["assets"]) {
+for (const directory of ["assets", "data"]) {
   if (existsSync(join(root, directory))) {
-    cpSync(join(root, directory), join(dist, directory), { recursive: true, force: true });
+    copyDirectory(join(root, directory), join(dist, directory));
   }
 }

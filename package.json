@@ -5,6 +5,9 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
+    "lint": "node scripts/lint.mjs",
+    "test": "node --test",
+    "audit:questions": "node scripts/audit-questions.mjs",
     "export:data": "node scripts/export-question-json.mjs",
     "start": "python -m http.server 8080 -d dist"
   }

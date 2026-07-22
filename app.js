@@ -6,6 +6,9 @@
   const BLANK = "__blank";
   const STORE_KEY = "multiconcurso.study.v1";
   const SESSION_KEY = "multiconcurso.session.v1";
+  const SAO_PAULO_TZ = "America/Sao_Paulo";
+  const RECENT_WINDOW_DAYS = 14;
+  const MIN_RECENT_WINDOW_DAYS = 7;
   const TABS = [
     ["dashboard", "Dashboard"],
     ["treino", "Treino"],
@@ -53,6 +56,26 @@
     if (!dateString) return "—";
     const [year, month, day] = dateString.split("-").map(Number);
     return new Intl.DateTimeFormat("pt-BR", { dateStyle: "short" }).format(new Date(year, month - 1, day));
+  }
+
+  function dateKeySaoPaulo(date = new Date()) {
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: SAO_PAULO_TZ,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).formatToParts(date);
+    const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+    return `${values.year}-${values.month}-${values.day}`;
+  }
+
+  function dayNumber(dateKey) {
+    const [year, month, day] = dateKey.split("-").map(Number);
+    return Math.floor(Date.UTC(year, month - 1, day) / 86400000);
+  }
+
+  function daysBetween(leftDateKey, rightDateKey = dateKeySaoPaulo()) {
+    return dayNumber(rightDateKey) - dayNumber(leftDateKey);
   }
 
   function daysUntil(dateString) {
@@ -146,6 +169,9 @@
       notes: {},
       reports: {},
       revisionMarked: {},
+      dailyMocks: {},
+      recentQuestionUses: [],
+      activeMock: null,
       goals: {
         dailyQuestions: 30,
         weeklyMocks: 2,
@@ -160,6 +186,10 @@
     const user = currentUserRecord(store);
     const key = scopeKey(contestId, roleId);
     user.scopes[key] = user.scopes[key] || makeScope();
+    user.scopes[key].revisionMarked = user.scopes[key].revisionMarked || {};
+    user.scopes[key].dailyMocks = user.scopes[key].dailyMocks || {};
+    user.scopes[key].recentQuestionUses = user.scopes[key].recentQuestionUses || [];
+    user.scopes[key].activeMock = user.scopes[key].activeMock || null;
     return user.scopes[key];
   }
 
@@ -203,7 +233,7 @@
     };
   }
 
-  function shuffle(items, seedText = String(Date.now())) {
+  function shuffle(items, seedText = "static-seed") {
     const output = [...items];
     const random = seededRandom(seedText);
     for (let index = output.length - 1; index > 0; index -= 1) {
@@ -392,6 +422,99 @@
       .map((item) => item.question);
   }
 
+  function recentlySeenIds(scope, preferredWindow = RECENT_WINDOW_DAYS) {
+    const today = dateKeySaoPaulo();
+    const recent = (scope.recentQuestionUses || []).filter((item) => daysBetween(item.date, today) <= preferredWindow);
+    return new Set(recent.map((item) => item.questionId));
+  }
+
+  function filterRecentIfPossible(pool, needed, scope, preferredWindow = RECENT_WINDOW_DAYS) {
+    const windows = [preferredWindow, MIN_RECENT_WINDOW_DAYS];
+    for (const windowDays of windows) {
+      const recent = recentlySeenIds(scope, windowDays);
+      const filtered = pool.filter((question) => !recent.has(question.id));
+      if (filtered.length >= needed) return filtered;
+    }
+    return pool;
+  }
+
+  function registerRecentQuestionUse(scope, mock, queue) {
+    const date = mock.dailyKey || dateKeySaoPaulo();
+    const rows = queue.map((question) => ({
+      questionId: question.id,
+      date,
+      simuladoId: mock.id,
+      kind: mock.kind,
+    }));
+    const cutoff = dayNumber(dateKeySaoPaulo()) - RECENT_WINDOW_DAYS;
+    scope.recentQuestionUses = [...(scope.recentQuestionUses || []), ...rows]
+      .filter((item) => dayNumber(item.date) >= cutoff)
+      .slice(-1500);
+  }
+
+  function toggleRevisionMark(questionId) {
+    const marked = persistScope((scope) => {
+      scope.revisionMarked = scope.revisionMarked || {};
+      if (scope.revisionMarked[questionId]) {
+        delete scope.revisionMarked[questionId];
+        return false;
+      }
+      scope.revisionMarked[questionId] = {
+        questionId,
+        markedAt: nowIso(),
+        user_id: state.currentUserId,
+        concurso_id: state.activeContestId,
+        cargo_id: state.activeRoleId,
+      };
+      return true;
+    });
+    if (state.mock && !state.mock.finished) {
+      state.mock.markedForReview = state.mock.markedForReview || {};
+      if (marked) state.mock.markedForReview[questionId] = true;
+      else delete state.mock.markedForReview[questionId];
+      persistMockState();
+    }
+    return marked;
+  }
+
+  function mockBelongsToCurrentScope(mock) {
+    return Boolean(
+      mock
+      && mock.user_id === state.currentUserId
+      && mock.concurso_id === state.activeContestId
+      && mock.cargo_id === state.activeRoleId
+    );
+  }
+
+  function persistMockState() {
+    if (!state.currentUserId || !state.activeContestId || !state.activeRoleId) return;
+    persistScope((scope) => {
+      scope.activeMock = state.mock && !state.mock.finished && mockBelongsToCurrentScope(state.mock)
+        ? state.mock
+        : null;
+    });
+  }
+
+  function loadPersistedMock() {
+    const scope = getScope();
+    const active = scope.activeMock;
+    if (!mockBelongsToCurrentScope(active) || active.finished) return null;
+    const available = new Set(questionsFor().map((question) => question.id));
+    if (!active.queueIds?.every((id) => available.has(id))) return null;
+    return {
+      currentIndex: 0,
+      markedForReview: {},
+      reviewBeforeFinish: false,
+      ...active,
+    };
+  }
+
+  function clearPersistedMock() {
+    persistScope((scope) => {
+      scope.activeMock = null;
+    });
+  }
+
   function init() {
     renderProfiles();
     bindEvents();
@@ -418,6 +541,7 @@
       currentUserId: state.currentUserId,
       activeContestId: state.activeContestId,
       activeRoleId: state.activeRoleId,
+      activeTab: state.activeTab,
     }));
   }
 
@@ -441,6 +565,7 @@
     state.activeRoleId = state.activeContestId
       ? record.selectedRoleByContest[state.activeContestId] || contestById(state.activeContestId).defaultRoleId
       : null;
+    state.activeTab = session?.currentUserId === userId && session?.activeTab ? session.activeTab : "dashboard";
     state.showContestPicker = !state.activeContestId;
     $("#login-screen").hidden = true;
     $("#app-shell").hidden = false;
@@ -522,14 +647,16 @@
     const contest = contestById();
     const role = roleById();
     if (!contest || state.showContestPicker) {
+      const contestCount = DATA.concursos.length;
+      const contestNames = DATA.concursos.map((item) => item.nome).join(", ");
       $("#hero-eyebrow").textContent = "Escolha seu concurso";
       $("#hero-title").textContent = "Plataforma de estudos segmentada";
-      $("#hero-copy").textContent = "Selecione CRT-SP, IBGE ou Prefeitura de Santos para carregar matérias, formato da banca, questões, simulados e estatísticas independentes.";
+      $("#hero-copy").textContent = `Selecione entre ${contestCount} concursos para carregar matérias, formato da banca, questões, simulados e estatísticas independentes.`;
       $("#hero-notice").textContent = "Nada se mistura: usuário + concurso + cargo têm progresso próprio.";
       $("#active-contest-card").innerHTML = `
-        <span class="chip">3 concursos</span>
+        <span class="chip">${contestCount} concursos</span>
         <h2>Mapa de prova</h2>
-        <p>CRT-SP em prioridade máxima, IBGE em segundo plano e Santos como terceira trilha.</p>
+        <p>${escapeHtml(contestNames)}</p>
       `;
       return;
     }
@@ -808,6 +935,7 @@
               <option value="nao-respondidas">Questões não respondidas</option>
               <option value="erradas">Questões erradas</option>
               <option value="favoritas">Questões favoritas</option>
+              <option value="marcadas">Marcadas para revisão</option>
               <option value="revisao-rapida">Revisão rápida</option>
             </select>
           </label>
@@ -866,6 +994,7 @@
     if (mode === "nao-respondidas") list = list.filter((question) => !scope.answers[question.id]);
     if (mode === "erradas") list = list.filter((question) => scope.answers[question.id] && !scope.answers[question.id].lastCorrect && !scope.answers[question.id].lastBlank);
     if (mode === "favoritas") list = list.filter((question) => scope.favorites[question.id]);
+    if (mode === "marcadas") list = list.filter((question) => scope.revisionMarked?.[question.id]);
     if (mode === "revisao-rapida") list = smartRevisionQuestions(scope, Math.max(quantity, 15));
     if (mode === "aleatorias" || mode === "modo-treino") {
       if (matterId) list = list.filter((question) => question.materia_id === matterId);
@@ -911,39 +1040,43 @@
     const showCorrection = options.showCorrection || (!isMock && practiceAnswer !== undefined);
     const evaluation = showCorrection ? evaluateAnswer(question, selected) : null;
     const favorite = Boolean(scope.favorites?.[question.id]);
+    const markedForReview = Boolean(scope.revisionMarked?.[question.id] || state.mock?.markedForReview?.[question.id]);
     const note = scope.notes?.[question.id];
     const answeredBefore = scope.answers?.[question.id];
+    const hideStudyTools = isMock && !state.mock?.finished;
+    const showStudyActions = !hideStudyTools;
     const cardClass = showCorrection
       ? evaluation.blank ? "question-card--blank" : evaluation.correct ? "question-card--correct" : "question-card--wrong"
       : "";
 
     return `
-      <article class="question-card ${cardClass}" id="q-${escapeHtml(question.id)}">
+      <article class="question-card ${cardClass} ${markedForReview ? "question-card--marked" : ""}" id="q-${escapeHtml(question.id)}">
         <button class="question-card__summary" type="button" data-toggle-question="${escapeHtml(question.id)}">
           <span class="question-number">${escapeHtml(options.index !== undefined ? options.index + 1 : question.id)}</span>
           <span>
             <strong>${escapeHtml(question.materia)}</strong>
             <small>${escapeHtml(question.assunto)} · ${escapeHtml(question.dificuldade)} · ${escapeHtml(question.tipo.replace("_", "/"))}</small>
           </span>
-          ${showCorrection ? renderResultBadge(evaluation) : answeredBefore ? `<span class="badge badge--neutral">já respondida</span>` : `<span class="badge badge--neutral">nova</span>`}
+          ${markedForReview ? `<span class="badge badge--review">revisão</span>` : ""}
+          ${showCorrection ? renderResultBadge(evaluation) : answeredBefore && !isMock ? `<span class="badge badge--neutral">já respondida</span>` : `<span class="badge badge--neutral">${isMock ? "modo prova" : "nova"}</span>`}
         </button>
 
         <div class="question-card__body">
           <p class="statement">${escapeHtml(question.enunciado)}</p>
-          <div class="meta-row">
+          ${hideStudyTools ? "" : `<div class="meta-row">
             <span>${escapeHtml(question.banca)}</span>
             <span>${escapeHtml(question.origem)}</span>
             <span>${escapeHtml(question.fonte)}</span>
-          </div>
+          </div>`}
           ${renderAnswerButtons(question, { isPractice, isMock, selected, showCorrection })}
           <div class="question-actions">
-            <button class="ghost-button" type="button" data-toggle-favorite="${escapeHtml(question.id)}">${favorite ? "★ Favorita" : "☆ Favoritar"}</button>
-            <button class="ghost-button" type="button" data-mark-review="${escapeHtml(question.id)}">Marcar revisão</button>
-            <button class="ghost-button" type="button" data-add-note="${escapeHtml(question.id)}">Anotação</button>
-            <button class="ghost-button ghost-button--danger" type="button" data-report-question="${escapeHtml(question.id)}">Denunciar erro</button>
+            ${showStudyActions ? `<button class="ghost-button" type="button" data-toggle-favorite="${escapeHtml(question.id)}">${favorite ? "★ Favorita" : "☆ Favoritar"}</button>` : ""}
+            <button class="ghost-button ${markedForReview ? "is-active" : ""}" type="button" data-mark-review="${escapeHtml(question.id)}">${markedForReview ? "Desmarcar revisão" : "Marcar revisão"}</button>
+            ${showStudyActions ? `<button class="ghost-button" type="button" data-add-note="${escapeHtml(question.id)}">Anotação</button>` : ""}
+            ${showStudyActions ? `<button class="ghost-button ghost-button--danger" type="button" data-report-question="${escapeHtml(question.id)}">Denunciar erro</button>` : ""}
           </div>
-          ${note ? `<p class="note-box"><strong>Sua anotação:</strong> ${escapeHtml(note)}</p>` : ""}
-          ${showCorrection ? renderExplanation(question, evaluation, isMock) : `<p class="locked-explanation">${isMock ? "Explicação bloqueada até finalizar o simulado." : "Responda para liberar explicação, fonte e links de estudo."}</p>`}
+          ${note && showStudyActions ? `<p class="note-box"><strong>Sua anotação:</strong> ${escapeHtml(note)}</p>` : ""}
+          ${showCorrection ? renderExplanation(question, evaluation, isMock) : `<p class="locked-explanation">${isMock ? "Explicação e fonte bloqueadas até finalizar o simulado." : "Responda para liberar explicação, fonte e links de estudo."}</p>`}
         </div>
       </article>
     `;
@@ -1010,16 +1143,21 @@
     if (contest?.editalUrl && contest.editalUrl !== question.link) {
       links.push({ label: `Edital ${contest.nome}`, url: contest.editalUrl });
     }
-    if (question.tags.includes("portugues")) links.push({ label: "Manual de Redação oficial", url: DATA.sources.manual_redacao.url });
-    if (question.tags.includes("lgpd")) links.push({ label: "Lei 13.709/2018", url: DATA.sources.lgpd.url });
-    if (question.tags.includes("lai")) links.push({ label: "Lei 12.527/2011", url: DATA.sources.lai.url });
-    if (question.tags.includes("sistema-cft-crt") || question.tags.includes("lei-13639")) links.push({ label: "Lei 13.639/2018", url: DATA.sources.lei_13639.url });
+    const tags = question.tags || [];
+    if (tags.includes("portugues")) links.push({ label: "Manual de Redação oficial", url: DATA.sources.manual_redacao.url });
+    if (tags.includes("lgpd")) links.push({ label: "Lei 13.709/2018", url: DATA.sources.lgpd.url });
+    if (tags.includes("lai")) links.push({ label: "Lei 12.527/2011", url: DATA.sources.lai.url });
+    if (tags.includes("sistema-cft-crt") || tags.includes("lei-13639")) links.push({ label: "Lei 13.639/2018", url: DATA.sources.lei_13639.url });
     return links.slice(0, 4);
   }
 
   function renderSimulado() {
     const contest = contestById();
     const role = roleById();
+    if (!state.mock) {
+      state.mock = loadPersistedMock();
+      if (state.mock) startTimer();
+    }
     if (state.mock) {
       renderActiveMock();
       return;
@@ -1090,6 +1228,10 @@
                 <option value="treino">Modo treino</option>
               </select>
             </label>
+            <label class="check-field">
+              <input id="custom-avoid-recent" type="checkbox" checked>
+              <span>Evitar questões vistas recentemente</span>
+            </label>
             <button class="primary-button" type="button" data-start-mock="custom">Iniciar personalizado</button>
           </div>
         </section>
@@ -1114,22 +1256,44 @@
     `;
   }
 
-  function buildExamQueue() {
+  function buildExamQueue(options = {}) {
+    const scope = getScope();
     const role = roleById();
+    const dailyKey = options.dailyKey || dateKeySaoPaulo();
+    const typeKey = options.typeKey || "complete";
+    const storedDaily = scope.dailyMocks?.[`${dailyKey}::${typeKey}`];
+    if (storedDaily?.queueIds?.length) {
+      const byId = new Map(questionsFor().map((question) => [question.id, question]));
+      const restored = storedDaily.queueIds.map((id) => byId.get(id)).filter(Boolean);
+      if (restored.length === storedDaily.queueIds.length) return restored;
+    }
+
     const selected = [];
     const all = questionsFor();
     role.exam.distribution.forEach((item) => {
-      const pool = all.filter((question) => (
+      const fullPool = all.filter((question) => (
         item.kind === "bloco" ? question.bloco === item.id : question.materia_id === item.id
       ) && !selected.includes(question));
-      selected.push(...shuffle(pool, `${state.currentUserId}-${item.id}-${Date.now()}`).slice(0, item.count));
+      const pool = filterRecentIfPossible(fullPool, item.count, scope);
+      selected.push(...shuffle(pool, `${dailyKey}-${state.currentUserId}-${state.activeContestId}-${state.activeRoleId}-${typeKey}-${item.id}`).slice(0, item.count));
     });
     if (selected.length < role.exam.totalQuestoes) {
-      const fill = shuffle(all.filter((question) => !selected.includes(question)), `${state.currentUserId}-fill-${Date.now()}`)
+      const fillPool = filterRecentIfPossible(all.filter((question) => !selected.includes(question)), role.exam.totalQuestoes - selected.length, scope);
+      const fill = shuffle(fillPool, `${dailyKey}-${state.currentUserId}-${state.activeContestId}-${state.activeRoleId}-${typeKey}-fill`)
         .slice(0, role.exam.totalQuestoes - selected.length);
       selected.push(...fill);
     }
-    return selected.slice(0, role.exam.totalQuestoes);
+    const queue = selected.slice(0, role.exam.totalQuestoes);
+    persistScope((innerScope) => {
+      innerScope.dailyMocks = innerScope.dailyMocks || {};
+      innerScope.dailyMocks[`${dailyKey}::${typeKey}`] = {
+        dailyKey,
+        typeKey,
+        queueIds: queue.map((question) => question.id),
+        generatedAt: nowIso(),
+      };
+    });
+    return queue;
   }
 
   function buildCustomMockQueue() {
@@ -1138,35 +1302,50 @@
     const source = $("#custom-source").value;
     const difficulty = $("#custom-difficulty").value;
     const quantity = safeNumber($("#custom-quantity").value, 20);
+    const avoidRecent = $("#custom-avoid-recent")?.checked ?? true;
     let pool = questionsFor();
     if (matterId) pool = pool.filter((question) => question.materia_id === matterId);
     if (difficulty) pool = pool.filter((question) => question.dificuldade === difficulty);
     if (source === "novas") pool = pool.filter((question) => !scope.answers[question.id]);
     if (source === "erradas") pool = pool.filter((question) => scope.answers[question.id] && !scope.answers[question.id].lastCorrect && !scope.answers[question.id].lastBlank);
     if (source === "favoritas") pool = pool.filter((question) => scope.favorites[question.id]);
-    return shuffle(pool, `${state.currentUserId}-custom-${Date.now()}`).slice(0, quantity);
+    const finalPool = avoidRecent ? filterRecentIfPossible(pool, quantity, scope) : pool;
+    return shuffle(finalPool, `${dateKeySaoPaulo()}-${state.currentUserId}-${state.activeContestId}-${state.activeRoleId}-custom-${matterId}-${source}-${difficulty}-${quantity}`).slice(0, quantity);
   }
 
   function startMock(kind, mode) {
     const role = roleById();
-    const queue = kind === "complete" ? buildExamQueue() : buildCustomMockQueue();
+    const dailyKey = dateKeySaoPaulo();
+    const typeKey = `${kind}:${mode}`;
+    const queue = kind === "complete" ? buildExamQueue({ dailyKey, typeKey }) : buildCustomMockQueue();
     if (!queue.length) {
       alert("Nenhuma questão encontrada para esse simulado. Ajuste os filtros.");
       return;
     }
     const durationMinutes = kind === "complete" ? role.exam.duracaoMinutos : safeNumber($("#custom-time")?.value, role.exam.duracaoMinutos);
     state.mock = {
-      id: `sim-${Date.now()}`,
+      id: kind === "complete"
+        ? `daily-${dailyKey}-${state.currentUserId}-${state.activeContestId}-${state.activeRoleId}-${mode}`
+        : `custom-${Date.now()}`,
+      user_id: state.currentUserId,
+      concurso_id: state.activeContestId,
+      cargo_id: state.activeRoleId,
       title: kind === "complete" ? "Simulado completo" : "Simulado personalizado",
       kind,
       mode,
+      dailyKey,
+      typeKey,
       queueIds: queue.map((question) => question.id),
       answers: {},
+      markedForReview: {},
+      currentIndex: 0,
+      reviewBeforeFinish: false,
       startedAt: Date.now(),
       durationSeconds: durationMinutes * 60,
       finished: false,
       result: null,
     };
+    persistMockState();
     startTimer();
     renderActiveMock();
   }
@@ -1178,7 +1357,7 @@
       if (!timer || !state.mock || state.mock.finished) return;
       timer.textContent = formatRemaining();
       if (remainingSeconds() <= 0) {
-        finishMock();
+        finishMock({ force: true });
       }
     }, 1000);
   }
@@ -1204,16 +1383,121 @@
     return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
   }
 
+  function getMockQueue() {
+    const byId = new Map(questionsFor().map((question) => [question.id, question]));
+    return (state.mock?.queueIds || []).map((id) => byId.get(id)).filter(Boolean);
+  }
+
+  function mockStats(queue = getMockQueue()) {
+    const scope = getScope();
+    const marked = queue.filter((question) => scope.revisionMarked?.[question.id] || state.mock?.markedForReview?.[question.id]).length;
+    const blank = queue.filter((question) => isBlank(state.mock.answers[question.id])).length;
+    return {
+      total: queue.length,
+      answered: queue.length - blank,
+      blank,
+      marked,
+    };
+  }
+
+  function blankIndexes(queue = getMockQueue()) {
+    return queue
+      .map((question, index) => (isBlank(state.mock.answers[question.id]) ? index : -1))
+      .filter((index) => index >= 0);
+  }
+
+  function markedIndexes(queue = getMockQueue()) {
+    const scope = getScope();
+    return queue
+      .map((question, index) => (scope.revisionMarked?.[question.id] || state.mock?.markedForReview?.[question.id] ? index : -1))
+      .filter((index) => index >= 0);
+  }
+
+  function goToNextBlank(afterIndex = state.mock.currentIndex) {
+    const blanks = blankIndexes();
+    const next = blanks.find((index) => index > afterIndex) ?? blanks[0];
+    if (next === undefined) return false;
+    state.mock.currentIndex = next;
+    state.mock.navigationFilter = "all";
+    persistMockState();
+    return true;
+  }
+
+  function renderMockNavigator(queue, stats) {
+    const markedOnly = state.mock.navigationFilter === "marked";
+    const allowedIndexes = markedOnly ? new Set(markedIndexes(queue)) : null;
+    const buttons = queue
+      .map((question, index) => ({ question, index }))
+      .filter((item) => !allowedIndexes || allowedIndexes.has(item.index))
+      .map(({ question, index }) => {
+        const answered = !isBlank(state.mock.answers[question.id]);
+        const marked = getScope().revisionMarked?.[question.id] || state.mock.markedForReview?.[question.id];
+        return `
+          <button class="question-nav__item ${index === state.mock.currentIndex ? "is-active" : ""} ${answered ? "is-answered" : "is-blank"} ${marked ? "is-marked" : ""}" type="button" data-mock-go-index="${index}">
+            ${index + 1}
+          </button>
+        `;
+      }).join("");
+    return `
+      <aside class="question-nav" aria-label="Navegador do simulado">
+        <div class="question-nav__summary">
+          <span>Respondidas: <strong>${stats.answered}</strong></span>
+          <span>Em branco: <strong>${stats.blank}</strong></span>
+          <span>Marcadas: <strong>${stats.marked}</strong></span>
+        </div>
+        <div class="question-nav__grid">${buttons || `<p class="empty">Nenhuma questão marcada.</p>`}</div>
+        <div class="button-row">
+          <button class="ghost-button" type="button" data-mock-first-blank ${stats.blank ? "" : "disabled"}>${stats.blank ? "Primeira em branco" : "Todas respondidas"}</button>
+          <button class="ghost-button" type="button" data-mock-next-blank ${stats.blank ? "" : "disabled"}>${stats.blank ? "Próxima em branco" : "Todas respondidas"}</button>
+          <button class="ghost-button" type="button" data-mock-show-marked ${stats.marked ? "" : "disabled"}>Ver marcadas</button>
+          <button class="ghost-button" type="button" data-mock-start>Voltar ao início</button>
+          ${markedOnly ? `<button class="ghost-button" type="button" data-mock-show-all>Ver todas</button>` : ""}
+        </div>
+      </aside>
+    `;
+  }
+
+  function renderMockReviewScreen(queue, stats) {
+    return `
+      <section class="panel result-panel">
+        <div class="section-heading section-heading--compact">
+          <p class="eyebrow">Revisão antes de finalizar</p>
+          <h2>Respondidas: ${stats.answered} · Em branco: ${stats.blank} · Marcadas para revisão: ${stats.marked}</h2>
+          <p>Você ainda pode voltar, revisar marcadas ou finalizar mesmo com questões em branco.</p>
+        </div>
+        ${stats.blank ? `<p class="warning-box">Há ${stats.blank} questão(ões) em branco. Se finalizar agora, elas serão registradas como “Em branco”.</p>` : `<p class="success-box">Todas respondidas.</p>`}
+        <div class="button-row">
+          ${stats.blank ? `<button class="secondary-button" type="button" data-back-to-blanks>Voltar às questões em branco</button>` : ""}
+          <button class="ghost-button" type="button" data-cancel-finish-review>Voltar ao simulado</button>
+          <button class="primary-button" type="button" data-confirm-finish-mock>Confirmar finalização</button>
+        </div>
+        ${renderMockNavigator(queue, stats)}
+      </section>
+    `;
+  }
+
   function renderActiveMock() {
-    const queue = state.mock.queueIds.map((id) => questionsFor().find((question) => question.id === id)).filter(Boolean);
-    const answered = Object.keys(state.mock.answers).length;
+    const queue = getMockQueue();
+    if (!queue.length) {
+      state.mock = null;
+      clearPersistedMock();
+      renderSimulado();
+      return;
+    }
+    state.mock.currentIndex = Math.min(Math.max(safeNumber(state.mock.currentIndex, 0), 0), queue.length - 1);
+    const stats = mockStats(queue);
     const resultHtml = state.mock.finished ? renderMockResult(queue) : "";
+    const current = queue[state.mock.currentIndex];
+    const currentHtml = state.mock.finished
+      ? queue.map((question, index) => renderQuestionCard(question, { context: "mock", index, showCorrection: true })).join("")
+      : renderQuestionCard(current, { context: "mock", index: state.mock.currentIndex, showCorrection: false });
+
     $("#tab-content").innerHTML = `
       <section class="panel mock-bar">
         <div>
           <p class="eyebrow">${escapeHtml(state.mock.title)} · ${escapeHtml(state.mock.mode === "prova" ? "Modo prova" : "Modo treino")}</p>
-          <h2>${answered}/${queue.length} respondidas</h2>
-          <p>${state.mock.finished ? "Simulado finalizado. Clique em cada questão para abrir a explicação." : "As explicações ficam bloqueadas até finalizar."}</p>
+          <h2>${stats.answered}/${queue.length} respondidas</h2>
+          <p>${state.mock.finished ? "Simulado finalizado. Clique em cada questão para consultar a explicação." : "Modo prova: uma questão por vez, sem fontes nem explicações até finalizar."}</p>
         </div>
         <div class="timer" id="timer">${formatRemaining()}</div>
         <div class="button-row">
@@ -1221,16 +1505,31 @@
           <button class="ghost-button" type="button" data-reset-mock>Reiniciar</button>
         </div>
       </section>
+      ${!state.mock.finished && state.mock.reviewBeforeFinish ? renderMockReviewScreen(queue, stats) : ""}
       ${resultHtml}
-      <section class="question-stack">
-        ${queue.map((question, index) => renderQuestionCard(question, { context: "mock", index, showCorrection: state.mock.finished })).join("")}
+      ${!state.mock.finished && !state.mock.reviewBeforeFinish ? renderMockNavigator(queue, stats) : ""}
+      <section class="question-stack ${state.mock.finished ? "" : "question-stack--single"}">
+        ${!state.mock.finished && !state.mock.reviewBeforeFinish ? `
+          <div class="button-row mock-question-controls">
+            <button class="secondary-button" type="button" data-mock-prev ${state.mock.currentIndex === 0 ? "disabled" : ""}>Anterior</button>
+            <button class="secondary-button" type="button" data-mock-next ${state.mock.currentIndex === queue.length - 1 ? "disabled" : ""}>Próxima</button>
+            <button class="ghost-button" type="button" data-clear-mock-answer="${escapeHtml(current.id)}">Limpar resposta</button>
+          </div>
+        ` : ""}
+        ${currentHtml}
       </section>
     `;
   }
 
-  function finishMock() {
+  function finishMock(options = {}) {
     if (!state.mock || state.mock.finished) return;
     const queue = state.mock.queueIds.map((id) => questionsFor().find((question) => question.id === id)).filter(Boolean);
+    if (!options.force) {
+      state.mock.reviewBeforeFinish = true;
+      persistMockState();
+      renderActiveMock();
+      return;
+    }
     const simuladoId = state.mock.id;
     const startedAt = state.mock.startedAt;
     const records = queue.map((question) => {
@@ -1243,6 +1542,8 @@
     state.mock.result = result;
     stopTimer();
     persistScope((scope) => {
+      registerRecentQuestionUse(scope, state.mock, queue);
+      scope.activeMock = null;
       scope.mocks.unshift({
         id: simuladoId,
         title: state.mock.title,
@@ -1522,6 +1823,7 @@
       if (tab) {
         state.activeTab = tab;
         stopTimer();
+        writeSession();
         renderTabs();
         renderActiveTab();
         return;
@@ -1543,7 +1845,90 @@
 
       const mockQuestionId = target.dataset.mockAnswer;
       if (mockQuestionId && state.mock && !state.mock.finished) {
+        const wasBlank = isBlank(state.mock.answers[mockQuestionId]);
         state.mock.answers[mockQuestionId] = target.dataset.answer;
+        state.mock.reviewBeforeFinish = false;
+        if (wasBlank && !isBlank(target.dataset.answer)) {
+          goToNextBlank(state.mock.currentIndex);
+        }
+        persistMockState();
+        renderActiveMock();
+        return;
+      }
+
+      const goIndex = target.dataset.mockGoIndex;
+      if (goIndex !== undefined && state.mock && !state.mock.finished) {
+        state.mock.currentIndex = safeNumber(goIndex, 0);
+        state.mock.reviewBeforeFinish = false;
+        persistMockState();
+        renderActiveMock();
+        return;
+      }
+
+      if (target.dataset.mockPrev !== undefined && state.mock && !state.mock.finished) {
+        state.mock.currentIndex = Math.max(0, state.mock.currentIndex - 1);
+        persistMockState();
+        renderActiveMock();
+        return;
+      }
+
+      if (target.dataset.mockNext !== undefined && state.mock && !state.mock.finished) {
+        state.mock.currentIndex = Math.min(state.mock.queueIds.length - 1, state.mock.currentIndex + 1);
+        persistMockState();
+        renderActiveMock();
+        return;
+      }
+
+      const clearMockAnswerId = target.dataset.clearMockAnswer;
+      if (clearMockAnswerId && state.mock && !state.mock.finished) {
+        delete state.mock.answers[clearMockAnswerId];
+        persistMockState();
+        renderActiveMock();
+        return;
+      }
+
+      if (target.dataset.mockFirstBlank !== undefined && state.mock && !state.mock.finished) {
+        const first = blankIndexes()[0];
+        if (first !== undefined) state.mock.currentIndex = first;
+        state.mock.reviewBeforeFinish = false;
+        state.mock.navigationFilter = "all";
+        persistMockState();
+        renderActiveMock();
+        return;
+      }
+
+      if (target.dataset.mockNextBlank !== undefined && state.mock && !state.mock.finished) {
+        goToNextBlank(state.mock.currentIndex);
+        state.mock.reviewBeforeFinish = false;
+        persistMockState();
+        renderActiveMock();
+        return;
+      }
+
+      if (target.dataset.mockShowMarked !== undefined && state.mock && !state.mock.finished) {
+        const firstMarked = markedIndexes()[0];
+        if (firstMarked !== undefined) {
+          state.mock.currentIndex = firstMarked;
+          state.mock.navigationFilter = "marked";
+        }
+        state.mock.reviewBeforeFinish = false;
+        persistMockState();
+        renderActiveMock();
+        return;
+      }
+
+      if (target.dataset.mockShowAll !== undefined && state.mock && !state.mock.finished) {
+        state.mock.navigationFilter = "all";
+        persistMockState();
+        renderActiveMock();
+        return;
+      }
+
+      if (target.dataset.mockStart !== undefined && state.mock && !state.mock.finished) {
+        state.mock.currentIndex = 0;
+        state.mock.navigationFilter = "all";
+        state.mock.reviewBeforeFinish = false;
+        persistMockState();
         renderActiveMock();
         return;
       }
@@ -1560,8 +1945,30 @@
         return;
       }
 
+      if (target.dataset.cancelFinishReview !== undefined && state.mock && !state.mock.finished) {
+        state.mock.reviewBeforeFinish = false;
+        persistMockState();
+        renderActiveMock();
+        return;
+      }
+
+      if (target.dataset.backToBlanks !== undefined && state.mock && !state.mock.finished) {
+        state.mock.reviewBeforeFinish = false;
+        const first = blankIndexes()[0];
+        if (first !== undefined) state.mock.currentIndex = first;
+        persistMockState();
+        renderActiveMock();
+        return;
+      }
+
+      if (target.dataset.confirmFinishMock !== undefined) {
+        finishMock({ force: true });
+        return;
+      }
+
       if (target.dataset.resetMock !== undefined) {
         state.mock = null;
+        clearPersistedMock();
         stopTimer();
         renderSimulado();
         return;
@@ -1579,10 +1986,8 @@
 
       const markId = target.dataset.markReview;
       if (markId) {
-        persistScope((scope) => {
-          scope.revisionMarked[markId] = true;
-        });
-        target.textContent = "Marcada";
+        toggleRevisionMark(markId);
+        renderActiveTab();
         return;
       }
 
@@ -1619,5 +2024,9 @@
     });
   }
 
-  document.addEventListener("DOMContentLoaded", init);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
 })();

@@ -10,7 +10,7 @@ O projeto era um site estático para CRT-SP:
 - Progresso, ranking, histórico e preferências eram salvos no navegador.
 - O build do Vercel copiava os arquivos estáticos para `dist/`.
 
-## Decisão de arquitetura
+## Decisão de arquitetura atual
 
 A nova versão mantém o site estático, porque o projeto atual não possui backend nem migrations reais.
 
@@ -79,6 +79,62 @@ Implementado:
 - Múltipla escolha
 - Redação como treino manual, sem autocorreção
 - Discursiva como tipo reservado para evolução futura
+
+## Fonte de verdade dos dados
+
+O arquivo `simulados.js` deixou de ser o banco gigante da aplicação. Ele agora é apenas um carregador modular.
+
+Fonte canônica:
+
+```text
+data/sources/sources.js
+data/contests/*.js
+data/config/*.js
+data/questions/*.json
+```
+
+Arquivos em `data/questoes/` são cópias exportadas para compatibilidade, auditoria e futura importação.
+
+## Auditoria de questões
+
+O script `scripts/audit-questions.mjs` gera:
+
+```text
+reports/question-audit.json
+reports/question-audit.md
+```
+
+A auditoria analisa cada escopo `concurso_id::cargo_id` separadamente e verifica:
+
+- IDs duplicados.
+- Enunciados iguais após normalização.
+- Enunciados muito semelhantes por tokens/n-grams.
+- Mesmo gabarito e fato-base.
+- Fonte, explicação, alternativas e gabarito.
+
+## Simulado diário e persistência
+
+O simulado completo usa seleção determinística por:
+
+```text
+YYYY-MM-DD no fuso America/Sao_Paulo
+usuario_id
+concurso_id
+cargo_id
+tipo_simulado
+```
+
+O mesmo usuário recebe a mesma fila no mesmo dia para o mesmo concurso/cargo. A seleção muda no dia seguinte e tenta evitar questões usadas nos últimos 14 dias, com fallback mínimo de 7 dias quando o banco não é suficiente.
+
+O simulado em andamento é salvo em `scope.activeMock` e preserva:
+
+- ID do simulado.
+- Fila de questões.
+- Respostas.
+- Marcadas para revisão.
+- Índice atual.
+- Início e duração.
+- Usuário, concurso e cargo.
 
 ## Limitações atuais
 
