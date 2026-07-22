@@ -6,6 +6,7 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "export:data": "node scripts/export-question-json.mjs",
+    "rotate:daily": "node scripts/rotate-daily-questions.mjs",
     "start": "python -m http.server 8080 -d dist"
   }
 }

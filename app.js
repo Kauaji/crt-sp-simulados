@@ -6,6 +6,8 @@
   const BLANK = "__blank";
   const STORE_KEY = "multiconcurso.study.v1";
   const SESSION_KEY = "multiconcurso.session.v1";
+  const DAILY_SELECTION_URL = "data/daily-selection.json";
+  const DAILY_TIMEZONE = "America/Sao_Paulo";
   const TABS = [
     ["dashboard", "Dashboard"],
     ["treino", "Treino"],
@@ -30,6 +32,7 @@
     },
     mock: null,
     timerInterval: null,
+    dailySelection: null,
   };
 
   const $ = (selector) => document.querySelector(selector);
@@ -53,6 +56,17 @@
     if (!dateString) return "—";
     const [year, month, day] = dateString.split("-").map(Number);
     return new Intl.DateTimeFormat("pt-BR", { dateStyle: "short" }).format(new Date(year, month - 1, day));
+  }
+
+  function saoPauloDateKey(date = new Date()) {
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: DAILY_TIMEZONE,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).formatToParts(date);
+    const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+    return `${values.year}-${values.month}-${values.day}`;
   }
 
   function daysUntil(dateString) {
@@ -392,7 +406,29 @@
       .map((item) => item.question);
   }
 
-  function init() {
+  async function loadDailySelection() {
+    try {
+      const response = await fetch(DAILY_SELECTION_URL, { cache: "no-store" });
+      if (!response.ok) return null;
+      const payload = await response.json();
+      if (
+        payload?.timezone !== DAILY_TIMEZONE
+        || payload?.date !== saoPauloDateKey()
+        || !payload?.selections
+        || typeof payload.selections !== "object"
+      ) {
+        return null;
+      }
+      state.dailySelection = payload;
+      return payload;
+    } catch {
+      state.dailySelection = null;
+      return null;
+    }
+  }
+
+  async function init() {
+    await loadDailySelection();
     renderProfiles();
     bindEvents();
     withStore(() => null);
@@ -1114,7 +1150,43 @@
     `;
   }
 
+  function dailyQueueForActiveScope() {
+    const role = roleById();
+    const scopeKey = `${state.activeContestId}::${state.activeRoleId}`;
+    const ids = state.dailySelection?.selections?.[scopeKey];
+    if (!Array.isArray(ids) || ids.length !== role.exam.totalQuestoes) return null;
+    if (new Set(ids).size !== ids.length) return null;
+
+    const all = questionsFor();
+    const byId = new Map(all.map((question) => [question.id, question]));
+    const queue = ids.map((id) => byId.get(id));
+    if (queue.some((question) => !question)) return null;
+
+    const matchesFormat = queue.every((question) => (
+      role.exam.formato === "certo_errado"
+        ? question.tipo === "certo_errado"
+        : question.tipo === "multipla_escolha"
+    ));
+    if (!matchesFormat) return null;
+
+    const matchesDistribution = role.exam.distribution.every((item) => {
+      const availableInDistribution = all.filter((question) => (
+        item.kind === "bloco" ? question.bloco === item.id : question.materia_id === item.id
+      )).length;
+      const required = Math.min(item.count, availableInDistribution);
+      const total = queue.filter((question) => (
+        item.kind === "bloco" ? question.bloco === item.id : question.materia_id === item.id
+      )).length;
+      return total >= required;
+    });
+
+    return matchesDistribution ? queue : null;
+  }
+
   function buildExamQueue() {
+    const dailyQueue = dailyQueueForActiveScope();
+    if (dailyQueue) return dailyQueue;
+
     const role = roleById();
     const selected = [];
     const all = questionsFor();
