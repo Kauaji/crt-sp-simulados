@@ -12,6 +12,7 @@
   const USERS = [
     { id: "kaua", nome: "Kauã", initial: "K", accent: "verde" },
     { id: "vitoria", nome: "Vitória", initial: "V", accent: "coral" },
+    { id: "caio", nome: "Caio", initial: "C", accent: "azul" },
   ];
 
   const TABS = [
@@ -490,8 +491,8 @@
     $("#top-user-name").textContent = user ? `${user.nome} · 🔥 ${stats.streakAtual}` : "";
     $("#change-contest").hidden = true;
     $("#hero-eyebrow").textContent = "Plataforma gamificada";
-    $("#hero-title").textContent = "CRT-SP, Santos IBAM, DP-600, Programação e Dados";
-    $("#hero-copy").textContent = "Estude com simulados rotativos, histórico por usuário, foguinho, ranking, pontuação por banca e recomendações personalizadas. Tudo salvo localmente neste navegador.";
+    $("#hero-title").textContent = "Central de Simulados";
+    $("#hero-copy").textContent = "CRT-SP, Santos IBAM, DP-600, programação e dados com simulados rotativos, histórico por usuário, foguinho, ranking, pontuação por banca e recomendações personalizadas.";
     $("#hero-notice").textContent = `Hoje: ${getTodayKey()} (${TIMEZONE}). O CRT-SP mantém Certo/Errado Quadrix; Santos IBAM usa múltipla escolha ponderada por pesos.`;
     $("#active-contest-card").innerHTML = `
       <h2>Foco principal</h2>
@@ -532,7 +533,7 @@
       <section class="panel">
         <div class="section-heading">
           <p class="eyebrow">Ranking local</p>
-          <h2>🏆 Kauã x Vitória</h2>
+          <h2>🏆 Ranking dos perfis</h2>
         </div>
         <div class="ranking-grid">
           ${rows.map((row) => `

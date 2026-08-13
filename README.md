@@ -10,10 +10,10 @@ O foco principal continua sendo o concurso CRT-SP 2026 para Técnico Administrat
 
 ## Funcionalidades
 
-- Seleção obrigatória de usuário ao abrir ou recarregar o site: Kauã ou Vitória.
+- Seleção obrigatória de usuário ao abrir ou recarregar o site: Kauã, Vitória ou Caio.
 - Dados separados por usuário via `localStorage`.
 - Dashboard com foguinho, maior streak, pontos, acessos, média, taxa de acerto e últimas tentativas.
-- Ranking Kauã x Vitória por pontos, acessos, foguinho, atividades e média.
+- Ranking dos perfis por pontos, acessos, foguinho, atividades e média.
 - Abas: Dashboard, CRT-SP, Prova real CRT-SP, Certificações, Programação, Dados, Academia de Dados, Concursos Santos — IBAM, Estudos e Histórico.
 - Botão “Trocar usuário” disponível no topo.
 - Botão “Zerar meus dados locais”.
