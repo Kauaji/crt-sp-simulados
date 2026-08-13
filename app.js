@@ -20,11 +20,12 @@
     ["certificacoes", "Certificações"],
     ["programacao", "Programação"],
     ["dados", "Dados"],
+    ["academia-dados", "Academia de Dados"],
     ["estudos", "Estudos"],
     ["historico", "Histórico"],
   ];
 
-  const OPEN_TYPES = new Set(["explainCode", "sqlQuery", "daxMeasure", "completeCode", "orderSteps", "caseStudy"]);
+  const OPEN_TYPES = new Set(["explainCode", "explainConcept", "sqlQuery", "daxMeasure", "completeCode", "orderSteps", "caseStudy", "businessQuestion"]);
   const DIFFICULTY_POINTS = { facil: 1, medio: 2, dificil: 3 };
   const CRT_ROLE_ID = "crt-tecnico-administrativo-bs";
 
@@ -37,8 +38,106 @@
     certTopic: "Microsoft Fabric",
     programmingTrack: "Python",
     dataTrack: "Fundamentos de Dados",
+    academyTrack: "Fundamentos de Dados",
+    academyMode: "rapido",
+    academyQuantity: 10,
+    academyAttempt: 0,
     activeQuiz: null,
   };
+
+  const DATA_ACADEMY_TRACKS = [
+    { id: "Fundamentos de Dados", title: "Fundamentos de Dados", level: "Iniciante", description: "Base para pensar como analista: qualidade, nulos, duplicidade, granularidade, métricas, KPIs e insights." },
+    { id: "SQL para Análise", title: "SQL para Análise", level: "Iniciante/intermediário", description: "SELECT, filtros, JOINs, GROUP BY, HAVING, CTEs, janelas e consultas para perguntas de negócio." },
+    { id: "Python/Pandas", title: "Python/Pandas", level: "Iniciante/intermediário", description: "DataFrames, filtros, groupby, merge, datas, nulos, duplicados e análise exploratória." },
+    { id: "Power BI e DAX", title: "Power BI e DAX", level: "Intermediário", description: "Power Query, modelo estrela, medidas, CALCULATE, SUMX, visuais, performance e storytelling." },
+    { id: "Modelagem de Dados", title: "Modelagem de Dados", level: "Intermediário", description: "Fatos, dimensões, chaves, granularidade, normalização, BI e modelagem dimensional." },
+    { id: "ETL, ELT e Engenharia de Dados", title: "ETL, ELT e Engenharia de Dados", level: "Intermediário", description: "Pipelines, ingestão, incremental load, particionamento, lakehouse, bronze/silver/gold e monitoramento." },
+    { id: "Microsoft Fabric e DP-600", title: "Microsoft Fabric e DP-600", level: "Intermediário/avançado", description: "OneLake, Lakehouse, Warehouse, Semantic Model, Dataflows Gen2, Direct Lake, shortcuts e governança." },
+    { id: "Analytics e Negócio", title: "Analytics e Negócio", level: "Iniciante/intermediário", description: "SLA, produtividade, churn, funil, estoque, atendimento, métricas e tomada de decisão." },
+    { id: "Desafios de Portfólio", title: "Desafios de Portfólio", level: "Prático", description: "Projetos guiados para GitHub e LinkedIn com perguntas de negócio e entregáveis." },
+    { id: "Revisão Inteligente", title: "Revisão Inteligente", level: "Personalizado", description: "Treino puxado dos assuntos com mais erro, brancos e menor desempenho no histórico." },
+  ];
+
+  const DATA_PORTFOLIO_PROJECTS = [
+    {
+      name: "Dashboard de chamados de TI",
+      objective: "Analisar volume de chamados, tempo médio de resolução, SLA, setor e técnico responsável.",
+      skills: "SQL, Power BI, métricas, atendimento e dashboard operacional.",
+      dataset: "Planilha fictícia ou exportação anonimizada de chamados: abertura, fechamento, setor, técnico, prioridade e status.",
+      questions: ["Qual setor abre mais chamados?", "Qual técnico tem maior fila?", "Qual prioridade estoura mais SLA?"],
+      metrics: "Total de chamados, TMR, SLA %, backlog, chamados por setor e prioridade.",
+      tools: "Excel/CSV, SQL, Power BI e README no GitHub.",
+      deliverables: "Dashboard, consultas SQL, dicionário de dados e README explicando decisões.",
+      difficulty: "Médio",
+      github: "Explique objetivo, fonte/dataset, modelagem, métricas, prints do dashboard e aprendizados.",
+      linkedin: "Conte o problema, mostre 2 insights e diga quais decisões o dashboard ajudaria a tomar.",
+    },
+    {
+      name: "Análise de ordens de serviço",
+      objective: "Entender gargalos, produtividade e tempo de atendimento.",
+      skills: "Limpeza de dados, Power BI, indicadores e análise operacional.",
+      dataset: "OS com data de abertura, fechamento, solicitante, responsável, categoria e status.",
+      questions: ["Onde estão os gargalos?", "Qual categoria demora mais?", "Qual etapa concentra atrasos?"],
+      metrics: "Lead time, throughput, backlog, aging e produtividade por responsável.",
+      tools: "SQL, Power Query e Power BI.",
+      deliverables: "Relatório de gargalos, dashboard operacional e recomendações.",
+      difficulty: "Médio",
+      github: "Inclua diagrama simples do fluxo e regra de cálculo dos indicadores.",
+      linkedin: "Mostre como a análise identifica gargalos e prioriza melhoria de processo.",
+    },
+    {
+      name: "Inventário de máquinas",
+      objective: "Cruzar equipamentos, status, setor e necessidade de manutenção.",
+      skills: "Modelagem, Power BI, ETL, indicadores e qualidade de dados.",
+      dataset: "Inventário com patrimônio, usuário, setor, status, idade, garantia e última manutenção.",
+      questions: ["Quais máquinas estão críticas?", "Qual setor tem maior risco?", "O que vence garantia primeiro?"],
+      metrics: "Máquinas críticas, idade média, cobertura de garantia, manutenção vencida e risco por setor.",
+      tools: "Excel, Power Query, DAX e Power BI.",
+      deliverables: "Dashboard de inventário, matriz de risco e plano de ação.",
+      difficulty: "Fácil/médio",
+      github: "Documente regras de classificação de risco e tratamento de nulos.",
+      linkedin: "Explique como dados de inventário reduzem parada e ajudam planejamento.",
+    },
+    {
+      name: "Análise de derrotas do Santos",
+      objective: "Analisar partidas, gols sofridos, mando de campo, sequência, técnicos e desempenho.",
+      skills: "Coleta de dados, limpeza, análise exploratória e storytelling.",
+      dataset: "CSV montado manualmente com jogos, placar, competição, mando, técnico e período.",
+      questions: ["O time perde mais em qual contexto?", "Há sequência crítica?", "Qual indicador explica melhor a fase?"],
+      metrics: "Derrotas por mês, gols sofridos, aproveitamento, sequência sem vitória e mando.",
+      tools: "Python/Pandas, Power BI e narrativa visual.",
+      deliverables: "Notebook de EDA, dashboard e texto de insight.",
+      difficulty: "Médio",
+      github: "Separe coleta, limpeza, análise e visualizações no README.",
+      linkedin: "Use storytelling: pergunta inicial, achado surpreendente e gráfico principal.",
+    },
+    {
+      name: "Análise de estoque",
+      objective: "Identificar itens críticos, giro, estoque mínimo e risco de ruptura.",
+      skills: "Logística, materiais, KPIs, SQL e Power BI.",
+      dataset: "Movimentações com item, entrada, saída, saldo, custo, fornecedor e data.",
+      questions: ["Quais itens têm risco de ruptura?", "Qual item está parado?", "Onde há capital empatado?"],
+      metrics: "Giro, cobertura, estoque mínimo, ruptura, curva ABC e valor parado.",
+      tools: "SQL, Power Query e Power BI.",
+      deliverables: "Dashboard de estoque, curva ABC e recomendação de reposição.",
+      difficulty: "Médio",
+      github: "Inclua regra de curva ABC e cálculo de cobertura.",
+      linkedin: "Mostre como análise de estoque evita falta e reduz capital parado.",
+    },
+    {
+      name: "Dashboard de estudos",
+      objective: "Acompanhar horas estudadas, questões feitas, taxa de acerto e evolução por disciplina.",
+      skills: "Modelagem, DAX, visualização, métricas e disciplina de estudo.",
+      dataset: "Histórico manual de estudos: data, disciplina, minutos, questões, acertos e erros.",
+      questions: ["Qual disciplina evolui?", "Onde o acerto caiu?", "Qual meta diária foi cumprida?"],
+      metrics: "Horas, questões, acerto %, streak, média móvel e pontos por disciplina.",
+      tools: "Google Sheets/Excel, Power BI e DAX.",
+      deliverables: "Dashboard pessoal, metas e plano de revisão.",
+      difficulty: "Fácil",
+      github: "Explique o modelo e como outra pessoa pode usar o template.",
+      linkedin: "Mostre evolução e fale sobre aprender dados usando seus próprios estudos.",
+    },
+  ];
 
   const $ = (selector) => document.querySelector(selector);
 
@@ -150,6 +249,7 @@
       questionariosCertificacaoFinalizados: 0,
       questionariosProgramacaoFinalizados: 0,
       questionariosDadosFinalizados: 0,
+      questionariosAcademiaDadosFinalizados: 0,
       melhorPontuacaoLiquidaGeral: null,
       ultimaPontuacaoLiquida: 0,
       mediaPontuacao: 0,
@@ -157,6 +257,7 @@
       totalAcertos: 0,
       totalErros: 0,
       totalBrancos: 0,
+      totalParciais: 0,
       historicoUltimosResultados: [],
       materiasComMaisErro: {},
       materiasComMaisBranco: {},
@@ -275,6 +376,7 @@
     stats.totalAcertos += result.correct;
     stats.totalErros += result.wrong;
     stats.totalBrancos += result.blank;
+    stats.totalParciais = (stats.totalParciais || 0) + (result.partial || 0);
     stats.pontosTotais += result.gamifiedPoints;
     stats.ultimaPontuacaoLiquida = result.score;
     stats.melhorPontuacaoLiquidaGeral = stats.melhorPontuacaoLiquidaGeral === null
@@ -286,12 +388,16 @@
     if (result.area === "certificacoes") stats.questionariosCertificacaoFinalizados += 1;
     if (result.area === "programacao") stats.questionariosProgramacaoFinalizados += 1;
     if (result.area === "dados") stats.questionariosDadosFinalizados += 1;
+    if (result.area === "academia-dados") stats.questionariosAcademiaDadosFinalizados = (stats.questionariosAcademiaDadosFinalizados || 0) + 1;
 
     stats.trilhasEstudadas[result.trilha] = (stats.trilhasEstudadas[result.trilha] || 0) + 1;
 
     for (const item of result.items) {
-      if (!item.correct && !item.blank) {
+      if (!item.correct && !item.blank && !item.partial) {
         stats.materiasComMaisErro[item.disciplina] = (stats.materiasComMaisErro[item.disciplina] || 0) + 1;
+        if (result.area === "academia-dados" && item.assunto) {
+          stats.materiasComMaisErro[item.assunto] = (stats.materiasComMaisErro[item.assunto] || 0) + 1;
+        }
       }
       if (item.blank) {
         stats.materiasComMaisBranco[item.disciplina] = (stats.materiasComMaisBranco[item.disciplina] || 0) + 1;
@@ -309,8 +415,12 @@
       acertos: result.correct,
       erros: result.wrong,
       brancos: result.blank,
+      parciais: result.partial || 0,
       pontuacao: result.score,
       percentual: result.percent,
+      pontosGanhos: result.gamifiedPoints,
+      dificuldade: result.difficulty || state.difficulty,
+      observacao: result.observation || "",
     });
     stats.historicoUltimosResultados = attempts.slice(0, 50);
     const scores = stats.historicoUltimosResultados.map((item) => item.pontuacao);
@@ -378,7 +488,7 @@
   function renderRanking() {
     const rows = USERS.map((user) => {
       const stats = loadUserStats(user.id);
-      const activities = stats.simuladosCrtFinalizados + stats.provasReaisCrtFinalizadas + stats.questionariosCertificacaoFinalizados + stats.questionariosProgramacaoFinalizados + stats.questionariosDadosFinalizados;
+      const activities = stats.simuladosCrtFinalizados + stats.provasReaisCrtFinalizadas + stats.questionariosCertificacaoFinalizados + stats.questionariosProgramacaoFinalizados + stats.questionariosDadosFinalizados + (stats.questionariosAcademiaDadosFinalizados || 0);
       return { user, stats, activities };
     });
     const score = (row) => (row.stats.pontosTotais || 0) + (row.stats.maiorStreak || 0) * 5 + row.activities * 3 + (row.stats.mediaPontuacao || 0);
@@ -430,6 +540,7 @@
           ${metricCard("DP-600", stats.questionariosCertificacaoFinalizados, "questionários finalizados")}
           ${metricCard("Programação", stats.questionariosProgramacaoFinalizados, "questionários finalizados")}
           ${metricCard("Dados", stats.questionariosDadosFinalizados, "questionários finalizados")}
+          ${metricCard("Academia de Dados", stats.questionariosAcademiaDadosFinalizados || 0, "treinos práticos")}
           ${metricCard("Melhor pontuação", stats.melhorPontuacaoLiquidaGeral ?? "—", `última: ${stats.ultimaPontuacaoLiquida}`)}
           ${metricCard("Média geral", stats.mediaPontuacao, "últimos resultados")}
           ${metricCard("Trilha mais estudada", getTopKey(stats.trilhasEstudadas), "por atividades")}
@@ -595,6 +706,241 @@
     `;
   }
 
+  function dataAcademyPool() {
+    return poolByArea("academia-dados");
+  }
+
+  function getDataAcademyStats(userStats = loadUserStats()) {
+    const history = (userStats.historicoUltimosResultados || []).filter((item) => item.area === "academia-dados");
+    const byTrack = {};
+    for (const item of history) {
+      byTrack[item.trilha] = byTrack[item.trilha] || { total: 0, correct: 0, wrong: 0, partial: 0, attempts: 0, score: 0 };
+      byTrack[item.trilha].total += item.total || 0;
+      byTrack[item.trilha].correct += item.acertos || 0;
+      byTrack[item.trilha].wrong += item.erros || 0;
+      byTrack[item.trilha].partial += item.parciais || 0;
+      byTrack[item.trilha].attempts += 1;
+      byTrack[item.trilha].score += item.pontuacao || 0;
+    }
+    const rows = Object.entries(byTrack).map(([track, values]) => ({
+      track,
+      ...values,
+      accuracy: values.total ? Math.round((values.correct / values.total) * 100) : 0,
+    }));
+    const best = [...rows].sort((a, b) => b.accuracy - a.accuracy || b.total - a.total)[0];
+    const mostStudied = [...rows].sort((a, b) => b.attempts - a.attempts || b.total - a.total)[0];
+    const weakest = [...rows].sort((a, b) => b.wrong - a.wrong || a.accuracy - b.accuracy)[0];
+    const total = rows.reduce((sum, row) => sum + row.total, 0);
+    const correct = rows.reduce((sum, row) => sum + row.correct, 0);
+    return {
+      history,
+      rows,
+      total,
+      correct,
+      accuracy: total ? Math.round((correct / total) * 100) : 0,
+      best: best?.track || "Ainda sem dados",
+      mostStudied: mostStudied?.track || "Ainda sem dados",
+      weakest: weakest?.track || "Ainda sem dados",
+      last: history[0],
+    };
+  }
+
+  function getDataStudyRecommendation(userStats = loadUserStats()) {
+    const stats = getDataAcademyStats(userStats);
+    if (!stats.history.length) {
+      return {
+        track: "Fundamentos de Dados",
+        difficulty: "facil",
+        mode: "Treino rápido",
+        review: ["qualidade de dados", "granularidade", "KPIs"],
+        project: "Dashboard de estudos",
+        reason: "Comece criando base: dados, informação, insight, métricas e qualidade.",
+      };
+    }
+    if (!stats.rows.some((row) => row.track === "Microsoft Fabric e DP-600")) {
+      return {
+        track: "Microsoft Fabric e DP-600",
+        difficulty: "facil",
+        mode: "Treino por trilha",
+        review: ["OneLake", "Lakehouse", "Semantic Model"],
+        project: "Dashboard de estudos",
+        reason: "Você ainda não treinou Fabric; vale abrir a base antes de ir para DP-600 difícil.",
+      };
+    }
+    const lowerErrors = Object.entries(userStats.materiasComMaisErro || {})
+      .filter(([name]) => /SQL|DAX|Power|Fabric|Modelagem|Dados|Analytics|Python|Pandas/i.test(name))
+      .sort((a, b) => b[1] - a[1])
+      .map(([name]) => name);
+    const weak = stats.weakest !== "Ainda sem dados" ? stats.weakest : "SQL para Análise";
+    return {
+      track: lowerErrors[0]?.includes("DAX") || lowerErrors[0]?.includes("Power") ? "Power BI e DAX" : weak,
+      difficulty: stats.accuracy >= 78 ? "dificil" : stats.accuracy >= 58 ? "medio" : "facil",
+      mode: stats.accuracy >= 75 ? "Desafio prático" : "Treino por trilha",
+      review: lowerErrors.slice(0, 3).length ? lowerErrors.slice(0, 3) : [weak, "JOINs", "métricas"],
+      project: stats.accuracy >= 70 ? "Dashboard de chamados de TI" : "Dashboard de estudos",
+      reason: stats.accuracy >= 75
+        ? "Seu acerto geral está bom; hora de estudo de caso e portfólio."
+        : "Ainda vale consolidar conceitos com treino guiado e revisão dos erros.",
+    };
+  }
+
+  function renderAcademyDashboard() {
+    const academy = getDataAcademyStats();
+    const recommendation = getDataStudyRecommendation();
+    return `
+      <section class="panel">
+        <div class="section-heading">
+          <p class="eyebrow">Mini-dashboard</p>
+          <h2>Seu painel da Academia de Dados</h2>
+        </div>
+        <div class="dashboard-grid">
+          ${metricCard("Trilha mais estudada", academy.mostStudied, "por tentativas")}
+          ${metricCard("Melhor trilha", academy.best, "maior taxa de acerto")}
+          ${metricCard("Mais erros", academy.weakest, "prioridade de revisão")}
+          ${metricCard("Questões de dados", academy.total, "respondidas na academia")}
+          ${metricCard("Taxa de acerto", `${academy.accuracy}%`, `${academy.correct}/${academy.total}`)}
+          ${metricCard("Último treino", academy.last?.titulo || "Ainda não fez", academy.last ? `${academy.last.percentual}% · ${academy.last.pontosGanhos || 0} pts` : "comece pelo treino rápido")}
+        </div>
+        <div class="notice">Recomendação: ${escapeHtml(recommendation.track)} · ${escapeHtml(recommendation.difficulty)} · ${escapeHtml(recommendation.mode)} — ${escapeHtml(recommendation.reason)}</div>
+        ${academy.rows.length ? `
+          <div class="progress-list">
+            ${academy.rows.map((row) => `
+              <div class="progress-row">
+                <span>${escapeHtml(row.track)}</span>
+                <strong>${row.accuracy}%</strong>
+                <div class="progress-bar"><i style="width:${Math.min(100, row.accuracy)}%"></i></div>
+              </div>
+            `).join("")}
+          </div>
+        ` : "<p class='muted'>Faça um treino para liberar progresso por trilha.</p>"}
+      </section>
+    `;
+  }
+
+  function renderAcademyCard(track) {
+    return `
+      <article class="academy-card">
+        <div>
+          <h3>${escapeHtml(track.title)}</h3>
+          <p>${escapeHtml(track.description)}</p>
+          <small>Nível recomendado: ${escapeHtml(track.level)}</small>
+        </div>
+        <div class="action-row">
+          <button class="primary-button" type="button" data-academy-action="start" data-academy-track="${escapeHtml(track.id)}">Começar treino</button>
+          <button class="secondary-button" type="button" data-academy-action="summary" data-academy-track="${escapeHtml(track.id)}">Ver resumo</button>
+          <button class="secondary-button" type="button" data-academy-action="challenge" data-academy-track="${escapeHtml(track.id)}">Fazer desafio</button>
+        </div>
+      </article>
+    `;
+  }
+
+  function renderPortfolioProject(project) {
+    return `
+      <article class="portfolio-card">
+        <h3>${escapeHtml(project.name)}</h3>
+        <p>${escapeHtml(project.objective)}</p>
+        <dl>
+          <div><dt>Dataset</dt><dd>${escapeHtml(project.dataset)}</dd></div>
+          <div><dt>Métricas</dt><dd>${escapeHtml(project.metrics)}</dd></div>
+          <div><dt>Ferramentas</dt><dd>${escapeHtml(project.tools)}</dd></div>
+          <div><dt>Entregáveis</dt><dd>${escapeHtml(project.deliverables)}</dd></div>
+          <div><dt>Dificuldade</dt><dd>${escapeHtml(project.difficulty)}</dd></div>
+        </dl>
+        <p><strong>Perguntas de negócio:</strong> ${project.questions.map(escapeHtml).join(" · ")}</p>
+        <p><strong>README GitHub:</strong> ${escapeHtml(project.github)}</p>
+        <p><strong>Post LinkedIn:</strong> ${escapeHtml(project.linkedin)}</p>
+      </article>
+    `;
+  }
+
+  function renderDataAcademyTab() {
+    const recommendation = getDataStudyRecommendation();
+    $("#tab-content").innerHTML = `
+      ${renderAcademyDashboard()}
+      <section class="panel">
+        <div class="section-heading">
+          <p class="eyebrow">Academia de Dados</p>
+          <h2>Treinos práticos para estágio/júnior em dados</h2>
+        </div>
+        <p>Escolha uma trilha, treine com questões rotativas, faça desafios práticos, pratique entrevista e monte ideias de portfólio.</p>
+        <div class="form-grid">
+          <label class="field">
+            <span>Modo</span>
+            <select data-academy-mode>
+              <option value="rapido" ${state.academyMode === "rapido" ? "selected" : ""}>Treino rápido</option>
+              <option value="trilha" ${state.academyMode === "trilha" ? "selected" : ""}>Treino por trilha</option>
+              <option value="desafio" ${state.academyMode === "desafio" ? "selected" : ""}>Desafio prático</option>
+              <option value="entrevista" ${state.academyMode === "entrevista" ? "selected" : ""}>Modo entrevista</option>
+              <option value="erro" ${state.academyMode === "erro" ? "selected" : ""}>Modo erro</option>
+              <option value="portfolio" ${state.academyMode === "portfolio" ? "selected" : ""}>Modo portfólio</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Quantidade</span>
+            <select data-academy-quantity>
+              ${[10, 20, 40].map((qty) => `<option value="${qty}" ${Number(state.academyQuantity) === qty ? "selected" : ""}>${qty} questões</option>`).join("")}
+            </select>
+          </label>
+          ${difficultySelect()}
+        </div>
+        <div class="action-row">
+          <button class="primary-button" type="button" data-start-academy>Iniciar pelo modo selecionado</button>
+          <button class="secondary-button" type="button" data-academy-action="challenge" data-academy-track="${escapeHtml(recommendation.track)}">Desafio recomendado</button>
+        </div>
+      </section>
+      <section class="panel">
+        <h2>Trilhas da Academia</h2>
+        <div class="academy-grid">
+          ${DATA_ACADEMY_TRACKS.map(renderAcademyCard).join("")}
+        </div>
+      </section>
+      <section class="panel">
+        <div class="section-heading">
+          <p class="eyebrow">Projetos práticos</p>
+          <h2>Desafios de Portfólio</h2>
+        </div>
+        <div class="portfolio-grid">
+          ${DATA_PORTFOLIO_PROJECTS.map(renderPortfolioProject).join("")}
+        </div>
+      </section>
+    `;
+  }
+
+  function renderAcademySummary(trackId) {
+    const track = DATA_ACADEMY_TRACKS.find((item) => item.id === trackId) || DATA_ACADEMY_TRACKS[0];
+    const questions = dataAcademyPool().filter((question) => question.trilha === track.id);
+    const topics = [...new Set(questions.map((question) => question.assunto))].slice(0, 14);
+    const recommendation = getDataStudyRecommendation();
+    $("#tab-content").innerHTML = `
+      <section class="panel">
+        <div class="section-heading">
+          <p class="eyebrow">Resumo da trilha</p>
+          <h2>${escapeHtml(track.title)}</h2>
+        </div>
+        <p>${escapeHtml(track.description)}</p>
+        <div class="dashboard-grid">
+          ${metricCard("Nível", track.level, "recomendado")}
+          ${metricCard("Questões no banco", questions.length, "rotativas")}
+          ${metricCard("Tipos", [...new Set(questions.map((q) => q.tipo))].length, "formatos de treino")}
+          ${metricCard("Recomendação atual", recommendation.track, recommendation.mode)}
+        </div>
+        <h3>Assuntos principais</h3>
+        <div class="tag-cloud">${topics.map((topic) => `<span>${escapeHtml(topic)}</span>`).join("")}</div>
+        <h3>Como estudar</h3>
+        <ul class="check-list">
+          <li>Leia o conceito e tente explicar com um exemplo de negócio.</li>
+          <li>Faça 10 questões rápidas antes de subir para 20 ou 40.</li>
+          <li>Quando errar, anote se o problema foi conceito, cálculo, modelagem ou interpretação.</li>
+          <li>Finalize com um projeto de portfólio ligado à trilha.</li>
+        </ul>
+        <div class="action-row">
+          <button class="primary-button" type="button" data-academy-action="start" data-academy-track="${escapeHtml(track.id)}">Começar treino</button>
+          <button class="secondary-button" type="button" data-tab="academia-dados">Voltar à Academia</button>
+        </div>
+      </section>
+    `;
+  }
+
   function getPersonalizedRecommendations() {
     const stats = loadUserStats();
     if (!stats.historicoUltimosResultados?.length) {
@@ -624,6 +970,19 @@
           ${studyCard("DP-600", ["Microsoft Learn", "Fabric, Lakehouse, Warehouse e Semantic Model", "Treine SQL, DAX, KQL, Direct Lake, RLS e deployment pipelines"], [["Guia DP-600", "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-600"], ["Curso DP-600", "https://learn.microsoft.com/en-us/training/courses/dp-600t00"]])}
           ${studyCard("Programação", ["1. lógica", "2. Python", "3. SQL", "4. Git", "5. HTML/CSS", "6. JavaScript", "7. Java", "8. projetos práticos"], [["MDN", "https://developer.mozilla.org/pt-BR/"], ["Python", "https://docs.python.org/pt-br/3/"]])}
           ${studyCard("Dados", ["SQL forte", "Python/Pandas", "Power BI", "Modelagem", "ETL/ELT", "Fabric", "Portfólio: chamados de TI, ordens de serviço, estoque e atendimento"], [["Power BI Learn", "https://learn.microsoft.com/pt-br/power-bi/"], ["Pandas", "https://pandas.pydata.org/docs/"]])}
+          ${studyCard("Trilha recomendada para Dados", ["1. SQL forte", "2. Python/Pandas", "3. Power BI", "4. Modelagem dimensional", "5. Estatística básica", "6. ETL/ELT", "7. Microsoft Fabric", "8. Projetos de portfólio", "9. Preparação para entrevistas"], [["Microsoft Fabric", "https://learn.microsoft.com/en-us/fabric/"], ["PostgreSQL", "https://www.postgresql.org/docs/"], ["Kaggle", "https://www.kaggle.com/"], ["dados.gov.br", "https://dados.gov.br/"]])}
+        </div>
+      </section>
+      <section class="panel">
+        <div class="section-heading">
+          <p class="eyebrow">Resumo rápido de carreira em dados</p>
+          <h2>O que estudar primeiro para estágio/júnior</h2>
+        </div>
+        <div class="study-grid">
+          ${studyCard("Análise de dados", ["Transforma dados em respostas de negócio.", "Começa por pergunta, métrica e recorte.", "Entrega insight, visual e recomendação."], [])}
+          ${studyCard("BI", ["Organiza indicadores recorrentes.", "Usa modelagem, Power BI, DAX e storytelling.", "Foco em acompanhamento e decisão."], [])}
+          ${studyCard("Engenharia de dados", ["Constrói pipelines e bases confiáveis.", "Cuida de ingestão, transformação, qualidade e monitoramento.", "Foco em disponibilidade e escala."], [])}
+          ${studyCard("Quando usar cada ferramenta", ["SQL: consultar, combinar e agregar dados.", "Python/Pandas: limpar, explorar e automatizar.", "Power BI: modelar, medir e comunicar.", "Fabric: integrar lakehouse, warehouse, pipelines e BI."], [["Power BI", "https://learn.microsoft.com/en-us/power-bi/"], ["Pandas", "https://pandas.pydata.org/docs/"]])}
         </div>
       </section>
       <section class="panel">
@@ -652,7 +1011,7 @@
     return `
       <article class="history-item">
         <strong>${escapeHtml(item.titulo)}</strong>
-        <span>${new Date(item.data).toLocaleString("pt-BR")} · ${item.acertos} acertos · ${item.erros} erros · ${item.brancos} brancos · pontuação ${item.pontuacao}</span>
+        <span>${new Date(item.data).toLocaleString("pt-BR")} · ${item.acertos} acertos · ${item.erros} erros · ${item.brancos} brancos${item.parciais ? ` · ${item.parciais} parciais` : ""} · pontuação ${item.pontuacao}${item.pontosGanhos ? ` · ${item.pontosGanhos} pts` : ""}</span>
       </article>
     `;
   }
@@ -681,6 +1040,7 @@
       certificacoes: renderCertificationTab,
       programacao: renderProgrammingTab,
       dados: renderDataTab,
+      "academia-dados": renderDataAcademyTab,
       estudos: renderStudyTab,
       historico: renderHistory,
     };
@@ -723,8 +1083,18 @@
       `;
     }
     if (OPEN_TYPES.has(question.tipo)) {
+      const marked = quiz.selfEvaluations[question.id];
       return `
         <textarea class="open-answer" data-open-answer="${escapeHtml(question.id)}" placeholder="Escreva sua resposta para autoavaliação">${escapeHtml(current || "")}</textarea>
+        <div class="answer-grid self-eval-grid" aria-label="Autoavaliação">
+          ${[
+            ["correct", "Acertei"],
+            ["partial", "Parcial"],
+            ["wrong", "Errei"],
+          ].map(([value, label]) => `
+            <button class="answer-option self-eval-option ${marked === value ? "selected" : ""}" type="button" data-self-eval="${escapeHtml(question.id)}" data-self-eval-value="${escapeHtml(value)}">${escapeHtml(label)}</button>
+          `).join("")}
+        </div>
       `;
     }
     return `
@@ -743,12 +1113,13 @@
     const blank = answer === undefined || answer === "" || answer === BLANK;
     if (OPEN_TYPES.has(question.tipo)) {
       const marked = quiz.selfEvaluations[question.id];
-      return { blank: !answer && !marked, correct: marked === "correct", wrong: marked === "wrong" };
+      const partial = marked === "partial" || (answer && !marked);
+      return { blank: !answer && !marked, correct: marked === "correct", partial, wrong: marked === "wrong" };
     }
-    if (blank) return { blank: true, correct: false, wrong: false };
+    if (blank) return { blank: true, correct: false, partial: false, wrong: false };
     const expected = question.tipo === "trueFalse" ? question.gabarito : String(question.gabarito);
     const correct = String(answer) === String(expected);
-    return { blank: false, correct, wrong: !correct };
+    return { blank: false, correct, partial: false, wrong: !correct };
   }
 
   function buildResult(quiz) {
@@ -759,16 +1130,24 @@
         id: question.id,
         disciplina: question.disciplina || question.bloco || question.trilha,
         assunto: question.assunto,
-        score: quiz.scoring === "quadrix" ? (evaluation.correct ? 1 : evaluation.wrong ? -1 : 0) : (evaluation.correct ? DIFFICULTY_POINTS[question.dificuldade] || 1 : 0),
+        score: quiz.scoring === "quadrix"
+          ? (evaluation.correct ? 1 : evaluation.wrong ? -1 : 0)
+          : (evaluation.correct ? DIFFICULTY_POINTS[question.dificuldade] || 1 : evaluation.partial ? 0.5 : 0),
       };
     });
     const correct = items.filter((item) => item.correct).length;
     const wrong = items.filter((item) => item.wrong).length;
     const blank = items.filter((item) => item.blank).length;
+    const partial = items.filter((item) => item.partial).length;
     const score = items.reduce((sum, item) => sum + item.score, 0);
+    const activityBonus = quiz.area === "academia-dados" && quiz.kind.includes("desafio")
+      ? 10
+      : quiz.area === "academia-dados" && quiz.kind.includes("entrevista")
+        ? 15
+        : 0;
     const gamifiedPoints = quiz.scoring === "quadrix"
       ? Math.max(0, correct * 2 + (quiz.kind === "crt-real" ? 20 : 0))
-      : score + Math.min(10, loadUserStats().streakAtual || 0);
+      : score + activityBonus + Math.min(10, loadUserStats().streakAtual || 0);
     return {
       title: quiz.title,
       kind: quiz.kind,
@@ -779,6 +1158,7 @@
       correct,
       wrong,
       blank,
+      partial,
       score,
       percent: quiz.questions.length ? Math.round((correct / quiz.questions.length) * 100) : 0,
       gamifiedPoints,
@@ -864,7 +1244,7 @@
     const inside = basics >= MINIMOS_PROVA_REAL.basicos && comp >= MINIMOS_PROVA_REAL.complementares && spec >= MINIMOS_PROVA_REAL.especificos && result.score >= MINIMOS_PROVA_REAL.total;
     const attention = result.score >= MINIMOS_PROVA_REAL.total || [basics >= MINIMOS_PROVA_REAL.basicos, comp >= MINIMOS_PROVA_REAL.complementares, spec >= MINIMOS_PROVA_REAL.especificos].filter(Boolean).length >= 2;
     const status = !real ? "" : inside ? "Dentro da zona segura" : attention ? "Atenção" : "Risco de eliminação";
-    const weak = result.items.filter((item) => item.wrong || item.blank).slice(0, 12);
+    const weak = result.items.filter((item) => item.wrong || item.blank || item.partial).slice(0, 12);
 
     $("#tab-content").innerHTML = `
       <section class="panel">
@@ -875,6 +1255,7 @@
         <div class="dashboard-grid">
           ${metricCard("Pontuação", result.score, quiz.scoring === "quadrix" ? "+1/-1/0" : "sem penalidade")}
           ${metricCard("Percentual", `${result.percent}%`, "acertos sobre o total")}
+          ${metricCard("Parciais", result.partial || 0, "autoavaliação")}
           ${metricCard("Pontos gamificados", result.gamifiedPoints, "salvos no dashboard")}
           ${metricCard("Segurança", `${Math.max(0, Math.round((result.score / result.total) * 100))}%`, real ? status : "desempenho líquido")}
         </div>
@@ -912,7 +1293,11 @@
 
   function renderAnsweredQuestion(question, index, item) {
     const answer = state.activeQuiz.answers[question.id];
-    const expected = question.tipo === "trueFalse" ? question.gabarito : normalizeOptions(question)[Number(question.gabarito)]?.label;
+    const expected = OPEN_TYPES.has(question.tipo)
+      ? "autoavaliação"
+      : question.tipo === "trueFalse"
+        ? question.gabarito
+        : normalizeOptions(question)[Number(question.gabarito)]?.label;
     const marked = question.tipo === "trueFalse"
       ? answer === BLANK || answer === undefined ? "Em branco" : answer === "C" ? "Certo" : "Errado"
       : answer === undefined ? "Em branco" : normalizeOptions(question)[Number(answer)]?.label || answer;
@@ -920,13 +1305,14 @@
       <article class="question-card ${item.correct ? "is-correct" : item.wrong ? "is-wrong" : "is-blank"}">
         <div class="question-meta">
           <span>Questão ${index + 1}</span>
-          <span>${item.correct ? "✅ certa" : item.wrong ? "❌ errada" : "⬜ branco"}</span>
+          <span>${item.correct ? "✅ certa" : item.partial ? "🟨 parcial" : item.wrong ? "❌ errada" : "⬜ branco"}</span>
         </div>
         <p>${escapeHtml(question.enunciado)}</p>
         ${question.codigo ? `<pre><code>${escapeHtml(question.codigo)}</code></pre>` : ""}
         <p><strong>Sua resposta:</strong> ${escapeHtml(marked)} · <strong>Gabarito:</strong> ${escapeHtml(expected ?? question.gabarito)}</p>
         <details open>
           <summary>Ver explicação e fonte</summary>
+          ${OPEN_TYPES.has(question.tipo) && question.resposta_esperada ? `<p><strong>Resposta esperada:</strong> ${escapeHtml(question.resposta_esperada)}</p>` : ""}
           <p>${escapeHtml(question.comentario || "Revise o assunto indicado.")}</p>
           ${question.link ? `<a href="${escapeHtml(question.link)}" target="_blank" rel="noreferrer">Link de estudo/fonte</a>` : ""}
         </details>
@@ -1029,6 +1415,66 @@
     });
   }
 
+  function academyPoolForMode(mode = state.academyMode, trackId = state.academyTrack) {
+    const all = dataAcademyPool();
+    if (mode === "rapido") return all;
+    if (mode === "erro") {
+      const weak = Object.keys(loadUserStats().materiasComMaisErro || {});
+      const focused = all.filter((question) => weak.some((item) => (
+        question.trilha.includes(item)
+        || question.disciplina.includes(item)
+        || question.assunto.includes(item)
+        || question.tags?.some((tag) => item.toLowerCase().includes(String(tag).toLowerCase()))
+      )));
+      return focused.length ? focused : all;
+    }
+    if (mode === "entrevista") {
+      return all.filter((question) => ["explainConcept", "caseStudy", "businessQuestion", "sqlQuery", "daxMeasure", "codeOutput"].includes(question.tipo));
+    }
+    if (mode === "portfolio") {
+      return all.filter((question) => ["caseStudy", "businessQuestion", "explainConcept"].includes(question.tipo));
+    }
+    if (trackId === "Revisão Inteligente") {
+      const recommendation = getDataStudyRecommendation();
+      return all.filter((question) => question.trilha === recommendation.track);
+    }
+    if (trackId === "Desafios de Portfólio") {
+      return all.filter((question) => ["caseStudy", "businessQuestion", "explainConcept"].includes(question.tipo));
+    }
+    return all.filter((question) => question.trilha === trackId);
+  }
+
+  function startDataAcademyQuiz(options = {}) {
+    const mode = options.mode || state.academyMode;
+    const trackId = options.track || state.academyTrack;
+    const challenge = mode === "desafio" || options.challenge;
+    const interview = mode === "entrevista";
+    const portfolio = mode === "portfolio" || trackId === "Desafios de Portfólio";
+    const count = challenge ? 8 : interview ? 8 : portfolio ? 6 : mode === "rapido" ? 10 : Number(state.academyQuantity) || 10;
+    const difficulty = mode === "erro" ? state.difficulty : options.difficulty || state.difficulty;
+    const pool = academyPoolForMode(mode, trackId);
+    const scope = `academia-${mode}-${trackId}`;
+    state.academyAttempt += 1;
+
+    startQuiz({
+      title: `Academia de Dados — ${mode === "rapido" ? "Treino rápido" : mode === "erro" ? "Modo erro" : mode === "entrevista" ? "Modo entrevista" : mode === "portfolio" ? "Modo portfólio" : challenge ? "Desafio prático" : trackId}`,
+      kind: `academia-${mode}`,
+      area: "academia-dados",
+      trilha: mode === "rapido" ? "Academia de Dados" : trackId,
+      scopeKey: scope,
+      scoring: "positive",
+      difficulty,
+      observation: portfolio ? `Projeto sugerido: ${getDataStudyRecommendation().project}` : "",
+      questions: selectRotatingQuestions({
+        pool,
+        count,
+        difficulty,
+        seedKey: `${getTodayKey()}-${state.currentUserId}-${scope}-${difficulty}-${state.academyAttempt}`,
+        avoidIds: getRecentIds(scope),
+      }),
+    });
+  }
+
   function login(userId) {
     registerUserAccess(userId);
     state.activeTab = "dashboard";
@@ -1070,6 +1516,19 @@
     if (target.dataset.startCert !== undefined) startCertificationQuiz();
     if (target.dataset.startProgramming !== undefined) startProgrammingQuiz();
     if (target.dataset.startData !== undefined) startDataQuiz();
+    if (target.dataset.startAcademy !== undefined) startDataAcademyQuiz();
+    if (target.dataset.academyAction) {
+      const track = target.dataset.academyTrack || state.academyTrack;
+      state.academyTrack = track;
+      if (target.dataset.academyAction === "summary") renderAcademySummary(track);
+      if (target.dataset.academyAction === "start") startDataAcademyQuiz({ mode: "trilha", track });
+      if (target.dataset.academyAction === "challenge") startDataAcademyQuiz({ mode: "desafio", track, challenge: true });
+    }
+    if (target.dataset.selfEval && state.activeQuiz) {
+      state.activeQuiz.selfEvaluations[target.dataset.selfEval] = target.dataset.selfEvalValue;
+      target.closest(".question-card")?.querySelectorAll(".self-eval-option").forEach((option) => option.classList.remove("selected"));
+      target.classList.add("selected");
+    }
     if (target.dataset.cancelQuiz !== undefined || target.dataset.backTabs !== undefined) {
       state.activeQuiz = null;
       renderActiveTab();
@@ -1084,6 +1543,8 @@
     if (target.matches("[data-cert-topic]")) state.certTopic = target.value;
     if (target.matches("[data-programming-track]")) state.programmingTrack = target.value;
     if (target.matches("[data-data-track]")) state.dataTrack = target.value;
+    if (target.matches("[data-academy-mode]")) state.academyMode = target.value;
+    if (target.matches("[data-academy-quantity]")) state.academyQuantity = Number(target.value);
     if (target.matches("[data-answer]") && state.activeQuiz) {
       state.activeQuiz.answers[target.dataset.answer] = target.value;
       target.closest(".question-card")?.querySelectorAll(".answer-option").forEach((option) => option.classList.remove("selected"));

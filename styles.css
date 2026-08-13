@@ -1279,6 +1279,89 @@ footer {
   background: var(--paper-2);
 }
 
+.academy-grid,
+.portfolio-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.academy-card,
+.portfolio-card {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: #fff;
+}
+
+.academy-card h3,
+.portfolio-card h3 {
+  margin: 0;
+  color: var(--forest);
+}
+
+.academy-card small {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.portfolio-card dl {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.portfolio-card dt {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.portfolio-card dd {
+  margin: 0;
+}
+
+.progress-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.progress-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px 12px;
+  align-items: center;
+}
+
+.progress-bar {
+  grid-column: 1 / -1;
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--paper-2);
+}
+
+.progress-bar i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--forest), var(--gold));
+}
+
+.self-eval-grid {
+  margin-top: 10px;
+}
+
+.self-eval-option {
+  justify-content: center;
+  font-weight: 900;
+}
+
 @media (max-width: 760px) {
   .panel {
     width: min(100% - 20px, var(--max));

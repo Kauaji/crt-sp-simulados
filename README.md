@@ -14,7 +14,7 @@ O foco principal continua sendo o concurso CRT-SP 2026 para Técnico Administrat
 - Dados separados por usuário via `localStorage`.
 - Dashboard com foguinho, maior streak, pontos, acessos, média, taxa de acerto e últimas tentativas.
 - Ranking Kauã x Vitória por pontos, acessos, foguinho, atividades e média.
-- Abas: Dashboard, CRT-SP, Prova real CRT-SP, Certificações, Programação, Dados, Estudos e Histórico.
+- Abas: Dashboard, CRT-SP, Prova real CRT-SP, Certificações, Programação, Dados, Academia de Dados, Estudos e Histórico.
 - Botão “Trocar usuário” disponível no topo.
 - Botão “Zerar meus dados locais”.
 - Recomendações personalizadas com base em erros, brancos e trilhas estudadas.
@@ -162,7 +162,7 @@ Além disso, o repositório mantém a rotação agendada em GitHub Actions para 
 Arquivos:
 
 - `simulados.js`: banco CRT-SP e concursos existentes.
-- `questions-bank.js`: banco inicial de DP-600, Programação e Dados.
+- `questions-bank.js`: banco inicial de DP-600, Programação, Dados e Academia de Dados.
 
 Quantidade inicial usada pela plataforma:
 
@@ -170,6 +170,53 @@ Quantidade inicial usada pela plataforma:
 - DP-600: 60 questões.
 - Programação: 80 questões.
 - Dados: 80 questões.
+- Academia de Dados: 220 questões geradas por templates autorais, distribuídas entre fundamentos, SQL, Python/Pandas, Power BI/DAX, modelagem, engenharia, Fabric/DP-600 e analytics.
+
+## Academia de Dados
+
+A aba Academia de Dados é uma área prática para preparação de estágio/júnior em dados. Ela não é só um quiz: combina treinos, desafios, perguntas de raciocínio, análise de código, correção de erro, estudos de caso e projetos.
+
+Trilhas:
+
+- Fundamentos de Dados.
+- SQL para Análise.
+- Python/Pandas.
+- Power BI e DAX.
+- Modelagem de Dados.
+- ETL, ELT e Engenharia de Dados.
+- Microsoft Fabric e DP-600.
+- Analytics e Negócio.
+- Desafios de Portfólio.
+- Revisão Inteligente.
+
+Modos:
+
+- Treino rápido: 10 questões mistas.
+- Treino por trilha: 10, 20 ou 40 questões.
+- Desafio prático: estudos de caso e questões abertas.
+- Modo entrevista: explicação de conceitos, código e decisões.
+- Modo erro: prioriza assuntos com mais erro no histórico.
+- Modo portfólio: sugere atividade prática e como explicar no GitHub/LinkedIn.
+
+O mini-dashboard mostra:
+
+- trilha mais estudada;
+- melhor trilha;
+- trilha com mais erros;
+- total respondido;
+- taxa de acerto;
+- último treino;
+- recomendação do próximo treino;
+- progresso por trilha.
+
+Projetos sugeridos:
+
+- Dashboard de chamados de TI.
+- Análise de ordens de serviço.
+- Inventário de máquinas.
+- Análise de derrotas do Santos.
+- Análise de estoque.
+- Dashboard de estudos.
 
 Para adicionar novas questões em `questions-bank.js`, use campos como:
 
