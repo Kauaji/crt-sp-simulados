@@ -1362,6 +1362,39 @@ footer {
   font-weight: 900;
 }
 
+.role-card {
+  align-content: start;
+}
+
+.comparison-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.comparison-table {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: collapse;
+  overflow: hidden;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.comparison-table th,
+.comparison-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(18, 55, 42, 0.12);
+  text-align: left;
+  vertical-align: top;
+}
+
+.comparison-table th {
+  color: var(--forest);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 @media (max-width: 760px) {
   .panel {
     width: min(100% - 20px, var(--max));

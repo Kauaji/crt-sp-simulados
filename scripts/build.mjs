@@ -10,6 +10,7 @@ const staticFiles = [
   "styles.css",
   "simulados.js",
   "questions-bank.js",
+  "santos-ibam-bank.js",
   "app.js",
 ];
 

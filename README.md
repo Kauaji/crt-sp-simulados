@@ -1,4 +1,4 @@
-# Plataforma de Estudos — CRT-SP, DP-600, Programação e Dados
+# Plataforma de Estudos — CRT-SP, Santos IBAM, DP-600, Programação e Dados
 
 Site estático em HTML, CSS e JavaScript puro publicado no Vercel:
 
@@ -6,7 +6,7 @@ Site estático em HTML, CSS e JavaScript puro publicado no Vercel:
 https://crt-sp-simulados.vercel.app
 ```
 
-O foco principal continua sendo o concurso CRT-SP 2026 para Técnico Administrativo, com simulados Certo/Errado no estilo Quadrix. A plataforma também mantém o banco multi-concurso existente e adiciona trilhas de certificações, programação e dados com gamificação local.
+O foco principal continua sendo o concurso CRT-SP 2026 para Técnico Administrativo, com simulados Certo/Errado no estilo Quadrix. A plataforma também mantém o banco multi-concurso existente e adiciona trilhas de certificações, programação, dados, Academia de Dados e Concursos Santos — IBAM com gamificação local.
 
 ## Funcionalidades
 
@@ -14,7 +14,7 @@ O foco principal continua sendo o concurso CRT-SP 2026 para Técnico Administrat
 - Dados separados por usuário via `localStorage`.
 - Dashboard com foguinho, maior streak, pontos, acessos, média, taxa de acerto e últimas tentativas.
 - Ranking Kauã x Vitória por pontos, acessos, foguinho, atividades e média.
-- Abas: Dashboard, CRT-SP, Prova real CRT-SP, Certificações, Programação, Dados, Academia de Dados, Estudos e Histórico.
+- Abas: Dashboard, CRT-SP, Prova real CRT-SP, Certificações, Programação, Dados, Academia de Dados, Concursos Santos — IBAM, Estudos e Histórico.
 - Botão “Trocar usuário” disponível no topo.
 - Botão “Zerar meus dados locais”.
 - Recomendações personalizadas com base em erros, brancos e trilhas estudadas.
@@ -163,6 +163,7 @@ Arquivos:
 
 - `simulados.js`: banco CRT-SP e concursos existentes.
 - `questions-bank.js`: banco inicial de DP-600, Programação, Dados e Academia de Dados.
+- `santos-ibam-bank.js`: banco e metadados dos concursos Santos — IBAM.
 
 Quantidade inicial usada pela plataforma:
 
@@ -171,6 +172,7 @@ Quantidade inicial usada pela plataforma:
 - Programação: 80 questões.
 - Dados: 80 questões.
 - Academia de Dados: 220 questões geradas por templates autorais, distribuídas entre fundamentos, SQL, Python/Pandas, Power BI/DAX, modelagem, engenharia, Fabric/DP-600 e analytics.
+- Santos IBAM: 80 questões para Agente de Portaria, 80 para Inspetor de Alunos e 100 objetivas + 10 propostas de redação para Oficial de Administração.
 
 ## Academia de Dados
 
@@ -217,6 +219,81 @@ Projetos sugeridos:
 - Análise de derrotas do Santos.
 - Análise de estoque.
 - Dashboard de estudos.
+
+## Concursos Santos — IBAM
+
+A aba **Concursos Santos — IBAM** cobre três cargos da Prefeitura de Santos:
+
+- **Agente de Portaria** — Edital nº 73/2026 — SEPLA-RH — código 601.
+- **Inspetor de Alunos** — Edital nº 73/2026 — SEPLA-RH — código 606.
+- **Oficial de Administração** — Edital nº 71/2026 — SEPLA-RH — código 1101.
+
+Links oficiais usados para consulta:
+
+- Edital 73/2026: https://www.ibamsp-concursos.org.br/informacoes/178/
+- Edital 71/2026: https://www.ibamsp-concursos.org.br/informacoes/176/
+
+### Diferença entre CRT-SP/Quadrix e Santos/IBAM
+
+- CRT-SP/Quadrix: itens **Certo/Errado**, pontuação líquida `+1 / -1 / 0`.
+- Santos/IBAM: questões de **múltipla escolha**, 4 alternativas, apenas uma correta.
+- Santos/IBAM usa **pontuação ponderada por peso** conforme o edital do cargo.
+
+Exemplo: se uma questão de Conhecimentos Específicos de Agente de Portaria tem peso 5, um acerto soma 5 pontos; erro ou branco soma 0. O relatório final mostra acertos, erros, brancos, pontuação ponderada, percentual ponderado, desempenho por disciplina e assuntos para revisar.
+
+### Distribuição IBAM
+
+Os três cargos têm 40 questões objetivas:
+
+- Língua Portuguesa: 10 questões.
+- Matemática: 6 questões.
+- Legislação Municipal e Serviço Público: 8 questões.
+- Informática e Rotinas: 6 questões.
+- Conhecimentos Específicos: 10 questões.
+
+Os pesos mudam por cargo:
+
+- Agente de Portaria: Português 1, Matemática 1, Legislação 2, Informática/Rotinas 3, Específicos 5.
+- Inspetor de Alunos: Português 1, Matemática 1, Legislação/Atendimento Escolar 4, Informática/Rotinas 2, Específicos 4.
+- Oficial de Administração: Português 2, Matemática 2, Legislação 2, Informática/Rotinas 2, Específicos 4.
+
+### Redação administrativa do Oficial
+
+O cargo de Oficial de Administração possui módulo de redação administrativa. O sistema gera propostas autorais com textarea para treino e mostra um modelo de resposta após finalizar.
+
+Critérios exibidos no gabarito: atendimento ao tema, clareza, objetividade, impessoalidade, formalidade, estrutura, correção gramatical, adequação administrativa, sigilo e proteção de dados.
+
+### Como adicionar novas questões IBAM
+
+As questões de Santos ficam em `santos-ibam-bank.js`. Para adicionar uma questão manual, use o mesmo padrão do banco:
+
+```js
+{
+  id: "IBAM-AGP-081",
+  area: "concursos-santos-ibam",
+  concurso: "Prefeitura de Santos",
+  concurso_id: "santos-ibam",
+  banca: "IBAM",
+  edital: "73/2026",
+  cargo: "Agente de Portaria",
+  cargo_id: "santos-agente-portaria",
+  bloco: "Conhecimentos Específicos",
+  disciplina: "Conhecimentos Específicos",
+  assunto: "Controle de acesso",
+  tipo: "multipleChoice",
+  dificuldade: "medio",
+  peso: 5,
+  enunciado: "...",
+  alternativas: ["correta", "distrator", "distrator", "distrator"],
+  gabarito: 0,
+  comentario: "...",
+  fonte: "Questão autoral baseada no Edital nº 73/2026 — SEPLA-RH.",
+  link: "https://www.ibamsp-concursos.org.br/informacoes/178/",
+  tags: ["ibam", "santos", "agente-portaria"]
+}
+```
+
+Não copie questões reais protegidas. Use editais, legislação oficial e provas antigas apenas como inspiração de estilo.
 
 Para adicionar novas questões em `questions-bank.js`, use campos como:
 

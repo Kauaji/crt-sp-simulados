@@ -3,6 +3,7 @@
 (function initStudyPlatform() {
   const DATA = window.STUDY_DATA || { questoes: [], sources: {} };
   const EXTRA_BANK = window.QUESTION_BANK || [];
+  const SANTOS_IBAM_CONFIG = window.SANTOS_IBAM_CONFIG || { roles: [], officialLinks: {} };
   const STORE_KEY = "crtsp-gamified-study-v1";
   const TIMEZONE = "America/Sao_Paulo";
   const BLANK = "__blank__";
@@ -21,11 +22,12 @@
     ["programacao", "Programação"],
     ["dados", "Dados"],
     ["academia-dados", "Academia de Dados"],
+    ["santos-ibam", "Concursos Santos — IBAM"],
     ["estudos", "Estudos"],
     ["historico", "Histórico"],
   ];
 
-  const OPEN_TYPES = new Set(["explainCode", "explainConcept", "sqlQuery", "daxMeasure", "completeCode", "orderSteps", "caseStudy", "businessQuestion"]);
+  const OPEN_TYPES = new Set(["explainCode", "explainConcept", "sqlQuery", "daxMeasure", "completeCode", "orderSteps", "caseStudy", "businessQuestion", "administrativeWriting"]);
   const DIFFICULTY_POINTS = { facil: 1, medio: 2, dificil: 3 };
   const CRT_ROLE_ID = "crt-tecnico-administrativo-bs";
 
@@ -42,6 +44,9 @@
     academyMode: "rapido",
     academyQuantity: 10,
     academyAttempt: 0,
+    santosCargo: "santos-agente-portaria",
+    santosQuantity: 20,
+    santosAttempt: 0,
     activeQuiz: null,
   };
 
@@ -250,6 +255,8 @@
       questionariosProgramacaoFinalizados: 0,
       questionariosDadosFinalizados: 0,
       questionariosAcademiaDadosFinalizados: 0,
+      questionariosSantosIbamFinalizados: 0,
+      melhorPontuacaoPonderadaSantos: null,
       melhorPontuacaoLiquidaGeral: null,
       ultimaPontuacaoLiquida: 0,
       mediaPontuacao: 0,
@@ -344,6 +351,26 @@
     return EXTRA_BANK.filter((question) => question.area === area);
   }
 
+  function santosRoles() {
+    return SANTOS_IBAM_CONFIG.roles || [];
+  }
+
+  function getSantosRole(roleId = state.santosCargo) {
+    return santosRoles().find((role) => role.id === roleId) || santosRoles()[0];
+  }
+
+  function santosPool(roleId = state.santosCargo, { includeWriting = false } = {}) {
+    return poolByArea("concursos-santos-ibam")
+      .filter((question) => (
+        question.cargo_id === roleId
+        && (includeWriting || question.tipo === "multipleChoice")
+      ));
+  }
+
+  function santosObjectiveMaxScore(role) {
+    return (role?.distribution || []).reduce((sum, item) => sum + item.count * item.peso, 0);
+  }
+
   function getRecentIds(scopeKey) {
     const stats = loadUserStats();
     return stats.recentQuestionIds?.[scopeKey] || [];
@@ -389,6 +416,12 @@
     if (result.area === "programacao") stats.questionariosProgramacaoFinalizados += 1;
     if (result.area === "dados") stats.questionariosDadosFinalizados += 1;
     if (result.area === "academia-dados") stats.questionariosAcademiaDadosFinalizados = (stats.questionariosAcademiaDadosFinalizados || 0) + 1;
+    if (result.area === "concursos-santos-ibam") {
+      stats.questionariosSantosIbamFinalizados = (stats.questionariosSantosIbamFinalizados || 0) + 1;
+      stats.melhorPontuacaoPonderadaSantos = stats.melhorPontuacaoPonderadaSantos === null || stats.melhorPontuacaoPonderadaSantos === undefined
+        ? result.score
+        : Math.max(stats.melhorPontuacaoPonderadaSantos, result.score);
+    }
 
     stats.trilhasEstudadas[result.trilha] = (stats.trilhasEstudadas[result.trilha] || 0) + 1;
 
@@ -417,6 +450,7 @@
       brancos: result.blank,
       parciais: result.partial || 0,
       pontuacao: result.score,
+      pontuacaoMaxima: result.maxScore || result.total,
       percentual: result.percent,
       pontosGanhos: result.gamifiedPoints,
       dificuldade: result.difficulty || state.difficulty,
@@ -456,9 +490,9 @@
     $("#top-user-name").textContent = user ? `${user.nome} · 🔥 ${stats.streakAtual}` : "";
     $("#change-contest").hidden = true;
     $("#hero-eyebrow").textContent = "Plataforma gamificada";
-    $("#hero-title").textContent = "CRT-SP, DP-600, Programação e Dados";
-    $("#hero-copy").textContent = "Estude com simulados rotativos, histórico por usuário, foguinho, ranking e recomendações personalizadas. Tudo salvo localmente neste navegador.";
-    $("#hero-notice").textContent = `Hoje: ${getTodayKey()} (${TIMEZONE}). O simulado diário do CRT-SP permanece igual durante o dia e muda automaticamente amanhã.`;
+    $("#hero-title").textContent = "CRT-SP, Santos IBAM, DP-600, Programação e Dados";
+    $("#hero-copy").textContent = "Estude com simulados rotativos, histórico por usuário, foguinho, ranking, pontuação por banca e recomendações personalizadas. Tudo salvo localmente neste navegador.";
+    $("#hero-notice").textContent = `Hoje: ${getTodayKey()} (${TIMEZONE}). O CRT-SP mantém Certo/Errado Quadrix; Santos IBAM usa múltipla escolha ponderada por pesos.`;
     $("#active-contest-card").innerHTML = `
       <h2>Foco principal</h2>
       <p>CRT-SP 2026 — Técnico Administrativo</p>
@@ -488,7 +522,7 @@
   function renderRanking() {
     const rows = USERS.map((user) => {
       const stats = loadUserStats(user.id);
-      const activities = stats.simuladosCrtFinalizados + stats.provasReaisCrtFinalizadas + stats.questionariosCertificacaoFinalizados + stats.questionariosProgramacaoFinalizados + stats.questionariosDadosFinalizados + (stats.questionariosAcademiaDadosFinalizados || 0);
+      const activities = stats.simuladosCrtFinalizados + stats.provasReaisCrtFinalizadas + stats.questionariosCertificacaoFinalizados + stats.questionariosProgramacaoFinalizados + stats.questionariosDadosFinalizados + (stats.questionariosAcademiaDadosFinalizados || 0) + (stats.questionariosSantosIbamFinalizados || 0);
       return { user, stats, activities };
     });
     const score = (row) => (row.stats.pontosTotais || 0) + (row.stats.maiorStreak || 0) * 5 + row.activities * 3 + (row.stats.mediaPontuacao || 0);
@@ -518,10 +552,25 @@
     `;
   }
 
+  function getSantosWeakSubject(stats = loadUserStats()) {
+    const ibamSubjects = new Set(poolByArea("concursos-santos-ibam").map((question) => question.disciplina));
+    const combined = {};
+    for (const [subject, count] of Object.entries(stats.materiasComMaisErro || {})) {
+      if (ibamSubjects.has(subject)) combined[subject] = (combined[subject] || 0) + count;
+    }
+    for (const [subject, count] of Object.entries(stats.materiasComMaisBranco || {})) {
+      if (ibamSubjects.has(subject)) combined[subject] = (combined[subject] || 0) + count;
+    }
+    return getTopKey(combined);
+  }
+
   function renderDashboard() {
     const stats = loadUserStats();
     const accuracy = stats.totalQuestoesRespondidas ? Math.round((stats.totalAcertos / stats.totalQuestoesRespondidas) * 100) : 0;
     const recent = stats.historicoUltimosResultados || [];
+    const santosHistory = recent.filter((item) => item.area === "concursos-santos-ibam");
+    const bestSantos = [...santosHistory].sort((a, b) => (b.percentual || 0) - (a.percentual || 0))[0];
+    const worstSantosSubject = getSantosWeakSubject(stats);
 
     $("#dashboard").innerHTML = "";
     $("#tab-content").innerHTML = `
@@ -541,6 +590,10 @@
           ${metricCard("Programação", stats.questionariosProgramacaoFinalizados, "questionários finalizados")}
           ${metricCard("Dados", stats.questionariosDadosFinalizados, "questionários finalizados")}
           ${metricCard("Academia de Dados", stats.questionariosAcademiaDadosFinalizados || 0, "treinos práticos")}
+          ${metricCard("Santos IBAM", stats.questionariosSantosIbamFinalizados || 0, "simulados finalizados")}
+          ${metricCard("Melhor cargo IBAM", bestSantos?.trilha || "—", bestSantos ? `${bestSantos.percentual}%` : "sem histórico")}
+          ${metricCard("Pior disciplina IBAM", worstSantosSubject, "por erros/brancos")}
+          ${metricCard("Melhor ponderada IBAM", stats.melhorPontuacaoPonderadaSantos ?? "—", "pontuação por pesos")}
           ${metricCard("Melhor pontuação", stats.melhorPontuacaoLiquidaGeral ?? "—", `última: ${stats.ultimaPontuacaoLiquida}`)}
           ${metricCard("Média geral", stats.mediaPontuacao, "últimos resultados")}
           ${metricCard("Trilha mais estudada", getTopKey(stats.trilhasEstudadas), "por atividades")}
@@ -941,6 +994,257 @@
     `;
   }
 
+  function renderSantosIbamTab() {
+    const roles = santosRoles();
+    const selectedRole = getSantosRole();
+    const recommendation = getSantosRecommendation();
+    $("#tab-content").innerHTML = `
+      <section class="panel">
+        <div class="section-heading">
+          <p class="eyebrow">Concursos Santos — IBAM</p>
+          <h2>Prefeitura de Santos: Agente, Inspetor e Oficial</h2>
+        </div>
+        <p>Área baseada nas páginas oficiais do IBAM para os editais 73/2026 e 71/2026. As questões são autorais, inéditas e em múltipla escolha com 4 alternativas.</p>
+        <div class="dashboard-grid">
+          ${metricCard("Inscrições", "22/07 a 20/08/2026", "boletos até 21/08/2026")}
+          ${metricCard("Banca", "IBAM", "múltipla escolha")}
+          ${metricCard("Pontuação", "por peso", "sem regra Quadrix")}
+          ${metricCard("Recomendação", recommendation.title, recommendation.detail)}
+        </div>
+        <div class="form-grid">
+          <label class="field">
+            <span>Cargo para questões</span>
+            <select data-santos-cargo>
+              ${roles.map((role) => `<option value="${escapeHtml(role.id)}" ${state.santosCargo === role.id ? "selected" : ""}>${escapeHtml(role.cargo)}</option>`).join("")}
+            </select>
+          </label>
+          ${difficultySelect()}
+          <label class="field">
+            <span>Quantidade por cargo</span>
+            <select data-santos-quantity>
+              ${[10, 20, 40].map((value) => `<option value="${value}" ${Number(state.santosQuantity) === value ? "selected" : ""}>${value} questões</option>`).join("")}
+            </select>
+          </label>
+        </div>
+      </section>
+      <section class="panel">
+        <div class="section-heading">
+          <p class="eyebrow">Visão geral</p>
+          <h2>Cards dos cargos</h2>
+        </div>
+        <div class="study-grid">
+          ${roles.map(renderSantosRoleCard).join("")}
+        </div>
+      </section>
+      <section class="panel">
+        <div class="section-heading">
+          <p class="eyebrow">Comparativo</p>
+          <h2>Qual cargo vale mais a pena?</h2>
+        </div>
+        <div class="comparison-wrap">
+          <table class="comparison-table">
+            <thead><tr><th>Cargo</th><th>Vagas</th><th>Remuneração</th><th>Prova</th><th>Dificuldade estimada</th><th>Aderência ao Kauã</th></tr></thead>
+            <tbody>
+              ${roles.map((role) => `
+                <tr>
+                  <td>${escapeHtml(role.cargo)}</td>
+                  <td>${escapeHtml(role.vagas)}</td>
+                  <td>${escapeHtml(role.remuneracao)}</td>
+                  <td>${escapeHtml(role.prova)}</td>
+                  <td>${role.id === "santos-oficial-administracao" ? "Média/alta" : "Média"}</td>
+                  <td>${role.id === "santos-oficial-administracao" ? "Alta para rotina administrativa e redação" : role.id === "santos-inspetor-alunos" ? "Boa se curtir ambiente escolar" : "Boa para atendimento e controle"}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+        <p class="notice">Estratégia: Oficial tem melhor remuneração e mais vagas, mas cobra redação; Agente e Inspetor têm ensino fundamental e pesos fortes em específicos.</p>
+      </section>
+      <section class="panel">
+        <div class="section-heading">
+          <p class="eyebrow">Questões por cargo</p>
+          <h2>${escapeHtml(selectedRole?.cargo || "Selecione um cargo")}</h2>
+        </div>
+        <div class="action-row">
+          <button class="primary-button" type="button" data-santos-action="custom" data-santos-role="${escapeHtml(selectedRole?.id || "")}">Gerar questionário ${Number(state.santosQuantity) || 20} questões</button>
+          <button class="secondary-button" type="button" data-santos-action="full" data-santos-role="${escapeHtml(selectedRole?.id || "")}">Simulado completo</button>
+          <button class="secondary-button" type="button" data-santos-action="real" data-santos-role="${escapeHtml(selectedRole?.id || "")}">Prova real</button>
+        </div>
+      </section>
+      <section class="panel">
+        <div class="section-heading">
+          <p class="eyebrow">Estudos Santos IBAM</p>
+          <h2>Links e temas prioritários</h2>
+        </div>
+        <div class="study-grid">
+          ${studyCard("Português IBAM", ["Interpretação, finalidade e inferência.", "Reescrita com preservação de sentido.", "Pontuação, concordância e linguagem formal."], [["Manual de Redação", "https://www4.planalto.gov.br/centrodeestudos/assuntos/manual-de-redacao-da-presidencia-da-republica/manual-de-redacao.pdf"]])}
+          ${studyCard("Legislação e serviço público", ["Lei Orgânica e Estatuto municipal de Santos.", "Lei 13.460/2017, LAI, LGPD e Governo Digital.", "Atendimento prioritário, acessibilidade e ética."], [["Edital 73/2026", SANTOS_IBAM_CONFIG.officialLinks?.edital73], ["Edital 71/2026", SANTOS_IBAM_CONFIG.officialLinks?.edital71], ["LAI", SANTOS_IBAM_CONFIG.officialLinks?.lai], ["LGPD", SANTOS_IBAM_CONFIG.officialLinks?.lgpd]])}
+          ${studyCard("Estratégia por pesos", ["Agente: específicos, informática/rotinas e legislação/atendimento.", "Inspetor: específicos, legislação/atendimento escolar, ECA e segurança.", "Oficial: específicos, Português, redação administrativa, protocolo e arquivo."], [])}
+          ${studyCard("Videoaulas gratuitas", ["Busque aulas gratuitas de Português IBAM, Matemática básica, informática para concursos e redação oficial.", "Use os simulados daqui para descobrir o tema do vídeo do dia.", "Priorize lei seca e exercícios, não maratona passiva."], [["YouTube — Português IBAM", "https://www.youtube.com/results?search_query=portugu%C3%AAs+ibam+concursos"], ["YouTube — Informática concursos", "https://www.youtube.com/results?search_query=inform%C3%A1tica+para+concursos"]])}
+        </div>
+      </section>
+    `;
+  }
+
+  function renderSantosRoleCard(role) {
+    const totalQuestions = santosPool(role.id, { includeWriting: true }).length;
+    return `
+      <article class="study-card role-card">
+        <p class="eyebrow">${escapeHtml(role.editalCompleto)}</p>
+        <h3>${escapeHtml(role.cargo)}</h3>
+        <ul>
+          <li><strong>Código:</strong> ${escapeHtml(role.codigo)}</li>
+          <li><strong>Escolaridade:</strong> ${escapeHtml(role.escolaridade)}</li>
+          <li><strong>Remuneração:</strong> ${escapeHtml(role.remuneracao)}</li>
+          <li><strong>Carga horária:</strong> ${escapeHtml(role.cargaHoraria)}</li>
+          <li><strong>Vagas:</strong> ${escapeHtml(role.vagas)}</li>
+          <li><strong>Inscrição:</strong> ${escapeHtml(role.inscricao)} · ${escapeHtml(role.taxa)}</li>
+          <li><strong>Prova:</strong> ${escapeHtml(role.prova)} · ${escapeHtml(role.tipoProva)}</li>
+          <li><strong>Banco local:</strong> ${totalQuestions} questões/propostas</li>
+        </ul>
+        <div class="action-row">
+          <button class="primary-button" type="button" data-santos-action="study" data-santos-role="${escapeHtml(role.id)}">Estudar</button>
+          <button class="secondary-button" type="button" data-santos-action="quick" data-santos-role="${escapeHtml(role.id)}">Simulado rápido</button>
+          <button class="secondary-button" type="button" data-santos-action="real" data-santos-role="${escapeHtml(role.id)}">Prova real</button>
+          <button class="secondary-button" type="button" data-santos-action="summary" data-santos-role="${escapeHtml(role.id)}">Resumo do edital</button>
+          ${role.hasEssay ? `<button class="secondary-button" type="button" data-santos-action="writing" data-santos-role="${escapeHtml(role.id)}">Redação</button>` : ""}
+        </div>
+        <div class="link-list"><a href="${escapeHtml(role.officialUrl)}" target="_blank" rel="noreferrer">Página oficial IBAM</a></div>
+      </article>
+    `;
+  }
+
+  function renderSantosRoleSummary(roleId) {
+    const role = getSantosRole(roleId);
+    $("#tab-content").innerHTML = `
+      <section class="panel">
+        <div class="section-heading">
+          <p class="eyebrow">Resumo do edital</p>
+          <h2>${escapeHtml(role.cargo)} — ${escapeHtml(role.editalCompleto)}</h2>
+        </div>
+        <div class="dashboard-grid">
+          ${metricCard("Requisito", role.escolaridade, role.codigo)}
+          ${metricCard("Remuneração", role.remuneracao, role.cargaHoraria)}
+          ${metricCard("Vagas", role.vagas, `inscrição ${role.inscricao}`)}
+          ${metricCard("Prova", role.prova, role.tipoProva)}
+        </div>
+        <h3>Distribuição e pesos</h3>
+        <div class="comparison-wrap">
+          <table class="comparison-table">
+            <thead><tr><th>Disciplina</th><th>Questões</th><th>Peso</th><th>Pontos</th></tr></thead>
+            <tbody>${role.distribution.map((item) => `<tr><td>${escapeHtml(item.disciplina)}</td><td>${item.count}</td><td>${item.peso}</td><td>${item.count * item.peso}</td></tr>`).join("")}</tbody>
+          </table>
+        </div>
+        <h3>Atribuições e pontos críticos</h3>
+        <p>${escapeHtml(role.summary)}</p>
+        <ul class="check-list">${role.critical.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+        <h3>Conteúdo prioritário</h3>
+        <div class="tag-cloud">${role.priorities.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>
+        <div class="action-row">
+          <button class="primary-button" type="button" data-santos-action="quick" data-santos-role="${escapeHtml(role.id)}">Simulado rápido</button>
+          <button class="secondary-button" type="button" data-santos-action="full" data-santos-role="${escapeHtml(role.id)}">Simulado completo</button>
+          <button class="secondary-button" type="button" data-tab="santos-ibam">Voltar</button>
+        </div>
+      </section>
+    `;
+  }
+
+  function getSantosRecommendation() {
+    const stats = loadUserStats();
+    const weak = getSantosWeakSubject(stats);
+    if (weak.includes("Matemática")) return { title: "Treinar Matemática", detail: "porcentagem, regra de três e tabelas" };
+    if (weak.includes("Portugues") || weak.includes("Português")) return { title: "Treinar Português", detail: "interpretação e reescrita" };
+    if (weak.includes("Informática")) return { title: "Treinar Informática", detail: "planilhas, e-mail e segurança" };
+    if (weak.includes("Específicos")) return { title: "Treinar específicos", detail: "rotina do cargo escolhido" };
+    return { title: "Começar pelo peso", detail: "específicos + legislação/rotinas" };
+  }
+
+  function santosDistributionFor(role, count) {
+    if (count === 40) return role.distribution;
+    if (count === 20) {
+      return role.distribution.map((item) => ({ ...item, count: item.disciplina === "Matemática" || item.disciplina === "Informática e Rotinas" ? 3 : item.disciplina === "Conhecimentos Específicos" ? 5 : item.disciplina === "Legislação Municipal e Serviço Público" ? 4 : 5 }));
+    }
+    return [
+      { ...role.distribution[0], count: 2 },
+      { ...role.distribution[1], count: 2 },
+      { ...role.distribution[2], count: 2 },
+      { ...role.distribution[3], count: 1 },
+      { ...role.distribution[4], count: 3 },
+    ];
+  }
+
+  function selectSantosByDistribution(role, count, mode) {
+    const selected = [];
+    const avoidIds = getRecentIds(`santos-${role.id}-${mode}`);
+    for (const item of santosDistributionFor(role, count)) {
+      const pool = santosPool(role.id).filter((question) => question.disciplina === item.disciplina && !selected.some((picked) => picked.id === question.id));
+      selected.push(...selectRotatingQuestions({
+        pool,
+        count: item.count,
+        difficulty: state.difficulty,
+        seedKey: `${getTodayKey()}-${state.currentUserId}-${role.id}-${mode}-${state.difficulty}-${state.santosAttempt}-${item.disciplina}`,
+        avoidIds,
+      }));
+    }
+    return selected.slice(0, count);
+  }
+
+  function startSantosQuiz(roleId, mode = "quick") {
+    const role = getSantosRole(roleId);
+    state.santosCargo = role.id;
+    state.santosAttempt += 1;
+    const count = mode === "quick" ? 20 : mode === "custom" ? Number(state.santosQuantity) || 20 : 40;
+    let questions = selectSantosByDistribution(role, count, mode);
+    const titleMode = mode === "real" ? "Prova real" : mode === "full" ? "Simulado completo" : mode === "custom" ? `Questionário ${count} questões` : "Simulado rápido";
+    if (mode === "real" && role.hasEssay) {
+      const writingPool = santosPool(role.id, { includeWriting: true }).filter((question) => question.tipo === "administrativeWriting");
+      questions = [...questions, ...selectRotatingQuestions({
+        pool: writingPool,
+        count: 1,
+        difficulty: state.difficulty,
+        seedKey: `${getTodayKey()}-${state.currentUserId}-${role.id}-redacao-${state.santosAttempt}`,
+        avoidIds: getRecentIds(`santos-${role.id}-redacao`),
+      })];
+    }
+    startQuiz({
+      title: `${titleMode} Santos IBAM — ${role.cargo}`,
+      kind: `santos-${mode}`,
+      area: "concursos-santos-ibam",
+      trilha: role.cargo,
+      scopeKey: `santos-${role.id}-${mode}`,
+      scoring: "weighted",
+      durationMinutes: mode === "real" ? role.durationMinutes : undefined,
+      difficulty: state.difficulty,
+      observation: `Pontuação ponderada por pesos do ${role.editalCompleto}.`,
+      questions,
+    });
+  }
+
+  function startSantosWriting(roleId) {
+    const role = getSantosRole(roleId);
+    state.santosCargo = role.id;
+    state.santosAttempt += 1;
+    const pool = santosPool(role.id, { includeWriting: true }).filter((question) => question.tipo === "administrativeWriting");
+    startQuiz({
+      title: `Redação administrativa Santos IBAM — ${role.cargo}`,
+      kind: "santos-redacao",
+      area: "concursos-santos-ibam",
+      trilha: role.cargo,
+      scopeKey: `santos-${role.id}-redacao`,
+      scoring: "weighted",
+      durationMinutes: 60,
+      difficulty: state.difficulty,
+      observation: "Autoavaliação por critérios de redação técnico-administrativa.",
+      questions: selectRotatingQuestions({
+        pool,
+        count: 1,
+        difficulty: state.difficulty,
+        seedKey: `${getTodayKey()}-${state.currentUserId}-${role.id}-redacao-${state.santosAttempt}`,
+        avoidIds: getRecentIds(`santos-${role.id}-redacao`),
+      }),
+    });
+  }
+
   function getPersonalizedRecommendations() {
     const stats = loadUserStats();
     if (!stats.historicoUltimosResultados?.length) {
@@ -971,6 +1275,7 @@
           ${studyCard("Programação", ["1. lógica", "2. Python", "3. SQL", "4. Git", "5. HTML/CSS", "6. JavaScript", "7. Java", "8. projetos práticos"], [["MDN", "https://developer.mozilla.org/pt-BR/"], ["Python", "https://docs.python.org/pt-br/3/"]])}
           ${studyCard("Dados", ["SQL forte", "Python/Pandas", "Power BI", "Modelagem", "ETL/ELT", "Fabric", "Portfólio: chamados de TI, ordens de serviço, estoque e atendimento"], [["Power BI Learn", "https://learn.microsoft.com/pt-br/power-bi/"], ["Pandas", "https://pandas.pydata.org/docs/"]])}
           ${studyCard("Trilha recomendada para Dados", ["1. SQL forte", "2. Python/Pandas", "3. Power BI", "4. Modelagem dimensional", "5. Estatística básica", "6. ETL/ELT", "7. Microsoft Fabric", "8. Projetos de portfólio", "9. Preparação para entrevistas"], [["Microsoft Fabric", "https://learn.microsoft.com/en-us/fabric/"], ["PostgreSQL", "https://www.postgresql.org/docs/"], ["Kaggle", "https://www.kaggle.com/"], ["dados.gov.br", "https://dados.gov.br/"]])}
+          ${studyCard("Concursos Santos — IBAM", ["Edital 73/2026: Agente de Portaria e Inspetor de Alunos.", "Edital 71/2026: Oficial de Administração, objetiva + redação.", "Diferença central: IBAM usa múltipla escolha e pontuação por peso; CRT-SP/Quadrix usa Certo/Errado com pontuação líquida.", "Plano para mais de um cargo: Português, Matemática, Informática e Legislação primeiro; depois específicos por cargo.", "Estratégia: resolver questões curtas todos os dias e revisar os assuntos com erro ou branco."], [["Edital 73/2026 — IBAM", SANTOS_IBAM_CONFIG.officialLinks?.edital73], ["Edital 71/2026 — IBAM", SANTOS_IBAM_CONFIG.officialLinks?.edital71], ["Lei 13.460/2017", SANTOS_IBAM_CONFIG.officialLinks?.usuario], ["Lei 14.133/2021", SANTOS_IBAM_CONFIG.officialLinks?.compras]])}
         </div>
       </section>
       <section class="panel">
@@ -1041,6 +1346,7 @@
       programacao: renderProgrammingTab,
       dados: renderDataTab,
       "academia-dados": renderDataAcademyTab,
+      "santos-ibam": renderSantosIbamTab,
       estudos: renderStudyTab,
       historico: renderHistory,
     };
@@ -1132,7 +1438,9 @@
         assunto: question.assunto,
         score: quiz.scoring === "quadrix"
           ? (evaluation.correct ? 1 : evaluation.wrong ? -1 : 0)
-          : (evaluation.correct ? DIFFICULTY_POINTS[question.dificuldade] || 1 : evaluation.partial ? 0.5 : 0),
+          : quiz.scoring === "weighted"
+            ? (evaluation.correct ? Number(question.peso || 1) : evaluation.partial ? Number(question.peso || 1) / 2 : 0)
+            : (evaluation.correct ? DIFFICULTY_POINTS[question.dificuldade] || 1 : evaluation.partial ? 0.5 : 0),
       };
     });
     const correct = items.filter((item) => item.correct).length;
@@ -1140,6 +1448,11 @@
     const blank = items.filter((item) => item.blank).length;
     const partial = items.filter((item) => item.partial).length;
     const score = items.reduce((sum, item) => sum + item.score, 0);
+    const maxScore = quiz.scoring === "quadrix"
+      ? quiz.questions.length
+      : quiz.scoring === "weighted"
+        ? quiz.questions.reduce((sum, question) => sum + Number(question.peso || 1), 0)
+        : quiz.questions.reduce((sum, question) => sum + (DIFFICULTY_POINTS[question.dificuldade] || 1), 0);
     const activityBonus = quiz.area === "academia-dados" && quiz.kind.includes("desafio")
       ? 10
       : quiz.area === "academia-dados" && quiz.kind.includes("entrevista")
@@ -1147,7 +1460,7 @@
         : 0;
     const gamifiedPoints = quiz.scoring === "quadrix"
       ? Math.max(0, correct * 2 + (quiz.kind === "crt-real" ? 20 : 0))
-      : score + activityBonus + Math.min(10, loadUserStats().streakAtual || 0);
+      : Math.round(score) + activityBonus + Math.min(10, loadUserStats().streakAtual || 0);
     return {
       title: quiz.title,
       kind: quiz.kind,
@@ -1160,7 +1473,8 @@
       blank,
       partial,
       score,
-      percent: quiz.questions.length ? Math.round((correct / quiz.questions.length) * 100) : 0,
+      maxScore,
+      percent: quiz.scoring === "weighted" ? (maxScore ? Math.round((score / maxScore) * 100) : 0) : (quiz.questions.length ? Math.round((correct / quiz.questions.length) * 100) : 0),
       gamifiedPoints,
       items,
     };
@@ -1253,11 +1567,11 @@
           <h2>${result.correct} acertos · ${result.wrong} erros · ${result.blank} brancos</h2>
         </div>
         <div class="dashboard-grid">
-          ${metricCard("Pontuação", result.score, quiz.scoring === "quadrix" ? "+1/-1/0" : "sem penalidade")}
+          ${metricCard("Pontuação", result.score, quiz.scoring === "quadrix" ? "+1/-1/0" : quiz.scoring === "weighted" ? `máx. ${result.maxScore}` : "sem penalidade")}
           ${metricCard("Percentual", `${result.percent}%`, "acertos sobre o total")}
           ${metricCard("Parciais", result.partial || 0, "autoavaliação")}
           ${metricCard("Pontos gamificados", result.gamifiedPoints, "salvos no dashboard")}
-          ${metricCard("Segurança", `${Math.max(0, Math.round((result.score / result.total) * 100))}%`, real ? status : "desempenho líquido")}
+          ${metricCard("Segurança", `${Math.max(0, Math.round((result.score / (result.maxScore || result.total)) * 100))}%`, real ? status : quiz.scoring === "weighted" ? "aproveitamento ponderado" : "desempenho líquido")}
         </div>
         ${real ? `
           <div class="real-status">
@@ -1524,6 +1838,16 @@
       if (target.dataset.academyAction === "start") startDataAcademyQuiz({ mode: "trilha", track });
       if (target.dataset.academyAction === "challenge") startDataAcademyQuiz({ mode: "desafio", track, challenge: true });
     }
+    if (target.dataset.santosAction) {
+      const roleId = target.dataset.santosRole || state.santosCargo;
+      state.santosCargo = roleId;
+      if (target.dataset.santosAction === "summary" || target.dataset.santosAction === "study") renderSantosRoleSummary(roleId);
+      if (target.dataset.santosAction === "quick") startSantosQuiz(roleId, "quick");
+      if (target.dataset.santosAction === "full") startSantosQuiz(roleId, "full");
+      if (target.dataset.santosAction === "real") startSantosQuiz(roleId, "real");
+      if (target.dataset.santosAction === "custom") startSantosQuiz(roleId, "custom");
+      if (target.dataset.santosAction === "writing") startSantosWriting(roleId);
+    }
     if (target.dataset.selfEval && state.activeQuiz) {
       state.activeQuiz.selfEvaluations[target.dataset.selfEval] = target.dataset.selfEvalValue;
       target.closest(".question-card")?.querySelectorAll(".self-eval-option").forEach((option) => option.classList.remove("selected"));
@@ -1545,6 +1869,14 @@
     if (target.matches("[data-data-track]")) state.dataTrack = target.value;
     if (target.matches("[data-academy-mode]")) state.academyMode = target.value;
     if (target.matches("[data-academy-quantity]")) state.academyQuantity = Number(target.value);
+    if (target.matches("[data-santos-cargo]")) {
+      state.santosCargo = target.value;
+      if (state.activeTab === "santos-ibam") renderSantosIbamTab();
+    }
+    if (target.matches("[data-santos-quantity]")) {
+      state.santosQuantity = Number(target.value);
+      if (state.activeTab === "santos-ibam") renderSantosIbamTab();
+    }
     if (target.matches("[data-answer]") && state.activeQuiz) {
       state.activeQuiz.answers[target.dataset.answer] = target.value;
       target.closest(".question-card")?.querySelectorAll(".answer-option").forEach((option) => option.classList.remove("selected"));
