@@ -18,8 +18,8 @@
 
   const TABS = [
     ["santos-ibam", "Concursos Santos — IBAM"],
-    ["certificacoes", "Certificações"],
     ["programacao", "Programação"],
+    ["certificacoes", "Certificações"],
     ["dados", "Dados"],
     ["academia-dados", "Academia de Dados"],
     ["estudos", "Estudos"],
@@ -28,7 +28,7 @@
 
   const MODE_TABS = {
     concursos: ["santos-ibam", "estudos", "historico"],
-    tech: ["certificacoes", "programacao", "dados", "academia-dados", "estudos", "historico"],
+    tech: ["programacao", "certificacoes", "dados", "academia-dados", "estudos", "historico"],
   };
 
   const OPEN_TYPES = new Set(["explainCode", "explainConcept", "sqlQuery", "daxMeasure", "completeCode", "orderSteps", "caseStudy", "businessQuestion", "administrativeWriting"]);
@@ -156,55 +156,67 @@
       id: "frontend",
       title: "Front-end Developer",
       level: "Iniciante",
-      description: "Interfaces responsivas, HTML semÃ¢ntico, CSS moderno, JavaScript e consumo de dados.",
-      sourceTracks: ["HTML", "CSS", "JavaScript", "Git/GitHub", "LÃ³gica"],
-      modules: ["HTML semÃ¢ntico", "CSS responsivo", "JavaScript DOM", "Git e deploy"],
-      project: "Landing page responsiva com interaÃ§Ã£o em JavaScript",
+      description: "Interfaces responsivas, HTML semântico, CSS moderno, JavaScript e consumo de dados.",
+      sourceTracks: ["HTML", "CSS", "JavaScript", "Git/GitHub", "Lógica"],
+      modules: ["HTML semântico", "CSS responsivo", "JavaScript DOM", "Git e deploy"],
+      project: "Landing page responsiva com interação em JavaScript",
+      image: "assets/careers/frontend.webp",
+      imageAlt: "Desenvolvedor criando uma interface responsiva em várias telas",
     },
     {
       id: "backend",
       title: "Back-end Developer",
       level: "Base forte",
-      description: "LÃ³gica, Python/Java, SQL, erros comuns, leitura de cÃ³digo e raciocÃ­nio de API.",
-      sourceTracks: ["Python", "Java", "SQL", "Git/GitHub", "LÃ³gica"],
-      modules: ["LÃ³gica aplicada", "Python ou Java", "SQL essencial", "Tratamento de erros"],
-      project: "API conceitual de chamados com regras de negÃ³cio",
+      description: "Lógica, Python/Java, SQL, erros comuns, leitura de código e raciocínio de API.",
+      sourceTracks: ["Python", "Java", "SQL", "Git/GitHub", "Lógica"],
+      modules: ["Lógica aplicada", "Python ou Java", "SQL essencial", "Tratamento de erros"],
+      project: "API conceitual de chamados com regras de negócio",
+      image: "assets/careers/backend.webp",
+      imageAlt: "Desenvolvedor trabalhando com servidores, APIs e bancos de dados",
     },
     {
       id: "fullstack",
       title: "Full Stack Web",
-      level: "PrÃ¡tico",
-      description: "Une tela, regra, dados e versionamento para construir aplicaÃ§Ãµes completas.",
+      level: "Prático",
+      description: "Une tela, regra, dados e versionamento para construir aplicações completas.",
       sourceTracks: ["HTML", "CSS", "JavaScript", "SQL", "Git/GitHub"],
       modules: ["Layout", "Eventos JS", "CRUD conceitual", "Deploy e GitHub"],
-      project: "Mini sistema de tarefas com filtros e persistÃªncia local",
+      project: "Mini sistema de tarefas com filtros e persistência local",
+      image: "assets/careers/fullstack.webp",
+      imageAlt: "Desenvolvedor conectando interface, aplicação e banco de dados",
     },
     {
       id: "dados-bi",
       title: "Dados e BI",
       level: "Carreira de dados",
-      description: "SQL, Python, leitura de base, indicadores e preparaÃ§Ã£o para Power BI/Fabric.",
-      sourceTracks: ["Python", "SQL", "Estruturas de dados", "Git/GitHub", "LÃ³gica"],
-      modules: ["SQL para anÃ¡lise", "Python bÃ¡sico", "Estruturas", "Git para portfÃ³lio"],
-      project: "AnÃ¡lise de chamados com consultas e insights",
+      description: "SQL, Python, leitura de base, indicadores e preparação para Power BI/Fabric.",
+      sourceTracks: ["Python", "SQL", "Estruturas de dados", "Git/GitHub", "Lógica"],
+      modules: ["SQL para análise", "Python básico", "Estruturas", "Git para portfólio"],
+      project: "Análise de chamados com consultas e insights",
+      image: "assets/careers/dados-bi.webp",
+      imageAlt: "Analista explorando painéis, indicadores e conjuntos de dados",
     },
     {
       id: "qa",
       title: "QA / Testes",
       level: "Iniciante",
-      description: "RaciocÃ­nio de erro, leitura de requisitos, casos de teste e validaÃ§Ã£o de comportamento.",
-      sourceTracks: ["LÃ³gica", "JavaScript", "Git/GitHub", "HTML", "CSS"],
-      modules: ["Casos de teste", "Bugs comuns", "ValidaÃ§Ã£o de tela", "Versionamento"],
-      project: "Checklist de testes para uma pÃ¡gina de cadastro",
+      description: "Raciocínio de erro, leitura de requisitos, casos de teste e validação de comportamento.",
+      sourceTracks: ["Lógica", "JavaScript", "Git/GitHub", "HTML", "CSS"],
+      modules: ["Casos de teste", "Bugs comuns", "Validação de tela", "Versionamento"],
+      project: "Checklist de testes para uma página de cadastro",
+      image: "assets/careers/qa.webp",
+      imageAlt: "Profissional de qualidade validando fluxos e encontrando falhas",
     },
     {
       id: "devops",
-      title: "DevOps JÃºnior",
+      title: "DevOps Júnior",
       level: "Fundamentos",
-      description: "Git, comandos, fluxo de deploy, automaÃ§Ã£o simples e leitura de logs.",
-      sourceTracks: ["Git/GitHub", "Python", "SQL", "LÃ³gica"],
-      modules: ["Git na prÃ¡tica", "Scripts simples", "NoÃ§Ã£o de banco", "Deploy estÃ¡tico"],
-      project: "Pipeline manual: build, validaÃ§Ã£o e publicaÃ§Ã£o",
+      description: "Git, comandos, fluxo de deploy, automação simples e leitura de logs.",
+      sourceTracks: ["Git/GitHub", "Python", "SQL", "Lógica"],
+      modules: ["Git na prática", "Scripts simples", "Noção de banco", "Deploy estático"],
+      project: "Pipeline manual: build, validação e publicação",
+      image: "assets/careers/devops.webp",
+      imageAlt: "Engenheiro acompanhando uma esteira automatizada de publicação",
     },
   ];
 
@@ -593,7 +605,7 @@
   function renderTabs() {
     const allowed = MODE_TABS[state.studyMode] || MODE_TABS.concursos;
     $("#tabs").innerHTML = TABS.filter(([id]) => allowed.includes(id)).map(([id, label]) => `
-      <button type="button" class="${state.activeTab === id ? "active" : ""}" data-tab="${escapeHtml(id)}">${escapeHtml(label)}</button>
+      <button type="button" class="${state.activeTab === id ? "active" : ""}" data-tab="${escapeHtml(id)}" aria-current="${state.activeTab === id ? "page" : "false"}">${escapeHtml(label)}</button>
     `).join("");
   }
 
@@ -763,77 +775,70 @@
     const topics = [...new Set(allCertQuestions.filter((question) => question.trilha === state.certTrack).map((question) => question.disciplina))];
     if (!topics.includes(state.certTopic)) state.certTopic = topics[0] || state.certTopic;
     $("#tab-content").innerHTML = `
-      <section class="panel">
+      <section class="panel panel--tech-flow">
         <div class="section-heading">
           <p class="eyebrow">Certificações</p>
-          <h2>Simulados das certificações mais conhecidas</h2>
+          <h2>Escolha sua certificação</h2>
+          <p class="section-lead">Selecione uma prova e comece. Você pode fazer uma sessão rápida, um simulado completo ou revisar um tema.</p>
         </div>
-        <p>Questões autorais inspiradas nos guias públicos oficiais. Escolha a certificação, o modo e o tema.</p>
-        <div class="form-grid">
+        <div class="cert-grid" role="list" aria-label="Certificações disponíveis">
+          ${certs.map((cert, index) => {
+            const amount = allCertQuestions.filter((question) => question.trilha === cert).length;
+            return `<button class="mini-path ${state.certTrack === cert ? "is-selected" : ""}" style="--item-index:${index}" type="button" data-select-cert="${escapeHtml(cert)}" aria-pressed="${state.certTrack === cert}"><span class="mini-path__mark" aria-hidden="true">${escapeHtml(cert.slice(0, 2))}</span><span><strong>${escapeHtml(cert)}</strong><small>${amount} questões</small></span><span class="mini-path__check" aria-hidden="true">✓</span></button>`;
+          }).join("")}
+        </div>
+        <div class="cert-controls">
           <label class="field">
-            <span>Certificação</span>
-            <select data-cert-track>
-              ${certs.map((cert) => `<option value="${escapeHtml(cert)}" ${state.certTrack === cert ? "selected" : ""}>${escapeHtml(cert)}</option>`).join("")}
-            </select>
-          </label>
-          <label class="field">
-            <span>Modo</span>
+            <span>Como quer praticar?</span>
             <select data-cert-mode>
-              <option value="rapidas" ${state.certMode === "rapidas" ? "selected" : ""}>Questões rápidas</option>
-              <option value="simulado" ${state.certMode === "simulado" ? "selected" : ""}>Simulado 30 questões</option>
+              <option value="rapidas" ${state.certMode === "rapidas" ? "selected" : ""}>Sessão rápida · 10 questões</option>
+              <option value="simulado" ${state.certMode === "simulado" ? "selected" : ""}>Simulado · 30 questões</option>
               <option value="tema" ${state.certMode === "tema" ? "selected" : ""}>Revisão por tema</option>
-              <option value="dificil" ${state.certMode === "dificil" ? "selected" : ""}>Modo difícil</option>
-              <option value="erros" ${state.certMode === "erros" ? "selected" : ""}>Erros frequentes</option>
+              <option value="dificil" ${state.certMode === "dificil" ? "selected" : ""}>Desafio · 15 difíceis</option>
+              <option value="erros" ${state.certMode === "erros" ? "selected" : ""}>Revisar erros frequentes</option>
             </select>
           </label>
-          <label class="field">
+          ${state.certMode === "tema" ? `<label class="field cert-topic-field">
             <span>Tema</span>
             <select data-cert-topic>
               ${topics.map((topic) => `<option value="${escapeHtml(topic)}" ${state.certTopic === topic ? "selected" : ""}>${escapeHtml(topic)}</option>`).join("")}
             </select>
-          </label>
-          ${difficultySelect()}
+          </label>` : ""}
+          <button class="primary-button cert-start-button" type="button" data-start-cert>Iniciar ${escapeHtml(state.certTrack)}</button>
         </div>
-        <div class="cert-grid">
-          ${certs.map((cert) => {
-            const amount = allCertQuestions.filter((question) => question.trilha === cert).length;
-            return `<button class="mini-path ${state.certTrack === cert ? "is-selected" : ""}" type="button" data-select-cert="${escapeHtml(cert)}"><strong>${escapeHtml(cert)}</strong><span>${amount} questões</span></button>`;
-          }).join("")}
-        </div>
-        <div class="tag-cloud">${topics.map((topic) => `<span>${escapeHtml(topic)}</span>`).join("")}</div>
-        <button class="primary-button" type="button" data-start-cert>Iniciar ${escapeHtml(state.certTrack)}</button>
       </section>
     `;
   }
   function renderProgrammingTab() {
     const stats = loadUserStats();
     $("#tab-content").innerHTML = `
-      <section class="panel">
+      <section class="panel panel--tech-flow">
         <div class="section-heading">
           <p class="eyebrow">Programação</p>
           <h2>Escolha uma trilha profissional</h2>
         </div>
-        <p>A primeira tela agora é por carreira. Cada card junta estudos, exercícios e um medidor de progresso.</p>
-        <div class="form-grid form-grid--single">
-          ${difficultySelect()}
-        </div>
         <div class="career-grid">
-          ${PROGRAMMING_CAREERS.map((career) => {
+          ${PROGRAMMING_CAREERS.map((career, index) => {
             const progress = getProgrammingCareerProgress(career, stats);
             return `
-              <article class="career-card ${state.programmingCareer === career.id ? "is-selected" : ""}">
-                <div>
+              <article class="career-card ${state.programmingCareer === career.id ? "is-selected" : ""}" style="--item-index:${index}">
+                <figure class="career-card__media">
+                  <img src="${escapeHtml(career.image)}" alt="${escapeHtml(career.imageAlt)}" width="1280" height="720" loading="${index < 2 ? "eager" : "lazy"}" decoding="async">
+                  <span class="career-card__selected" aria-hidden="true">Trilha selecionada</span>
+                </figure>
+                <div class="career-card__content">
                   <span class="badge">${escapeHtml(career.level)}</span>
                   <h3>${escapeHtml(career.title)}</h3>
                   <p>${escapeHtml(career.description)}</p>
+                  <div class="career-progress-copy"><span>Seu progresso</span><strong>${progress.percent}%</strong></div>
+                  <div class="progress-meter" aria-label="Progresso em ${escapeHtml(career.title)}"><span style="width: ${progress.percent}%"></span></div>
+                  <small>${progress.attempts ? `${progress.attempts} sessão(ões) concluída(s)` : "Comece sua primeira sessão"}</small>
+                  <ul>
+                    ${career.modules.map((module) => `<li>${escapeHtml(module)}</li>`).join("")}
+                  </ul>
+                  <p class="career-project"><strong>Projeto prático</strong><span>${escapeHtml(career.project)}</span></p>
+                  <button class="primary-button career-card__cta" type="button" data-start-programming data-programming-career="${escapeHtml(career.id)}">Começar trilha <span aria-hidden="true">→</span></button>
                 </div>
-                <div class="progress-meter" aria-label="Progresso em ${escapeHtml(career.title)}"><span style="width: ${progress.percent}%"></span></div>
-                <small>${progress.percent}% concluído · ${progress.attempts} questionário(s)</small>
-                <ul>
-                  ${career.modules.map((module) => `<li>${escapeHtml(module)}</li>`).join("")}
-                </ul>
-                <p class="muted"><strong>Projeto:</strong> ${escapeHtml(career.project)}</p>
-                <button class="primary-button" type="button" data-start-programming data-programming-career="${escapeHtml(career.id)}">Estudar essa trilha</button>
               </article>
             `;
           }).join("")}
@@ -1439,7 +1444,7 @@
   function renderActiveTab() {
     const allowed = MODE_TABS[state.studyMode] || MODE_TABS.concursos;
     if (!allowed.includes(state.activeTab)) {
-      state.activeTab = state.studyMode === "concursos" ? "santos-ibam" : "certificacoes";
+      state.activeTab = state.studyMode === "concursos" ? "santos-ibam" : "programacao";
     }
     renderHeader();
     renderTabs();
@@ -1817,7 +1822,7 @@
       trilha: career.title,
       scopeKey: `programacao-${career.id}`,
       scoring: "positive",
-      questions: selectRotatingQuestions({ pool, count: 15, difficulty: state.difficulty, seedKey: `${getTodayKey()}-${state.currentUserId}-prog-${career.id}-${Date.now()}`, avoidIds: getRecentIds(`programacao-${career.id}`) }),
+      questions: selectRotatingQuestions({ pool, count: 15, difficulty: "misto", seedKey: `${getTodayKey()}-${state.currentUserId}-prog-${career.id}-${Date.now()}`, avoidIds: getRecentIds(`programacao-${career.id}`) }),
     });
   }
   function startDataQuiz() {
@@ -1925,7 +1930,7 @@
     if (target.dataset.switchUser !== undefined || target.id === "switch-user") renderUserSelection();
     if (target.dataset.modeSwitch) {
       state.studyMode = target.dataset.modeSwitch;
-      state.activeTab = state.studyMode === "concursos" ? "santos-ibam" : "certificacoes";
+      state.activeTab = state.studyMode === "concursos" ? "santos-ibam" : "programacao";
       state.activeQuiz = null;
       renderActiveTab();
     }
@@ -1985,7 +1990,10 @@
       state.certTrack = target.value;
       if (state.activeTab === "certificacoes") renderCertificationTab();
     }
-    if (target.matches("[data-cert-mode]")) state.certMode = target.value;
+    if (target.matches("[data-cert-mode]")) {
+      state.certMode = target.value;
+      if (state.activeTab === "certificacoes") renderCertificationTab();
+    }
     if (target.matches("[data-cert-topic]")) state.certTopic = target.value;
     if (target.matches("[data-programming-track]")) state.programmingTrack = target.value;
     if (target.matches("[data-data-track]")) state.dataTrack = target.value;

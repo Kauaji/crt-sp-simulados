@@ -1,4 +1,4 @@
-import { copyFileSync, cpSync, existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -13,6 +13,16 @@ const staticFiles = [
   "santos-ibam-bank.js",
   "app.js",
 ];
+
+function copyDirectory(source, destination) {
+  mkdirSync(destination, { recursive: true });
+  for (const entry of readdirSync(source, { withFileTypes: true })) {
+    const sourcePath = join(source, entry.name);
+    const destinationPath = join(destination, entry.name);
+    if (entry.isDirectory()) copyDirectory(sourcePath, destinationPath);
+    if (entry.isFile()) copyFileSync(sourcePath, destinationPath);
+  }
+}
 
 const supabaseUrl = process.env.SUPABASE_URL || "https://yzgmpjkuimzkerumsxls.supabase.co";
 const supabasePublishableKey =
@@ -51,6 +61,6 @@ if (existsSync(dailySelection)) {
 
 for (const directory of ["assets"]) {
   if (existsSync(join(root, directory))) {
-    cpSync(join(root, directory), join(dist, directory), { recursive: true, force: true });
+    copyDirectory(join(root, directory), join(dist, directory));
   }
 }
