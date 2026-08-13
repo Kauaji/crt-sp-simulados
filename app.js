@@ -952,6 +952,111 @@
     `;
   }
 
+  function formatSnapshotDate(value) {
+    const [year, month, day] = String(value || "").split("-");
+    return year && month && day ? `${day}/${month}/${year}` : "data não informada";
+  }
+
+  function renderCareerStars(value, label) {
+    const rating = Math.max(0, Math.min(5, Number(value) || 0));
+    const decimal = rating.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    return `
+      <span class="career-stars" style="--rating-width:${(rating / 5) * 100}%" aria-hidden="true">★★★★★</span>
+      <span class="sr-only">${escapeHtml(label || `Avaliação ${decimal} de 5`)}</span>
+    `;
+  }
+
+  function renderCareerCourse(course, index) {
+    const rating = course.rating || {};
+    const price = course.price || {};
+    const checkedAt = rating.checkedAt || price.checkedAt || course.checkedAt;
+    const count = Number(rating.count);
+    const countLabel = Number.isFinite(count)
+      ? `${new Intl.NumberFormat("pt-BR").format(count)} avaliações`
+      : rating.countLabel || "quantidade não informada";
+    const ratingLabel = `${Number(rating.value || 0).toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} de 5, com ${countLabel}`;
+    return `
+      <article class="career-course-card" style="--item-index:${index}">
+        <div class="career-card-labels">
+          <span>${escapeHtml(course.provider || "Curso online")}</span>
+          ${course.language ? `<span>${escapeHtml(course.language)}</span>` : ""}
+        </div>
+        <h5>${escapeHtml(course.title)}</h5>
+        <p>${course.instructor ? `Com ${escapeHtml(course.instructor)}` : escapeHtml(course.level || "Curso recomendado para a trilha")}</p>
+        <div class="career-course-metrics">
+          <div class="career-rating" aria-label="Avaliação ${escapeHtml(ratingLabel)}">
+            <span><strong>${Number(rating.value || 0).toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</strong> / 5</span>
+            ${renderCareerStars(rating.value, ratingLabel)}
+            <small>${escapeHtml(countLabel)}</small>
+          </div>
+          <div class="career-price">
+            <small>Preço</small>
+            <strong>${escapeHtml(price.label || (price.variable ? "Preço variável" : "Consulte o valor"))}</strong>
+            <span>${escapeHtml(price.qualifier || price.note || (price.variable ? "Oferta muda por conta e campanha" : "Na página oficial"))}</span>
+          </div>
+        </div>
+        <a class="career-card-link" href="${escapeHtml(course.url)}" target="_blank" rel="noopener noreferrer" aria-label="Ver ${escapeHtml(course.title)} e o preço atual (abre em nova aba)">Ver curso e preço atual <span aria-hidden="true">↗</span></a>
+        <small class="career-data-date">Nota e preço consultados em ${formatSnapshotDate(checkedAt)}; podem mudar.</small>
+      </article>
+    `;
+  }
+
+  function renderAcademicEvaluation(evaluation, fallbackLabel, contextLabel) {
+    if (!evaluation) return "";
+    const rating = Number(evaluation.value);
+    const hasRating = Number.isFinite(rating) && rating > 0;
+    const scale = Number(evaluation.scale) || 5;
+    const ratingContext = evaluation.label || evaluation.metric || evaluation.source || fallbackLabel;
+    return `
+      <div class="career-academic-rating ${hasRating ? "has-rating" : ""}">
+        <small>${escapeHtml(contextLabel)}</small>
+        ${hasRating ? `
+          <div class="career-academic-score" aria-label="${escapeHtml(`${ratingContext}: ${rating} de ${scale}`)}">
+            <strong>${escapeHtml(`${rating}/${scale}`)}</strong>
+            <span>${escapeHtml(evaluation.metric || evaluation.source || "Avaliação oficial")}</span>
+          </div>
+        ` : `<strong>${escapeHtml(evaluation.label || fallbackLabel)}</strong>`}
+        ${evaluation.year ? `<span>Ano de referência: ${escapeHtml(evaluation.year)}</span>` : ""}
+      </div>
+    `;
+  }
+
+  function renderCareerEducation(item, index) {
+    const evaluation = item.evaluation || {};
+    const institutionEvaluation = item.institutionEvaluation || null;
+    const price = item.price || item.tuition || {};
+    const checkedAt = price.checkedAt || item.checkedAt;
+    const evaluationSource = evaluation.url || evaluation.sourceUrl;
+    const institutionSource = institutionEvaluation?.url || institutionEvaluation?.sourceUrl;
+    return `
+      <article class="career-education-card" style="--item-index:${index}">
+        <div class="career-card-labels">
+          <span>${escapeHtml(item.kind || "Formação")}</span>
+          ${item.availability ? `<span class="career-availability">${escapeHtml(item.availability)}</span>` : ""}
+        </div>
+        <h5>${escapeHtml(item.title)}</h5>
+        <p class="career-institution">${escapeHtml(item.institution)}</p>
+        <dl class="career-education-facts">
+          <div><dt>Nível</dt><dd>${escapeHtml(item.level || item.kind || "Não informado")}</dd></div>
+          <div><dt>Modalidade</dt><dd>${escapeHtml(item.modality || "Consulte a instituição")}</dd></div>
+          <div><dt>Duração</dt><dd>${escapeHtml(item.duration || "Não informada")}</dd></div>
+          <div><dt>Investimento</dt><dd>${escapeHtml(price.label || "Consulte a instituição")}</dd></div>
+        </dl>
+        ${price.note ? `<p class="career-price-note">${escapeHtml(price.note)}</p>` : ""}
+        <div class="career-academic-ratings">
+          ${renderAcademicEvaluation(evaluation, "Avaliação específica do curso não informada", "Avaliação do curso")}
+          ${renderAcademicEvaluation(institutionEvaluation, "Avaliação institucional não informada", "Avaliação da instituição")}
+        </div>
+        <div class="career-card-actions">
+          <a class="career-card-link" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" aria-label="Ver ${escapeHtml(item.title)} na ${escapeHtml(item.institution)} (abre em nova aba)">Ver formação <span aria-hidden="true">↗</span></a>
+          ${evaluationSource ? `<a href="${escapeHtml(evaluationSource)}" target="_blank" rel="noopener noreferrer" aria-label="Ver fonte da avaliação de ${escapeHtml(item.title)} (abre em nova aba)">Fonte da nota do curso</a>` : ""}
+          ${institutionSource && institutionSource !== evaluationSource ? `<a href="${escapeHtml(institutionSource)}" target="_blank" rel="noopener noreferrer" aria-label="Ver fonte da avaliação institucional da ${escapeHtml(item.institution)} (abre em nova aba)">Fonte institucional</a>` : ""}
+        </div>
+        <small class="career-data-date">Dados consultados em ${formatSnapshotDate(checkedAt)}; valores e turmas podem mudar.</small>
+      </article>
+    `;
+  }
+
   function renderProgrammingCareerDetail(careerId = state.programmingCareer) {
     const career = getProgrammingCareer(careerId);
     const guide = getProgrammingGuide(career.id);
@@ -995,8 +1100,9 @@
         <nav class="career-detail__nav" aria-label="Conteúdo da trilha">
           <a href="#roteiro">Roteiro</a>
           <a href="#projetos">Projetos</a>
-          <a href="#materiais">Materiais e vídeos</a>
+          <a href="#materiais">Cursos e materiais</a>
           <a href="#certificacoes-trilha">Certificações</a>
+          <a href="#formacao">Graduação e pós</a>
           <a href="#carreira">Ramificações</a>
         </nav>
 
@@ -1072,8 +1178,11 @@
             </section>
 
             <section class="career-detail__section" id="materiais">
-              <div class="career-section-heading"><p class="eyebrow">Fontes confiáveis</p><h3>Materiais de estudo e vídeos de suporte</h3><p>Priorizei documentação, cursos e canais oficiais para você estudar com conteúdo atual.</p></div>
-              <h4 class="career-subheading">Documentação e cursos</h4>
+              <div class="career-section-heading"><p class="eyebrow">Aprendizado guiado</p><h3>Cursos, materiais e vídeos de suporte</h3><p>Compare cursos estruturados e complemente com documentação e canais oficiais.</p></div>
+              <h4 class="career-subheading">Cursos recomendados</h4>
+              <p class="career-live-data-note"><strong>Dados comerciais mudam.</strong> A nota e o preço abaixo são um retrato da data indicada. Abra o curso para confirmar a oferta disponível para sua conta.</p>
+              <div class="career-course-grid">${(guide.courses || []).map(renderCareerCourse).join("")}</div>
+              <h4 class="career-subheading">Documentação e cursos oficiais</h4>
               <div class="career-resource-grid">${guide.materials.map((item) => renderCareerResource(item, "material")).join("")}</div>
               <h4 class="career-subheading">Aulas e demonstrações</h4>
               <div class="career-resource-grid">${guide.videos.map((item) => renderCareerResource(item, "video")).join("")}</div>
@@ -1090,6 +1199,23 @@
                   </a>
                 `).join("")}
               </div>
+            </section>
+
+            <section class="career-detail__section" id="formacao">
+              <div class="career-section-heading"><p class="eyebrow">Formação acadêmica</p><h3>Graduação e pós-graduação para aprofundar a carreira</h3><p>Compare modalidade, duração, investimento público e avaliação acadêmica. Conceitos oficiais são identificados; quando não há nota específica, isso fica explícito.</p></div>
+              <nav class="career-education-tabs" aria-label="Tipos de formação">
+                <a href="#graduacao">Graduação</a>
+                <a href="#pos-graduacao">Pós-graduação</a>
+              </nav>
+              <div class="career-education-group" id="graduacao">
+                <div class="career-education-heading"><span>Para construir a base</span><h4>Graduação</h4></div>
+                <div class="career-education-grid">${(guide.education || []).filter((item) => String(item.kind).toLowerCase().includes("graduação") && !String(item.kind).toLowerCase().includes("pós")).map(renderCareerEducation).join("")}</div>
+              </div>
+              <div class="career-education-group" id="pos-graduacao">
+                <div class="career-education-heading"><span>Para quem já é graduado</span><h4>Pós-graduação</h4></div>
+                <div class="career-education-grid">${(guide.education || []).filter((item) => String(item.kind).toLowerCase().includes("pós")).map(renderCareerEducation).join("")}</div>
+              </div>
+              <p class="career-education-disclaimer">Avaliações MEC/ENADE/CI medem dimensões acadêmicas específicas e não equivalem a avaliações de consumidores. Confirme reconhecimento, polo, edital, turma e condições diretamente com a instituição antes da matrícula.</p>
             </section>
 
             <section class="career-detail__section" id="carreira">
