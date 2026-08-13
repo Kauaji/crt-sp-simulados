@@ -1,4 +1,4 @@
-"use strict";
+﻿"use strict";
 
 (function initStudyPlatform() {
   const DATA = window.STUDY_DATA || { questoes: [], sources: {} };
@@ -17,7 +17,6 @@
   ];
 
   const TABS = [
-    ["dashboard", "Dashboard"],
     ["santos-ibam", "Concursos Santos — IBAM"],
     ["certificacoes", "Certificações"],
     ["programacao", "Programação"],
@@ -28,8 +27,8 @@
   ];
 
   const MODE_TABS = {
-    concursos: ["dashboard", "santos-ibam", "estudos", "historico"],
-    tech: ["dashboard", "certificacoes", "programacao", "dados", "academia-dados", "estudos", "historico"],
+    concursos: ["santos-ibam", "estudos", "historico"],
+    tech: ["certificacoes", "programacao", "dados", "academia-dados", "estudos", "historico"],
   };
 
   const OPEN_TYPES = new Set(["explainCode", "explainConcept", "sqlQuery", "daxMeasure", "completeCode", "orderSteps", "caseStudy", "businessQuestion", "administrativeWriting"]);
@@ -42,9 +41,11 @@
     studyMode: "concursos",
     difficulty: "misto",
     crtExtraAttempt: 0,
+    certTrack: "DP-600",
     certMode: "rapidas",
     certTopic: "Microsoft Fabric",
     programmingTrack: "Python",
+    programmingCareer: "frontend",
     dataTrack: "Fundamentos de Dados",
     academyTrack: "Fundamentos de Dados",
     academyMode: "rapido",
@@ -147,6 +148,63 @@
       difficulty: "Fácil",
       github: "Explique o modelo e como outra pessoa pode usar o template.",
       linkedin: "Mostre evolução e fale sobre aprender dados usando seus próprios estudos.",
+    },
+  ];
+
+  const PROGRAMMING_CAREERS = [
+    {
+      id: "frontend",
+      title: "Front-end Developer",
+      level: "Iniciante",
+      description: "Interfaces responsivas, HTML semÃ¢ntico, CSS moderno, JavaScript e consumo de dados.",
+      sourceTracks: ["HTML", "CSS", "JavaScript", "Git/GitHub", "LÃ³gica"],
+      modules: ["HTML semÃ¢ntico", "CSS responsivo", "JavaScript DOM", "Git e deploy"],
+      project: "Landing page responsiva com interaÃ§Ã£o em JavaScript",
+    },
+    {
+      id: "backend",
+      title: "Back-end Developer",
+      level: "Base forte",
+      description: "LÃ³gica, Python/Java, SQL, erros comuns, leitura de cÃ³digo e raciocÃ­nio de API.",
+      sourceTracks: ["Python", "Java", "SQL", "Git/GitHub", "LÃ³gica"],
+      modules: ["LÃ³gica aplicada", "Python ou Java", "SQL essencial", "Tratamento de erros"],
+      project: "API conceitual de chamados com regras de negÃ³cio",
+    },
+    {
+      id: "fullstack",
+      title: "Full Stack Web",
+      level: "PrÃ¡tico",
+      description: "Une tela, regra, dados e versionamento para construir aplicaÃ§Ãµes completas.",
+      sourceTracks: ["HTML", "CSS", "JavaScript", "SQL", "Git/GitHub"],
+      modules: ["Layout", "Eventos JS", "CRUD conceitual", "Deploy e GitHub"],
+      project: "Mini sistema de tarefas com filtros e persistÃªncia local",
+    },
+    {
+      id: "dados-bi",
+      title: "Dados e BI",
+      level: "Carreira de dados",
+      description: "SQL, Python, leitura de base, indicadores e preparaÃ§Ã£o para Power BI/Fabric.",
+      sourceTracks: ["Python", "SQL", "Estruturas de dados", "Git/GitHub", "LÃ³gica"],
+      modules: ["SQL para anÃ¡lise", "Python bÃ¡sico", "Estruturas", "Git para portfÃ³lio"],
+      project: "AnÃ¡lise de chamados com consultas e insights",
+    },
+    {
+      id: "qa",
+      title: "QA / Testes",
+      level: "Iniciante",
+      description: "RaciocÃ­nio de erro, leitura de requisitos, casos de teste e validaÃ§Ã£o de comportamento.",
+      sourceTracks: ["LÃ³gica", "JavaScript", "Git/GitHub", "HTML", "CSS"],
+      modules: ["Casos de teste", "Bugs comuns", "ValidaÃ§Ã£o de tela", "Versionamento"],
+      project: "Checklist de testes para uma pÃ¡gina de cadastro",
+    },
+    {
+      id: "devops",
+      title: "DevOps JÃºnior",
+      level: "Fundamentos",
+      description: "Git, comandos, fluxo de deploy, automaÃ§Ã£o simples e leitura de logs.",
+      sourceTracks: ["Git/GitHub", "Python", "SQL", "LÃ³gica"],
+      modules: ["Git na prÃ¡tica", "Scripts simples", "NoÃ§Ã£o de banco", "Deploy estÃ¡tico"],
+      project: "Pipeline manual: build, validaÃ§Ã£o e publicaÃ§Ã£o",
     },
   ];
 
@@ -293,6 +351,18 @@
     store.users[userId] = store.users[userId] || makeUserStats(userId);
     saveStore(store);
     return store.users[userId];
+  }
+
+  function getProgrammingCareer(id = state.programmingCareer) {
+    return PROGRAMMING_CAREERS.find((career) => career.id === id) || PROGRAMMING_CAREERS[0];
+  }
+
+  function getProgrammingCareerProgress(career, stats = loadUserStats()) {
+    const history = stats.historicoUltimosResultados || [];
+    const attempts = history.filter((item) => item.kind === "programacao" && item.scopeKey === `programacao-${career.id}`).length;
+    const percent = Math.min(100, attempts * 20);
+    const last = history.find((item) => item.kind === "programacao" && item.scopeKey === `programacao-${career.id}`);
+    return { attempts, percent, last };
   }
 
   function saveUserStats(stats, userId = state.currentUserId) {
@@ -484,7 +554,7 @@
         <span class="profile-card__avatar profile-card__avatar--${escapeHtml(user.accent)}">${escapeHtml(user.initial)}</span>
         <span>
           <strong>${escapeHtml(user.nome)}</strong>
-          <small>Entrar no meu painel, foguinho, ranking e histórico local</small>
+          <small>Entrar no meu painel, foguinho e histórico local</small>
         </span>
         <span aria-hidden="true">🚀</span>
       </button>
@@ -617,19 +687,6 @@
           <h2>${escapeHtml(stats.nome)}, ${isConcursos ? "seu painel de concursos" : "seu painel tech"} 🔥</h2>
         </div>
         <div class="dashboard-grid">${metrics.join("")}</div>
-        <div class="action-row">
-          <button class="primary-button" type="button" data-tab="${isConcursos ? "santos-ibam" : "academia-dados"}">${isConcursos ? "Ver concursos" : "Treinar tech"}</button>
-          <button class="secondary-button" type="button" data-switch-user>Trocar usuário</button>
-          <button class="danger-button" type="button" data-reset-user>Zerar meus dados locais</button>
-        </div>
-      </section>
-      ${renderRanking()}
-      <section class="panel">
-        <div class="section-heading">
-          <p class="eyebrow">Últimas 5 tentativas</p>
-          <h2>Histórico rápido</h2>
-        </div>
-        ${visibleHistory.length ? `<div class="history-list">${visibleHistory.slice(0, 5).map(renderHistoryItem).join("")}</div>` : "<p class='muted'>Finalize uma atividade deste modo para aparecer aqui.</p>"}
       </section>
     `;
   }
@@ -700,23 +757,33 @@
   }
 
   function renderCertificationTab() {
-    const topics = [...new Set(poolByArea("certificacoes").map((question) => question.disciplina))];
+    const allCertQuestions = poolByArea("certificacoes");
+    const certs = [...new Set(allCertQuestions.map((question) => question.trilha))];
+    if (!certs.includes(state.certTrack)) state.certTrack = certs[0] || "DP-600";
+    const topics = [...new Set(allCertQuestions.filter((question) => question.trilha === state.certTrack).map((question) => question.disciplina))];
+    if (!topics.includes(state.certTopic)) state.certTopic = topics[0] || state.certTopic;
     $("#tab-content").innerHTML = `
       <section class="panel">
         <div class="section-heading">
           <p class="eyebrow">Certificações</p>
-          <h2>Microsoft DP-600 — Fabric Analytics Engineer Associate</h2>
+          <h2>Simulados das certificações mais conhecidas</h2>
         </div>
-        <p>Questões autorais baseadas nos tópicos públicos do guia de estudo. Preparado para DP-700, PL-300, AI-900, AZ-900 e DP-900 no futuro.</p>
+        <p>Questões autorais inspiradas nos guias públicos oficiais. Escolha a certificação, o modo e o tema.</p>
         <div class="form-grid">
+          <label class="field">
+            <span>Certificação</span>
+            <select data-cert-track>
+              ${certs.map((cert) => `<option value="${escapeHtml(cert)}" ${state.certTrack === cert ? "selected" : ""}>${escapeHtml(cert)}</option>`).join("")}
+            </select>
+          </label>
           <label class="field">
             <span>Modo</span>
             <select data-cert-mode>
-              <option value="rapidas" ${state.certMode === "rapidas" ? "selected" : ""}>DP-600 — Questões rápidas</option>
-              <option value="simulado" ${state.certMode === "simulado" ? "selected" : ""}>DP-600 — Simulado 30 questões</option>
-              <option value="tema" ${state.certMode === "tema" ? "selected" : ""}>DP-600 — Revisão por tema</option>
-              <option value="dificil" ${state.certMode === "dificil" ? "selected" : ""}>DP-600 — Modo difícil</option>
-              <option value="erros" ${state.certMode === "erros" ? "selected" : ""}>DP-600 — Erros frequentes</option>
+              <option value="rapidas" ${state.certMode === "rapidas" ? "selected" : ""}>Questões rápidas</option>
+              <option value="simulado" ${state.certMode === "simulado" ? "selected" : ""}>Simulado 30 questões</option>
+              <option value="tema" ${state.certMode === "tema" ? "selected" : ""}>Revisão por tema</option>
+              <option value="dificil" ${state.certMode === "dificil" ? "selected" : ""}>Modo difícil</option>
+              <option value="erros" ${state.certMode === "erros" ? "selected" : ""}>Erros frequentes</option>
             </select>
           </label>
           <label class="field">
@@ -727,35 +794,53 @@
           </label>
           ${difficultySelect()}
         </div>
+        <div class="cert-grid">
+          ${certs.map((cert) => {
+            const amount = allCertQuestions.filter((question) => question.trilha === cert).length;
+            return `<button class="mini-path ${state.certTrack === cert ? "is-selected" : ""}" type="button" data-select-cert="${escapeHtml(cert)}"><strong>${escapeHtml(cert)}</strong><span>${amount} questões</span></button>`;
+          }).join("")}
+        </div>
         <div class="tag-cloud">${topics.map((topic) => `<span>${escapeHtml(topic)}</span>`).join("")}</div>
-        <button class="primary-button" type="button" data-start-cert>Iniciar DP-600</button>
+        <button class="primary-button" type="button" data-start-cert>Iniciar ${escapeHtml(state.certTrack)}</button>
       </section>
     `;
   }
-
   function renderProgrammingTab() {
-    const tracks = [...new Set(poolByArea("programacao").map((question) => question.trilha))];
+    const stats = loadUserStats();
     $("#tab-content").innerHTML = `
       <section class="panel">
         <div class="section-heading">
           <p class="eyebrow">Programação</p>
-          <h2>Lógica, código, SQL, Git, HTML/CSS e linguagens</h2>
+          <h2>Escolha uma trilha profissional</h2>
         </div>
-        <p>Treine leitura de código, identificação de bug, fundamentos e interpretação de saída.</p>
-        <div class="form-grid">
-          <label class="field">
-            <span>Subtrilha</span>
-            <select data-programming-track>
-              ${tracks.map((track) => `<option value="${escapeHtml(track)}" ${state.programmingTrack === track ? "selected" : ""}>${escapeHtml(track)}</option>`).join("")}
-            </select>
-          </label>
+        <p>A primeira tela agora é por carreira. Cada card junta estudos, exercícios e um medidor de progresso.</p>
+        <div class="form-grid form-grid--single">
           ${difficultySelect()}
         </div>
-        <button class="primary-button" type="button" data-start-programming>Iniciar questionário de Programação</button>
+        <div class="career-grid">
+          ${PROGRAMMING_CAREERS.map((career) => {
+            const progress = getProgrammingCareerProgress(career, stats);
+            return `
+              <article class="career-card ${state.programmingCareer === career.id ? "is-selected" : ""}">
+                <div>
+                  <span class="badge">${escapeHtml(career.level)}</span>
+                  <h3>${escapeHtml(career.title)}</h3>
+                  <p>${escapeHtml(career.description)}</p>
+                </div>
+                <div class="progress-meter" aria-label="Progresso em ${escapeHtml(career.title)}"><span style="width: ${progress.percent}%"></span></div>
+                <small>${progress.percent}% concluído · ${progress.attempts} questionário(s)</small>
+                <ul>
+                  ${career.modules.map((module) => `<li>${escapeHtml(module)}</li>`).join("")}
+                </ul>
+                <p class="muted"><strong>Projeto:</strong> ${escapeHtml(career.project)}</p>
+                <button class="primary-button" type="button" data-start-programming data-programming-career="${escapeHtml(career.id)}">Estudar essa trilha</button>
+              </article>
+            `;
+          }).join("")}
+        </div>
       </section>
     `;
   }
-
   function renderDataTab() {
     const tracks = [...new Set(poolByArea("dados").map((question) => question.trilha))];
     $("#tab-content").innerHTML = `
@@ -1018,6 +1103,10 @@
     const roles = santosRoles();
     const selectedRole = getSantosRole();
     const recommendation = getSantosRecommendation();
+    const stats = loadUserStats();
+    const accuracy = stats.totalQuestoesRespondidas ? Math.round((stats.totalAcertos / stats.totalQuestoesRespondidas) * 100) : 0;
+    const santosHistory = (stats.historicoUltimosResultados || []).filter((item) => item.area === "concursos-santos-ibam");
+    const bestSantos = [...santosHistory].sort((a, b) => (b.percentual || 0) - (a.percentual || 0))[0];
     $("#tab-content").innerHTML = `
       <section class="panel">
         <div class="section-heading">
@@ -1030,6 +1119,12 @@
           ${metricCard("Banca", "IBAM", "múltipla escolha")}
           ${metricCard("Pontuação", "por peso", "sem regra Quadrix")}
           ${metricCard("Recomendação", recommendation.title, recommendation.detail)}
+        </div>
+        <div class="dashboard-grid compact-dashboard">
+          ${metricCard("Simulados feitos", stats.questionariosSantosIbamFinalizados || 0, "Santos IBAM")}
+          ${metricCard("Melhor cargo", bestSantos?.trilha || "—", bestSantos ? `${bestSantos.percentual}%` : "sem histórico")}
+          ${metricCard("Taxa geral", `${accuracy}%`, `${stats.totalAcertos}/${stats.totalQuestoesRespondidas}`)}
+          ${metricCard("Foguinho", `🔥 ${stats.streakAtual}`, `recorde: ${stats.maiorStreak}`)}
         </div>
         <div class="form-grid">
           <label class="field">
@@ -1078,7 +1173,6 @@
             </tbody>
           </table>
         </div>
-        <p class="notice">Estratégia: Oficial tem melhor remuneração e mais vagas, mas cobra redação; Agente e Inspetor têm ensino fundamental e pesos fortes em específicos.</p>
       </section>
       <section class="panel">
         <div class="section-heading">
@@ -1282,40 +1376,27 @@
   }
 
   function renderStudyTab() {
-    const recommendations = getPersonalizedRecommendations();
+    const isConcursos = state.studyMode === "concursos";
+    const title = isConcursos ? "Estudos para concursos" : "Estudos para tecnologia";
+    const cards = isConcursos
+      ? [
+        studyCard("Concursos Santos — IBAM", ["Edital 73/2026: Agente de Portaria e Inspetor de Alunos.", "Edital 71/2026: Oficial de Administração, objetiva + redação.", "Pontuação ponderada por pesos do edital.", "Treine Português, Matemática, Legislação, Informática e específicos do cargo."], [["Edital 73/2026 — IBAM", SANTOS_IBAM_CONFIG.officialLinks?.edital73], ["Edital 71/2026 — IBAM", SANTOS_IBAM_CONFIG.officialLinks?.edital71]]),
+        studyCard("Leis e atendimento público", ["Lei 13.460/2017: direitos do usuário.", "LAI e LGPD: transparência com proteção de dados.", "Atendimento prioritário, acessibilidade e postura do servidor."], [["Lei 13.460/2017", SANTOS_IBAM_CONFIG.officialLinks?.usuario], ["LAI", SANTOS_IBAM_CONFIG.officialLinks?.lai], ["LGPD", SANTOS_IBAM_CONFIG.officialLinks?.lgpd]]),
+        studyCard("Redação e rotina administrativa", ["Para Oficial, treine clareza, impessoalidade e objetividade.", "Faça textos curtos: memorando, despacho, e-mail e relatório.", "Revise protocolo, arquivo, controle de prazos e documentos."], [["Manual de Redação", "https://www4.planalto.gov.br/centrodeestudos/assuntos/manual-de-redacao-da-presidencia-da-republica/manual-de-redacao.pdf"]]),
+      ]
+      : [
+        studyCard("Certificações", ["Microsoft DP-600, PL-300, AZ-900, PL-900, DP-900 e DP-700.", "Treine por tema e depois faça simulado completo.", "Revise erros antes de subir dificuldade."], [["Microsoft Learn", "https://learn.microsoft.com/en-us/training/"]]),
+        studyCard("Programação por profissão", ["Escolha uma trilha: Front-end, Back-end, Full Stack, Dados/BI, QA ou DevOps.", "Complete blocos de estudo e exercícios para subir o progresso.", "Faça projetos pequenos para consolidar."], [["MDN", "https://developer.mozilla.org/pt-BR/"], ["Python", "https://docs.python.org/pt-br/3/"]]),
+        studyCard("Dados e Analytics", ["SQL forte, Python/Pandas e Power BI.", "Modele métricas antes de montar dashboard.", "Use projetos de portfólio para provar habilidade."], [["Power BI", "https://learn.microsoft.com/pt-br/power-bi/"], ["Pandas", "https://pandas.pydata.org/docs/"]]),
+        studyCard("Academia de Dados", ["Fundamentos, SQL, Python, DAX, modelagem, engenharia e Fabric.", "Use modo entrevista para treinar explicação.", "Use modo portfólio para gerar projetos."], [["Microsoft Fabric", "https://learn.microsoft.com/en-us/fabric/"], ["dados.gov.br", "https://dados.gov.br/"]]),
+      ];
     $("#tab-content").innerHTML = `
       <section class="panel">
         <div class="section-heading">
           <p class="eyebrow">Estudos</p>
-          <h2>Plano de estudo e recomendações</h2>
+          <h2>${escapeHtml(title)}</h2>
         </div>
-        <div class="study-grid">
-          ${studyCard("CRT-SP", ["Lei seca do Sistema CFT/CRT-SP", "Quadrix: cuidado com exceções e termos absolutos", "Priorize Lei 13.639/2018, Lei 9.784/1999, LAI, LGPD, protocolo e redação oficial"], [["Quadrix CRT-SP", DATA.sources?.crt_edital?.url], ["Lei 13.639/2018", DATA.sources?.lei_13639?.url]])}
-          ${studyCard("DP-600", ["Microsoft Learn", "Fabric, Lakehouse, Warehouse e Semantic Model", "Treine SQL, DAX, KQL, Direct Lake, RLS e deployment pipelines"], [["Guia DP-600", "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-600"], ["Curso DP-600", "https://learn.microsoft.com/en-us/training/courses/dp-600t00"]])}
-          ${studyCard("Programação", ["1. lógica", "2. Python", "3. SQL", "4. Git", "5. HTML/CSS", "6. JavaScript", "7. Java", "8. projetos práticos"], [["MDN", "https://developer.mozilla.org/pt-BR/"], ["Python", "https://docs.python.org/pt-br/3/"]])}
-          ${studyCard("Dados", ["SQL forte", "Python/Pandas", "Power BI", "Modelagem", "ETL/ELT", "Fabric", "Portfólio: chamados de TI, ordens de serviço, estoque e atendimento"], [["Power BI Learn", "https://learn.microsoft.com/pt-br/power-bi/"], ["Pandas", "https://pandas.pydata.org/docs/"]])}
-          ${studyCard("Trilha recomendada para Dados", ["1. SQL forte", "2. Python/Pandas", "3. Power BI", "4. Modelagem dimensional", "5. Estatística básica", "6. ETL/ELT", "7. Microsoft Fabric", "8. Projetos de portfólio", "9. Preparação para entrevistas"], [["Microsoft Fabric", "https://learn.microsoft.com/en-us/fabric/"], ["PostgreSQL", "https://www.postgresql.org/docs/"], ["Kaggle", "https://www.kaggle.com/"], ["dados.gov.br", "https://dados.gov.br/"]])}
-          ${studyCard("Concursos Santos — IBAM", ["Edital 73/2026: Agente de Portaria e Inspetor de Alunos.", "Edital 71/2026: Oficial de Administração, objetiva + redação.", "Diferença central: IBAM usa múltipla escolha e pontuação por peso; CRT-SP/Quadrix usa Certo/Errado com pontuação líquida.", "Plano para mais de um cargo: Português, Matemática, Informática e Legislação primeiro; depois específicos por cargo.", "Estratégia: resolver questões curtas todos os dias e revisar os assuntos com erro ou branco."], [["Edital 73/2026 — IBAM", SANTOS_IBAM_CONFIG.officialLinks?.edital73], ["Edital 71/2026 — IBAM", SANTOS_IBAM_CONFIG.officialLinks?.edital71], ["Lei 13.460/2017", SANTOS_IBAM_CONFIG.officialLinks?.usuario], ["Lei 14.133/2021", SANTOS_IBAM_CONFIG.officialLinks?.compras]])}
-        </div>
-      </section>
-      <section class="panel">
-        <div class="section-heading">
-          <p class="eyebrow">Resumo rápido de carreira em dados</p>
-          <h2>O que estudar primeiro para estágio/júnior</h2>
-        </div>
-        <div class="study-grid">
-          ${studyCard("Análise de dados", ["Transforma dados em respostas de negócio.", "Começa por pergunta, métrica e recorte.", "Entrega insight, visual e recomendação."], [])}
-          ${studyCard("BI", ["Organiza indicadores recorrentes.", "Usa modelagem, Power BI, DAX e storytelling.", "Foco em acompanhamento e decisão."], [])}
-          ${studyCard("Engenharia de dados", ["Constrói pipelines e bases confiáveis.", "Cuida de ingestão, transformação, qualidade e monitoramento.", "Foco em disponibilidade e escala."], [])}
-          ${studyCard("Quando usar cada ferramenta", ["SQL: consultar, combinar e agregar dados.", "Python/Pandas: limpar, explorar e automatizar.", "Power BI: modelar, medir e comunicar.", "Fabric: integrar lakehouse, warehouse, pipelines e BI."], [["Power BI", "https://learn.microsoft.com/en-us/power-bi/"], ["Pandas", "https://pandas.pydata.org/docs/"]])}
-        </div>
-      </section>
-      <section class="panel">
-        <div class="section-heading">
-          <p class="eyebrow">Recomendação personalizada</p>
-          <h2>O que estudar hoje</h2>
-        </div>
-        <ul class="check-list">${recommendations.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+        <div class="study-grid">${cards.join("")}</div>
       </section>
     `;
   }
@@ -1358,12 +1439,11 @@
   function renderActiveTab() {
     const allowed = MODE_TABS[state.studyMode] || MODE_TABS.concursos;
     if (!allowed.includes(state.activeTab)) {
-      state.activeTab = state.studyMode === "concursos" ? "santos-ibam" : "dashboard";
+      state.activeTab = state.studyMode === "concursos" ? "santos-ibam" : "certificacoes";
     }
     renderHeader();
     renderTabs();
     const renderers = {
-      dashboard: renderDashboard,
       crt: renderCrtDaily,
       "prova-real": renderCrtRealExam,
       certificacoes: renderCertificationTab,
@@ -1706,7 +1786,7 @@
   }
 
   function startCertificationQuiz() {
-    let pool = poolByArea("certificacoes");
+    let pool = poolByArea("certificacoes").filter((question) => question.trilha === state.certTrack);
     let count = 10;
     let difficulty = state.difficulty;
     if (state.certMode === "simulado") count = 30;
@@ -1717,29 +1797,29 @@
     }
     if (state.certMode === "erros") count = 15;
     startQuiz({
-      title: `DP-600 — ${state.certMode}`,
+      title: `${state.certTrack} — ${state.certMode}`,
       kind: "certificacoes",
       area: "certificacoes",
-      trilha: "DP-600",
-      scopeKey: `dp600-${state.certMode}`,
+      trilha: state.certTrack,
+      scopeKey: `${state.certTrack}-${state.certMode}`,
       scoring: "positive",
-      questions: selectRotatingQuestions({ pool, count, difficulty, seedKey: `${getTodayKey()}-${state.currentUserId}-dp600-${state.certMode}-${state.certTopic}-${Date.now()}`, avoidIds: getRecentIds(`dp600-${state.certMode}`) }),
+      questions: selectRotatingQuestions({ pool, count, difficulty, seedKey: `${getTodayKey()}-${state.currentUserId}-${state.certTrack}-${state.certMode}-${state.certTopic}-${Date.now()}`, avoidIds: getRecentIds(`${state.certTrack}-${state.certMode}`) }),
     });
   }
-
   function startProgrammingQuiz() {
-    const pool = poolByArea("programacao").filter((question) => question.trilha === state.programmingTrack);
+    const career = getProgrammingCareer();
+    let pool = poolByArea("programacao").filter((question) => career.sourceTracks.includes(question.trilha));
+    if (!pool.length) pool = poolByArea("programacao");
     startQuiz({
-      title: `Programação — ${state.programmingTrack}`,
+      title: `Programação — ${career.title}`,
       kind: "programacao",
       area: "programacao",
-      trilha: state.programmingTrack,
-      scopeKey: `programacao-${state.programmingTrack}`,
+      trilha: career.title,
+      scopeKey: `programacao-${career.id}`,
       scoring: "positive",
-      questions: selectRotatingQuestions({ pool, count: 15, difficulty: state.difficulty, seedKey: `${getTodayKey()}-${state.currentUserId}-prog-${state.programmingTrack}-${Date.now()}`, avoidIds: getRecentIds(`programacao-${state.programmingTrack}`) }),
+      questions: selectRotatingQuestions({ pool, count: 15, difficulty: state.difficulty, seedKey: `${getTodayKey()}-${state.currentUserId}-prog-${career.id}-${Date.now()}`, avoidIds: getRecentIds(`programacao-${career.id}`) }),
     });
   }
-
   function startDataQuiz() {
     const pool = poolByArea("dados").filter((question) => question.trilha === state.dataTrack);
     startQuiz({
@@ -1845,7 +1925,7 @@
     if (target.dataset.switchUser !== undefined || target.id === "switch-user") renderUserSelection();
     if (target.dataset.modeSwitch) {
       state.studyMode = target.dataset.modeSwitch;
-      state.activeTab = state.studyMode === "concursos" ? "santos-ibam" : "dashboard";
+      state.activeTab = state.studyMode === "concursos" ? "santos-ibam" : "certificacoes";
       state.activeQuiz = null;
       renderActiveTab();
     }
@@ -1858,8 +1938,15 @@
     if (target.dataset.startCrtDaily !== undefined) startCrtDaily();
     if (target.dataset.startCrtExtra !== undefined) startCrtExtra();
     if (target.dataset.startCrtReal !== undefined) startCrtRealExam();
+    if (target.dataset.selectCert) {
+      state.certTrack = target.dataset.selectCert;
+      renderCertificationTab();
+    }
     if (target.dataset.startCert !== undefined) startCertificationQuiz();
-    if (target.dataset.startProgramming !== undefined) startProgrammingQuiz();
+    if (target.dataset.startProgramming !== undefined) {
+      if (target.dataset.programmingCareer) state.programmingCareer = target.dataset.programmingCareer;
+      startProgrammingQuiz();
+    }
     if (target.dataset.startData !== undefined) startDataQuiz();
     if (target.dataset.startAcademy !== undefined) startDataAcademyQuiz();
     if (target.dataset.academyAction) {
@@ -1894,6 +1981,10 @@
   document.addEventListener("change", (event) => {
     const target = event.target;
     if (target.matches("[data-difficulty]")) state.difficulty = target.value;
+    if (target.matches("[data-cert-track]")) {
+      state.certTrack = target.value;
+      if (state.activeTab === "certificacoes") renderCertificationTab();
+    }
     if (target.matches("[data-cert-mode]")) state.certMode = target.value;
     if (target.matches("[data-cert-topic]")) state.certTopic = target.value;
     if (target.matches("[data-programming-track]")) state.programmingTrack = target.value;
@@ -1927,3 +2018,5 @@
 
   renderUserSelection();
 })();
+
+

@@ -127,6 +127,151 @@
     }
   }
 
+  const certificationSets = [
+    {
+      code: "PL-300",
+      name: "Microsoft Power BI Data Analyst",
+      source: "Microsoft Learn — Study guide for Exam PL-300",
+      link: "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/pl-300",
+      topics: [
+        ["Preparar dados", "Power Query", "Power Query limpa, tipa, combina e transforma dados antes do modelo."],
+        ["Modelar dados", "modelo estrela", "Modelo estrela separa fatos e dimensoes para analise eficiente."],
+        ["DAX", "medidas", "Medidas DAX sao avaliadas conforme o contexto de filtro do relatorio."],
+        ["Visualizacao", "relatorios", "Visuais devem responder a pergunta de negocio com clareza e contexto."],
+        ["Publicacao", "workspaces", "Workspaces organizam conteudo, permissoes, atualizacoes e colaboracao."],
+        ["Seguranca", "RLS", "RLS restringe linhas conforme regras e identidade do usuario."],
+      ],
+    },
+    {
+      code: "AZ-900",
+      name: "Microsoft Azure Fundamentals",
+      source: "Microsoft Learn — Study guide for Exam AZ-900",
+      link: "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/az-900",
+      topics: [
+        ["Conceitos de nuvem", "IaaS PaaS SaaS", "IaaS, PaaS e SaaS distribuem responsabilidades de infraestrutura e aplicacao."],
+        ["Core Azure", "regioes", "Regioes e zonas de disponibilidade apoiam residencia, latencia e resiliencia."],
+        ["Identidade", "Microsoft Entra ID", "Microsoft Entra ID centraliza identidade, acesso e autenticacao."],
+        ["Seguranca", "defesa em profundidade", "Defesa em profundidade combina controles em varias camadas."],
+        ["Custos", "calculadora", "Calculadoras e budgets ajudam a estimar, acompanhar e controlar gastos."],
+        ["Governanca", "Azure Policy", "Azure Policy aplica regras e conformidade em recursos."],
+      ],
+    },
+    {
+      code: "PL-900",
+      name: "Microsoft Power Platform Fundamentals",
+      source: "Microsoft Learn — Study guide for Exam PL-900",
+      link: "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/pl-900",
+      topics: [
+        ["Power Platform", "componentes", "Power Platform combina Power Apps, Power Automate, Power BI, Copilot Studio e conectores."],
+        ["Power Apps", "aplicativos", "Power Apps cria apps de baixo codigo conectados a dados e processos."],
+        ["Power Automate", "fluxos", "Power Automate automatiza tarefas e integra sistemas por gatilhos e acoes."],
+        ["Power BI", "analise", "Power BI transforma dados em relatorios, dashboards e indicadores."],
+        ["Dataverse", "dados", "Dataverse oferece armazenamento gerenciado, seguranca e regras de negocio."],
+        ["Copilot Studio", "agentes", "Copilot Studio permite criar agentes conversacionais para processos e atendimento."],
+      ],
+    },
+    {
+      code: "DP-900",
+      name: "Microsoft Azure Data Fundamentals",
+      source: "Microsoft Learn — Study guide for Exam DP-900",
+      link: "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-900",
+      topics: [
+        ["Dados relacionais", "tabelas", "Bancos relacionais organizam dados em tabelas com linhas, colunas e chaves."],
+        ["NoSQL", "dados semi-estruturados", "NoSQL atende cenarios flexiveis como documentos, chave-valor e grafos."],
+        ["Analytics", "batch e streaming", "Processamento batch usa lotes; streaming trata eventos quase em tempo real."],
+        ["Power BI", "visualizacao", "Power BI conecta, modela e visualiza dados para decisao."],
+        ["Azure SQL", "PaaS relacional", "Azure SQL oferece banco relacional gerenciado na nuvem."],
+        ["Data lake", "armazenamento analitico", "Data lakes armazenam grandes volumes em formatos variados para analise."],
+      ],
+    },
+    {
+      code: "DP-700",
+      name: "Microsoft Fabric Data Engineer",
+      source: "Microsoft Learn — Microsoft Certified: Fabric Data Engineer Associate",
+      link: "https://learn.microsoft.com/en-us/credentials/certifications/fabric-data-engineer-associate/",
+      topics: [
+        ["Lakehouse", "OneLake", "Lakehouse em Fabric usa OneLake para combinar arquivos, tabelas e analise."],
+        ["Pipelines", "orquestracao", "Pipelines movem e coordenam atividades de ingestao e transformacao."],
+        ["Dataflows Gen2", "Power Query", "Dataflows Gen2 reutilizam transformacoes com Power Query."],
+        ["Warehouse", "T-SQL", "Warehouse atende consultas SQL analiticas e modelagem relacional."],
+        ["Medallion", "bronze silver gold", "A arquitetura medalhao organiza dados brutos, tratados e prontos para consumo."],
+        ["Governanca", "seguranca", "Engenharia de dados exige permissoes, linhagem, qualidade e monitoramento."],
+      ],
+    },
+  ];
+
+  certificationSets.forEach((cert) => {
+    for (let index = 0; index < 30; index += 1) {
+      const [disciplina, assunto, conceito] = cert.topics[index % cert.topics.length];
+      const tipo = typeCycle[index % typeCycle.length];
+      const base = {
+        id: `${cert.code.replace("-", "")}-${String(index + 1).padStart(3, "0")}`,
+        area: "certificacoes",
+        trilha: cert.code,
+        disciplina,
+        assunto,
+        dificuldade: difficultyCycle[index % difficultyCycle.length],
+        fonte: cert.source,
+        link: cert.link,
+        tags: ["certificacao", cert.code.toLowerCase(), assunto.toLowerCase().replaceAll(" ", "-")],
+      };
+
+      if (tipo === "trueFalse") {
+        add({
+          ...base,
+          tipo,
+          enunciado: `${conceito} No contexto da certificacao ${cert.code}, essa afirmacao esta correta.`,
+          gabarito: "C",
+          comentario: conceito,
+        });
+      } else if (tipo === "codeOutput") {
+        add({
+          ...base,
+          tipo,
+          enunciado: `Em ${cert.name}, qual interpretacao melhor se encaixa no tema ${assunto}?`,
+          codigo: `${disciplina} -> ${assunto} -> decisao tecnica`,
+          alternativas: labelOptions([
+            conceito,
+            "Ignorar governanca, seguranca e contexto de negocio.",
+            "Usar o recurso apenas para editar imagens locais.",
+            "Substituir revisao tecnica por tentativa aleatoria.",
+          ]),
+          gabarito: 0,
+          comentario: conceito,
+        });
+      } else if (tipo === "findError") {
+        add({
+          ...base,
+          tipo,
+          enunciado: `Identifique o erro conceitual mais provavel em ${assunto}.`,
+          codigo: `Cenario: a equipe tenta resolver ${assunto} sem validar requisitos, permissoes ou impacto operacional.`,
+          alternativas: labelOptions([
+            "A solucao deve considerar requisito, seguranca, custo, desempenho e operacao.",
+            "O melhor caminho e sempre aumentar custo sem medir resultado.",
+            "Certificacoes cobram apenas decoracao de nomes, nunca cenarios.",
+            "Toda solucao correta dispensa monitoramento.",
+          ]),
+          gabarito: 0,
+          comentario: conceito,
+        });
+      } else {
+        add({
+          ...base,
+          tipo,
+          enunciado: `Qual alternativa descreve melhor ${assunto} na certificacao ${cert.code}?`,
+          alternativas: labelOptions([
+            conceito,
+            "Um conceito sem relacao com nuvem, dados, BI ou IA.",
+            "Uma pratica que elimina a necessidade de seguranca.",
+            "Um recurso exclusivo para formatar textos no navegador.",
+          ]),
+          gabarito: 0,
+          comentario: conceito,
+        });
+      }
+    }
+  });
+
   const programmingTopics = [
     ["Python", "Listas", "valores = [1, 2, 3]\nprint(valores[-1])", "3", "Índice -1 retorna o último item da lista."],
     ["Python", "Dicionários", "dados = {'setor': 'TI'}\nprint(dados['setor'])", "TI", "Dicionários acessam valores pela chave."],

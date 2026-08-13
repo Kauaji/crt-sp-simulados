@@ -409,11 +409,11 @@ footer p {
 
 .active-contest-card {
   position: relative;
-  min-height: 238px;
-  padding: 22px;
+  min-height: 148px;
+  padding: 18px;
   overflow: hidden;
   border: 1px solid rgba(121, 255, 178, 0.2);
-  border-radius: var(--radius-lg);
+  border-radius: 24px;
   background:
     linear-gradient(160deg, rgba(121, 255, 178, 0.14), rgba(88, 166, 255, 0.08)),
     rgba(255, 255, 255, 0.07);
@@ -422,14 +422,7 @@ footer p {
 }
 
 .active-contest-card::before {
-  position: absolute;
-  inset: 0;
-  content: "";
-  background:
-    linear-gradient(90deg, transparent 0 13px, rgba(205, 255, 224, 0.08) 13px 14px),
-    linear-gradient(0deg, transparent 0 13px, rgba(205, 255, 224, 0.06) 13px 14px);
-  background-size: 28px 28px;
-  mask-image: linear-gradient(180deg, #000, transparent);
+  display: none;
 }
 
 .active-contest-card > * {
@@ -1012,9 +1005,17 @@ main {
   transition: border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
 }
 
+.field select {
+  appearance: auto;
+  background: #f9fbff;
+  color: #17251e;
+  font-weight: 900;
+}
+
 .field select option {
-  background: #10211c;
-  color: var(--ink);
+  background: #ffffff;
+  color: #17251e;
+  font-weight: 800;
 }
 
 .field input:focus,
@@ -1514,11 +1515,149 @@ body.mode-concursos .hero-notice {
 }
 
 body.mode-tech .mode-switch {
-  background: rgba(8, 19, 16, 0.72);
+  background: rgba(5, 14, 31, 0.82);
 }
 
 body.mode-tech .mode-switch__button.active {
-  color: #04120d;
+  color: #041020;
+}
+
+body.mode-tech {
+  --void: #06101f;
+  --void-2: #081a33;
+  --panel: rgba(13, 30, 54, 0.82);
+  --panel-strong: rgba(15, 38, 70, 0.94);
+  --line: rgba(147, 197, 253, 0.18);
+  --line-strong: rgba(147, 197, 253, 0.34);
+  --ink: #eef7ff;
+  --muted: #9db4cf;
+  --muted-2: #d7eaff;
+  --forest: #60a5fa;
+  --forest-2: #38bdf8;
+  --mint: #d9efff;
+  --gold: #f8d477;
+  --blue: #7dd3fc;
+  --glow-green: 0 0 0 1px rgba(125, 211, 252, 0.22), 0 24px 80px rgba(37, 99, 235, 0.2);
+  background:
+    radial-gradient(circle at 14% 8%, rgba(56, 189, 248, 0.22), transparent 28rem),
+    radial-gradient(circle at 88% 12%, rgba(59, 130, 246, 0.24), transparent 30rem),
+    linear-gradient(135deg, #06101f, #08172b 48%, #061225);
+}
+
+body.mode-tech::before {
+  background-image:
+    linear-gradient(rgba(147, 197, 253, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(147, 197, 253, 0.06) 1px, transparent 1px);
+}
+
+body.mode-tech::after {
+  background:
+    linear-gradient(115deg, transparent 0 42%, rgba(56, 189, 248, 0.09) 48%, transparent 54% 100%),
+    radial-gradient(circle at 22% 88%, rgba(96, 165, 250, 0.16), transparent 26rem);
+}
+
+body.mode-tech .hero {
+  background:
+    radial-gradient(circle at 78% 10%, rgba(56, 189, 248, 0.18), transparent 28rem),
+    linear-gradient(135deg, rgba(6, 16, 31, 0.98), rgba(8, 26, 51, 0.95));
+}
+
+body.mode-tech .field select,
+body.mode-tech .field select option {
+  background: #0d1e36;
+  color: #eef7ff;
+}
+
+.form-grid--single {
+  grid-template-columns: minmax(220px, 340px);
+}
+
+.cert-grid,
+.career-grid {
+  display: grid;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.cert-grid {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.career-grid {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.mini-path,
+.career-card {
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.105), rgba(255, 255, 255, 0.045)),
+    var(--panel);
+  color: var(--ink);
+  box-shadow: 0 18px 54px rgba(0, 0, 0, 0.18);
+  transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease, background 200ms ease;
+}
+
+.mini-path {
+  display: grid;
+  gap: 2px;
+  padding: 14px;
+  border-radius: 18px;
+  text-align: left;
+}
+
+.mini-path span,
+.career-card small {
+  color: var(--muted);
+}
+
+.mini-path:hover,
+.mini-path.is-selected,
+.career-card:hover,
+.career-card.is-selected {
+  transform: translateY(-3px);
+  border-color: var(--line-strong);
+  box-shadow: var(--glow-green);
+}
+
+.career-card {
+  display: grid;
+  gap: 14px;
+  min-height: 430px;
+  padding: 20px;
+  border-radius: 24px;
+}
+
+.career-card h3 {
+  margin: 12px 0 8px;
+  font-size: 1.55rem;
+}
+
+.career-card ul {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--muted-2);
+}
+
+.career-card .primary-button {
+  align-self: end;
+  margin-top: auto;
+}
+
+.progress-meter {
+  height: 12px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.progress-meter span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--forest), var(--blue), var(--gold));
+  transition: width 480ms ease;
 }
 
 @media (max-width: 980px) {
