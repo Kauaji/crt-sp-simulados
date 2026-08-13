@@ -4,6 +4,7 @@
   const DATA = window.STUDY_DATA || { questoes: [], sources: {} };
   const EXTRA_BANK = window.QUESTION_BANK || [];
   const SANTOS_IBAM_CONFIG = window.SANTOS_IBAM_CONFIG || { roles: [], officialLinks: {} };
+  const CAREER_GUIDES = window.CAREER_GUIDES || {};
   const STORE_KEY = "crtsp-gamified-study-v1";
   const TIMEZONE = "America/Sao_Paulo";
   const BLANK = "__blank__";
@@ -18,7 +19,7 @@
 
   const TABS = [
     ["santos-ibam", "Concursos Santos — IBAM"],
-    ["programacao", "Programação"],
+    ["programacao", "Trilhas"],
     ["certificacoes", "Certificações"],
     ["dados", "Dados"],
     ["academia-dados", "Academia de Dados"],
@@ -46,6 +47,7 @@
     certTopic: "Microsoft Fabric",
     programmingTrack: "Python",
     programmingCareer: "frontend",
+    programmingDetail: null,
     dataTrack: "Fundamentos de Dados",
     academyTrack: "Fundamentos de Dados",
     academyMode: "rapido",
@@ -313,7 +315,12 @@
   }
 
   function saveStore(store) {
-    localStorage.setItem(STORE_KEY, JSON.stringify(store));
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify(store));
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   function makeUserStats(userId) {
@@ -346,6 +353,7 @@
       materiasComMaisBranco: {},
       trilhasEstudadas: {},
       recentQuestionIds: {},
+      careerProgress: {},
     };
   }
 
@@ -360,28 +368,94 @@
   function loadUserStats(userId = state.currentUserId) {
     const store = loadStore();
     store.users = store.users || {};
-    store.users[userId] = store.users[userId] || makeUserStats(userId);
-    saveStore(store);
-    return store.users[userId];
+    const existing = store.users[userId];
+    if (!existing) {
+      store.users[userId] = makeUserStats(userId);
+      saveStore(store);
+      return store.users[userId];
+    }
+    return {
+      ...makeUserStats(userId),
+      ...existing,
+      careerProgress: existing.careerProgress && typeof existing.careerProgress === "object" ? existing.careerProgress : {},
+    };
   }
 
   function getProgrammingCareer(id = state.programmingCareer) {
     return PROGRAMMING_CAREERS.find((career) => career.id === id) || PROGRAMMING_CAREERS[0];
   }
 
+  function getProgrammingGuide(careerId = state.programmingCareer) {
+    return CAREER_GUIDES[careerId] || null;
+  }
+
   function getProgrammingCareerProgress(career, stats = loadUserStats()) {
+    const guide = getProgrammingGuide(career.id);
     const history = stats.historicoUltimosResultados || [];
-    const attempts = history.filter((item) => item.kind === "programacao" && item.scopeKey === `programacao-${career.id}`).length;
-    const percent = Math.min(100, attempts * 20);
-    const last = history.find((item) => item.kind === "programacao" && item.scopeKey === `programacao-${career.id}`);
-    return { attempts, percent, last };
+    const careerHistory = history.filter((item) => (
+      item.kind === "programacao" && item.scopeKey === `programacao-${career.id}`
+    ) || (
+      item.area === "programacao" && item.trilha === career.title
+    ));
+    const validStepIds = new Set((guide?.stages || []).map((stage) => stage.id));
+    const stored = stats.careerProgress?.[career.id] || {};
+    const storedSteps = Array.isArray(stored.completedSteps) ? stored.completedSteps : [];
+    const completedSteps = [...new Set(storedSteps)].filter((id) => validStepIds.has(id));
+    const stageTotal = validStepIds.size;
+    const historyQuizPassed = careerHistory.some((item) => Number(item.percentual) >= 70);
+    const quizPassed = Boolean(stored.quizPassed) || historyQuizPassed;
+    if (historyQuizPassed && !stored.quizPassed) {
+      stats.careerProgress = stats.careerProgress || {};
+      stats.careerProgress[career.id] = {
+        ...stored,
+        completedSteps,
+        quizPassed: true,
+        projectDone: Boolean(stored.projectDone),
+        updatedAt: new Date().toISOString(),
+      };
+      saveUserStats(stats);
+    }
+    const projectDone = Boolean(stored.projectDone);
+    const stagePercent = stageTotal ? (completedSteps.length / stageTotal) * 70 : 0;
+    const percent = Math.round(stagePercent + (quizPassed ? 20 : 0) + (projectDone ? 10 : 0));
+    const nextStage = (guide?.stages || []).find((stage) => !completedSteps.includes(stage.id)) || null;
+    return {
+      attempts: careerHistory.length,
+      percent,
+      last: careerHistory[0] || null,
+      completedSteps,
+      stageTotal,
+      quizPassed,
+      projectDone,
+      nextStage,
+    };
+  }
+
+  function updateProgrammingCareerProgress(careerId, update) {
+    const career = getProgrammingCareer(careerId);
+    const guide = getProgrammingGuide(career.id);
+    if (!guide) return;
+    const stats = loadUserStats();
+    stats.careerProgress = stats.careerProgress || {};
+    const validStepIds = new Set(guide.stages.map((stage) => stage.id));
+    const current = stats.careerProgress[career.id] || {};
+    const record = {
+      completedSteps: [...new Set(Array.isArray(current.completedSteps) ? current.completedSteps : [])].filter((id) => validStepIds.has(id)),
+      quizPassed: Boolean(current.quizPassed),
+      projectDone: Boolean(current.projectDone),
+    };
+    update(record);
+    record.completedSteps = [...new Set(record.completedSteps)].filter((id) => validStepIds.has(id));
+    record.updatedAt = new Date().toISOString();
+    stats.careerProgress[career.id] = record;
+    saveUserStats(stats);
   }
 
   function saveUserStats(stats, userId = state.currentUserId) {
     const store = loadStore();
     store.users = store.users || {};
     store.users[userId] = stats;
-    saveStore(store);
+    return saveStore(store);
   }
 
   function registerUserAccess(userId) {
@@ -513,6 +587,21 @@
 
     stats.trilhasEstudadas[result.trilha] = (stats.trilhasEstudadas[result.trilha] || 0) + 1;
 
+    if (result.area === "programacao" && result.percent >= 70) {
+      const career = PROGRAMMING_CAREERS.find((item) => result.scopeKey === `programacao-${item.id}`);
+      if (career) {
+        stats.careerProgress = stats.careerProgress || {};
+        const current = stats.careerProgress[career.id] || {};
+        stats.careerProgress[career.id] = {
+          ...current,
+          completedSteps: Array.isArray(current.completedSteps) ? current.completedSteps : [],
+          quizPassed: true,
+          projectDone: Boolean(current.projectDone),
+          updatedAt: new Date().toISOString(),
+        };
+      }
+    }
+
     for (const item of result.items) {
       if (!item.correct && !item.blank && !item.partial) {
         stats.materiasComMaisErro[item.disciplina] = (stats.materiasComMaisErro[item.disciplina] || 0) + 1;
@@ -530,6 +619,8 @@
       id: `${Date.now()}-${result.kind}`,
       data: new Date().toISOString(),
       titulo: result.title,
+      kind: result.kind,
+      scopeKey: result.scopeKey,
       area: result.area,
       trilha: result.trilha,
       total: result.total,
@@ -566,7 +657,6 @@
         <span class="profile-card__avatar profile-card__avatar--${escapeHtml(user.accent)}">${escapeHtml(user.initial)}</span>
         <span>
           <strong>${escapeHtml(user.nome)}</strong>
-          <small>Entrar no meu painel, foguinho e histórico local</small>
         </span>
         <span aria-hidden="true">🚀</span>
       </button>
@@ -811,6 +901,7 @@
   }
   function renderProgrammingTab() {
     const stats = loadUserStats();
+    state.programmingDetail = null;
     $("#tab-content").innerHTML = `
       <section class="panel panel--tech-flow">
         <div class="section-heading">
@@ -821,10 +912,9 @@
           ${PROGRAMMING_CAREERS.map((career, index) => {
             const progress = getProgrammingCareerProgress(career, stats);
             return `
-              <article class="career-card ${state.programmingCareer === career.id ? "is-selected" : ""}" style="--item-index:${index}">
+              <article class="career-card" style="--item-index:${index}">
                 <figure class="career-card__media">
                   <img src="${escapeHtml(career.image)}" alt="${escapeHtml(career.imageAlt)}" width="1280" height="720" loading="${index < 2 ? "eager" : "lazy"}" decoding="async">
-                  <span class="career-card__selected" aria-hidden="true">Trilha selecionada</span>
                 </figure>
                 <div class="career-card__content">
                   <span class="badge">${escapeHtml(career.level)}</span>
@@ -837,11 +927,207 @@
                     ${career.modules.map((module) => `<li>${escapeHtml(module)}</li>`).join("")}
                   </ul>
                   <p class="career-project"><strong>Projeto prático</strong><span>${escapeHtml(career.project)}</span></p>
-                  <button class="primary-button career-card__cta" type="button" data-start-programming data-programming-career="${escapeHtml(career.id)}">Começar trilha <span aria-hidden="true">→</span></button>
+                  <button class="primary-button career-card__cta" type="button" data-open-programming-career="${escapeHtml(career.id)}">Ver trilha completa <span aria-hidden="true">→</span></button>
                 </div>
               </article>
             `;
           }).join("")}
+        </div>
+      </section>
+    `;
+  }
+
+  function renderCareerResource(resource, type = "material") {
+    const eyebrow = resource.type || resource.kind || (type === "video" ? "Vídeo" : "Material oficial");
+    const description = resource.description || resource.note || [resource.provider, resource.language].filter(Boolean).join(" · ") || "Conteúdo recomendado para esta etapa da carreira.";
+    return `
+      <a class="career-resource" href="${escapeHtml(resource.url)}" target="_blank" rel="noreferrer">
+        <span class="career-resource__icon" aria-hidden="true">${type === "video" ? "▶" : "↗"}</span>
+        <span>
+          <small>${escapeHtml(eyebrow)}</small>
+          <strong>${escapeHtml(resource.title)}</strong>
+          <em>${escapeHtml(description)}</em>
+        </span>
+      </a>
+    `;
+  }
+
+  function renderProgrammingCareerDetail(careerId = state.programmingCareer) {
+    const career = getProgrammingCareer(careerId);
+    const guide = getProgrammingGuide(career.id);
+    if (!guide) {
+      state.programmingDetail = null;
+      renderProgrammingTab();
+      return;
+    }
+    state.programmingCareer = career.id;
+    state.programmingDetail = career.id;
+    state.activeQuiz = null;
+    const progress = getProgrammingCareerProgress(career);
+    const nextStage = progress.nextStage;
+    const completedSet = new Set(progress.completedSteps);
+
+    $("#tab-content").innerHTML = `
+      <section class="panel career-detail">
+        <button class="career-back" type="button" data-programming-back><span aria-hidden="true">←</span> Todas as trilhas</button>
+
+        <header class="career-detail__hero">
+          <figure class="career-detail__cover">
+            <img src="${escapeHtml(career.image)}" alt="" width="1280" height="720" decoding="async">
+          </figure>
+          <div class="career-detail__intro">
+            <p class="eyebrow">Trilha profissional completa</p>
+            <h2 id="career-detail-title" tabindex="-1">${escapeHtml(career.title)}</h2>
+            <p>${escapeHtml(guide.outcome)}</p>
+            <div class="career-detail__meta" aria-label="Informações da trilha">
+              <span>${escapeHtml(career.level)}</span>
+              <span>${escapeHtml(guide.duration)}</span>
+              <span>${escapeHtml(guide.weeklyHours)}</span>
+              <span>${guide.stages.length} etapas</span>
+            </div>
+            <div class="career-detail__hero-progress">
+              <div class="career-progress-copy"><span>Seu progresso nesta trilha</span><strong>${progress.percent}%</strong></div>
+              <div class="progress-meter" role="progressbar" aria-label="Progresso em ${escapeHtml(career.title)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progress.percent}"><span style="width:${progress.percent}%"></span></div>
+            </div>
+          </div>
+        </header>
+
+        <nav class="career-detail__nav" aria-label="Conteúdo da trilha">
+          <a href="#roteiro">Roteiro</a>
+          <a href="#projetos">Projetos</a>
+          <a href="#materiais">Materiais e vídeos</a>
+          <a href="#certificacoes-trilha">Certificações</a>
+          <a href="#carreira">Ramificações</a>
+        </nav>
+
+        <div class="career-detail__layout">
+          <div class="career-detail__main">
+            <section class="career-detail__section career-start-here">
+              <div class="career-section-heading">
+                <p class="eyebrow">Comece por aqui</p>
+                <h3>Como avançar sem se perder</h3>
+              </div>
+              <div class="career-instructions">
+                <article><span>1</span><strong>Estude na ordem</strong><p>Abra uma etapa por vez e domine os fundamentos antes de avançar.</p></article>
+                <article><span>2</span><strong>Pratique de verdade</strong><p>Faça a entrega indicada e confira o critério de conclusão.</p></article>
+                <article><span>3</span><strong>Comprove o domínio</strong><p>Marque a etapa, complete o quiz e finalize o projeto de portfólio.</p></article>
+              </div>
+            </section>
+
+            <section class="career-detail__section" id="roteiro">
+              <div class="career-section-heading">
+                <p class="eyebrow">Roteiro de aprendizagem</p>
+                <h3>Tudo o que você precisa aprender, na ordem certa</h3>
+                <p>${progress.completedSteps.length} de ${guide.stages.length} etapas concluídas.</p>
+              </div>
+              <div class="career-map">
+                ${guide.stages.map((stage, index) => {
+                  const completed = completedSet.has(stage.id);
+                  const isNext = nextStage?.id === stage.id;
+                  return `
+                    <article class="career-stage ${completed ? "is-complete" : ""} ${isNext ? "is-next" : ""}" style="--item-index:${index}">
+                      <div class="career-stage__rail" aria-hidden="true"><span>${completed ? "✓" : index + 1}</span></div>
+                      <details ${isNext || (!nextStage && index === 0) ? "open" : ""}>
+                        <summary>
+                          <span><small>${escapeHtml(stage.duration)}</small><strong>${escapeHtml(stage.title)}</strong></span>
+                          <span class="career-stage__status">${completed ? "Concluída" : isNext ? "Próxima etapa" : "Pendente"}</span>
+                        </summary>
+                        <div class="career-stage__body">
+                          ${stage.objective ? `<p class="career-stage__objective">${escapeHtml(stage.objective)}</p>` : ""}
+                          <div class="career-stage__columns">
+                            <div>
+                              <h4>O que aprender</h4>
+                              <ul>${stage.topics.map((topic) => `<li>${escapeHtml(topic)}</li>`).join("")}</ul>
+                            </div>
+                            <div class="career-stage__practice">
+                              <h4>Prática guiada</h4>
+                              <p>${escapeHtml(stage.practice)}</p>
+                            </div>
+                          </div>
+                          <div class="career-stage__done"><span aria-hidden="true">◆</span><p><strong>Você concluiu quando</strong>${escapeHtml(stage.completion)}</p></div>
+                          <button class="career-step-button ${completed ? "is-complete" : ""}" type="button" data-career-step="${escapeHtml(stage.id)}" data-career-id="${escapeHtml(career.id)}" aria-pressed="${completed}">
+                            <span aria-hidden="true">${completed ? "✓" : "+"}</span>${completed ? "Etapa concluída" : "Marcar etapa como concluída"}
+                          </button>
+                        </div>
+                      </details>
+                    </article>
+                  `;
+                }).join("")}
+              </div>
+            </section>
+
+            <section class="career-detail__section" id="projetos">
+              <div class="career-section-heading"><p class="eyebrow">Portfólio</p><h3>Projetos que comprovam sua evolução</h3><p>Não basta assistir: publique entregas que demonstrem as competências da trilha.</p></div>
+              <div class="career-project-grid">
+                ${guide.projects.map((project, index) => `
+                  <article class="career-project-card" style="--item-index:${index}">
+                    <span class="badge">${escapeHtml(project.level)}</span>
+                    <h4>${escapeHtml(project.title)}</h4>
+                    ${project.description ? `<p>${escapeHtml(project.description)}</p>` : ""}
+                    <ul>${(project.mustHave || project.deliverables || []).map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+                    <p><strong>${project.evidence ? "Evidência no portfólio" : "Entrega esperada"}</strong>${escapeHtml(project.evidence || "Publique o projeto com README, demonstração e os entregáveis acima.")}</p>
+                  </article>
+                `).join("")}
+              </div>
+            </section>
+
+            <section class="career-detail__section" id="materiais">
+              <div class="career-section-heading"><p class="eyebrow">Fontes confiáveis</p><h3>Materiais de estudo e vídeos de suporte</h3><p>Priorizei documentação, cursos e canais oficiais para você estudar com conteúdo atual.</p></div>
+              <h4 class="career-subheading">Documentação e cursos</h4>
+              <div class="career-resource-grid">${guide.materials.map((item) => renderCareerResource(item, "material")).join("")}</div>
+              <h4 class="career-subheading">Aulas e demonstrações</h4>
+              <div class="career-resource-grid">${guide.videos.map((item) => renderCareerResource(item, "video")).join("")}</div>
+            </section>
+
+            <section class="career-detail__section" id="certificacoes-trilha">
+              <div class="career-section-heading"><p class="eyebrow">Credenciais</p><h3>Certificações que fazem sentido</h3><p>Use certificação para validar prática — não como substituta dos projetos.</p></div>
+              <div class="career-cert-grid">
+                ${guide.certifications.map((cert, index) => `
+                  <a class="career-cert" href="${escapeHtml(cert.url)}" target="_blank" rel="noreferrer" style="--item-index:${index}">
+                    <span class="career-cert__order">${String(index + 1).padStart(2, "0")}</span>
+                    <span><small>${escapeHtml(cert.provider || cert.level || "Credencial oficial")}</small><strong>${escapeHtml(cert.title)}</strong><em>${escapeHtml(cert.note || cert.description || cert.relevance || cert.provider)}</em></span>
+                    <span aria-hidden="true">↗</span>
+                  </a>
+                `).join("")}
+              </div>
+            </section>
+
+            <section class="career-detail__section" id="carreira">
+              <div class="career-section-heading"><p class="eyebrow">Próximos caminhos</p><h3>Ramificações da área</h3><p>Depois da base, escolha uma especialização de acordo com o tipo de problema que gosta de resolver.</p></div>
+              <div class="career-branch-grid">
+                ${guide.branches.map((branch, index) => `
+                  <article class="career-branch" style="--item-index:${index}">
+                    <span aria-hidden="true">0${index + 1}</span>
+                    <h4>${escapeHtml(branch.title)}</h4>
+                    ${branch.description ? `<p>${escapeHtml(branch.description)}</p>` : ""}
+                    ${(branch.skills || branch.nextSkills)?.length ? `<div>${(branch.skills || branch.nextSkills).map((skill) => `<small>${escapeHtml(skill)}</small>`).join("")}</div>` : ""}
+                  </article>
+                `).join("")}
+              </div>
+            </section>
+          </div>
+
+          <aside class="career-detail__aside">
+            <div class="career-compass">
+              <p class="eyebrow">Seu plano</p>
+              <div class="career-compass__score"><strong>${progress.percent}%</strong><span>concluído</span></div>
+              <div class="progress-meter" role="progressbar" aria-label="Progresso geral" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progress.percent}"><span style="width:${progress.percent}%"></span></div>
+              <ul class="career-checkpoints">
+                <li class="${progress.completedSteps.length === guide.stages.length ? "is-done" : ""}"><span>${progress.completedSteps.length === guide.stages.length ? "✓" : progress.completedSteps.length}</span><p><strong>Roteiro</strong>${progress.completedSteps.length}/${guide.stages.length} etapas</p></li>
+                <li class="${progress.quizPassed ? "is-done" : ""}"><span>${progress.quizPassed ? "✓" : "2"}</span><p><strong>Quiz da trilha</strong>${progress.quizPassed ? "Aprovado com 70%+" : `${progress.attempts} tentativa(s)`}</p></li>
+                <li class="${progress.projectDone ? "is-done" : ""}"><span>${progress.projectDone ? "✓" : "3"}</span><p><strong>Projeto final</strong>${progress.projectDone ? "Entrega concluída" : "Ainda pendente"}</p></li>
+              </ul>
+              ${nextStage ? `<div class="career-next-step"><small>Próxima etapa</small><strong>${escapeHtml(nextStage.title)}</strong><a href="#roteiro">Continuar roteiro <span aria-hidden="true">↓</span></a></div>` : `<div class="career-next-step is-ready"><small>Roteiro completo</small><strong>Hora de validar e publicar</strong></div>`}
+              <button class="primary-button career-quiz-button" type="button" data-start-programming data-programming-career="${escapeHtml(career.id)}">Fazer quiz da trilha</button>
+              <button class="secondary-button career-project-toggle ${progress.projectDone ? "is-complete" : ""}" type="button" data-career-project data-career-id="${escapeHtml(career.id)}" aria-pressed="${progress.projectDone}">${progress.projectDone ? "✓ Projeto final concluído" : "Marcar projeto final concluído"}</button>
+              <small class="career-local-note">O progresso fica salvo neste perfil e neste navegador.</small>
+            </div>
+            <div class="career-essentials">
+              <p class="eyebrow">Não pule isto</p>
+              <h3>Princípios essenciais</h3>
+              <ul>${guide.essentials.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+            </div>
+          </aside>
         </div>
       </section>
     `;
@@ -1709,7 +1995,7 @@
         <div class="question-stack">
           ${quiz.questions.map((question, index) => renderAnsweredQuestion(question, index, result.items.find((item) => item.id === question.id))).join("")}
         </div>
-        <button class="primary-button" type="button" data-back-tabs>Voltar para as abas</button>
+        <button class="primary-button" type="button" data-back-tabs>${result.area === "programacao" && state.programmingDetail ? "Voltar para a trilha" : "Voltar para as abas"}</button>
       </section>
     `;
   }
@@ -1932,12 +2218,14 @@
       state.studyMode = target.dataset.modeSwitch;
       state.activeTab = state.studyMode === "concursos" ? "santos-ibam" : "programacao";
       state.activeQuiz = null;
+      state.programmingDetail = null;
       renderActiveTab();
     }
     if (target.dataset.resetUser !== undefined) resetCurrentUserData();
     if (target.dataset.tab) {
       state.activeTab = target.dataset.tab;
       state.activeQuiz = null;
+      state.programmingDetail = null;
       renderActiveTab();
     }
     if (target.dataset.startCrtDaily !== undefined) startCrtDaily();
@@ -1948,6 +2236,38 @@
       renderCertificationTab();
     }
     if (target.dataset.startCert !== undefined) startCertificationQuiz();
+    if (target.dataset.openProgrammingCareer) {
+      state.programmingCareer = target.dataset.openProgrammingCareer;
+      renderProgrammingCareerDetail(state.programmingCareer);
+      requestAnimationFrame(() => {
+        $("#career-detail-title")?.focus({ preventScroll: true });
+        $("#workspace")?.scrollIntoView({
+          behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+          block: "start"
+        });
+      });
+    }
+    if (target.dataset.programmingBack !== undefined) {
+      state.programmingDetail = null;
+      renderProgrammingTab();
+      requestAnimationFrame(() => document.querySelector(`[data-open-programming-career="${state.programmingCareer}"]`)?.focus());
+    }
+    if (target.dataset.careerStep && target.dataset.careerId) {
+      const scrollY = window.scrollY;
+      updateProgrammingCareerProgress(target.dataset.careerId, (record) => {
+        record.completedSteps = record.completedSteps.includes(target.dataset.careerStep)
+          ? record.completedSteps.filter((id) => id !== target.dataset.careerStep)
+          : [...record.completedSteps, target.dataset.careerStep];
+      });
+      renderProgrammingCareerDetail(target.dataset.careerId);
+      requestAnimationFrame(() => window.scrollTo({ top: scrollY, behavior: "auto" }));
+    }
+    if (target.dataset.careerProject !== undefined && target.dataset.careerId) {
+      const scrollY = window.scrollY;
+      updateProgrammingCareerProgress(target.dataset.careerId, (record) => { record.projectDone = !record.projectDone; });
+      renderProgrammingCareerDetail(target.dataset.careerId);
+      requestAnimationFrame(() => window.scrollTo({ top: scrollY, behavior: "auto" }));
+    }
     if (target.dataset.startProgramming !== undefined) {
       if (target.dataset.programmingCareer) state.programmingCareer = target.dataset.programmingCareer;
       startProgrammingQuiz();
@@ -1978,7 +2298,8 @@
     }
     if (target.dataset.cancelQuiz !== undefined || target.dataset.backTabs !== undefined) {
       state.activeQuiz = null;
-      renderActiveTab();
+      if (state.activeTab === "programacao" && state.programmingDetail) renderProgrammingCareerDetail(state.programmingDetail);
+      else renderActiveTab();
     }
     if (target.dataset.finishQuiz !== undefined) finishQuiz();
   });

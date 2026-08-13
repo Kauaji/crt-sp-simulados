@@ -11,6 +11,7 @@ const staticFiles = [
   "simulados.js",
   "questions-bank.js",
   "santos-ibam-bank.js",
+  "career-guides.js",
   "app.js",
 ];
 
