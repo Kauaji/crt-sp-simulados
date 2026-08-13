@@ -1037,3 +1037,269 @@ footer {
     animation-iteration-count: 1 !important;
   }
 }
+
+.panel {
+  width: min(var(--max), calc(100% - 32px));
+  margin: 22px auto;
+  padding: clamp(20px, 4vw, 34px);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 18px 50px rgba(18, 55, 42, 0.08);
+}
+
+.section-heading {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.dashboard-grid,
+.ranking-grid,
+.study-grid,
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px;
+}
+
+.metric-card,
+.ranking-card,
+.study-card {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: #fff;
+}
+
+.metric-card span,
+.metric-card small {
+  display: block;
+  color: var(--muted);
+}
+
+.metric-card strong {
+  display: block;
+  margin: 4px 0;
+  color: var(--forest);
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  line-height: 1;
+}
+
+.action-row,
+.sticky-actions,
+.quiz-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.primary-button,
+.secondary-button,
+.danger-button {
+  border: 0;
+  border-radius: 999px;
+  padding: 12px 18px;
+  font-weight: 800;
+}
+
+.primary-button {
+  background: var(--forest);
+  color: #fff;
+}
+
+.secondary-button {
+  background: var(--mint);
+  color: var(--forest);
+}
+
+.danger-button {
+  background: #ffe5e5;
+  color: var(--danger);
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.field select,
+.open-answer {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--ink);
+  padding: 12px;
+}
+
+.tag-cloud,
+.link-list {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.tag-cloud span,
+.link-list a,
+.notice {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 8px 11px;
+  background: var(--mint-2);
+  color: var(--forest);
+  font-size: 0.9rem;
+}
+
+.question-stack {
+  display: grid;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.question-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: #fff;
+  padding: clamp(16px, 3vw, 24px);
+}
+
+.question-card pre {
+  overflow-x: auto;
+  padding: 14px;
+  border-radius: 14px;
+  background: #10231b;
+  color: #e5ffe9;
+}
+
+.question-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.question-meta span {
+  border-radius: 999px;
+  background: var(--paper-2);
+  color: var(--muted);
+  padding: 6px 9px;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.answer-grid,
+.answer-list {
+  display: grid;
+  gap: 10px;
+}
+
+.answer-grid {
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+}
+
+.answer-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--mint-2);
+  padding: 12px;
+}
+
+.answer-option.selected {
+  border-color: var(--forest);
+  box-shadow: 0 0 0 3px rgba(18, 55, 42, 0.12);
+}
+
+.open-answer {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.sticky-actions {
+  position: sticky;
+  bottom: 12px;
+  justify-content: space-between;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(14px);
+}
+
+.is-correct {
+  border-color: rgba(22, 122, 74, 0.45);
+}
+
+.is-wrong {
+  border-color: rgba(179, 57, 57, 0.45);
+}
+
+.is-blank {
+  border-color: rgba(156, 107, 18, 0.4);
+}
+
+.check-list {
+  display: grid;
+  gap: 10px;
+  padding-left: 1.2rem;
+}
+
+.history-list {
+  display: grid;
+  gap: 10px;
+}
+
+.history-item {
+  display: grid;
+  gap: 4px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #fff;
+}
+
+.history-item span,
+.muted {
+  color: var(--muted);
+}
+
+.real-status {
+  margin-top: 18px;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background: var(--paper-2);
+}
+
+@media (max-width: 760px) {
+  .panel {
+    width: min(100% - 20px, var(--max));
+    border-radius: 22px;
+  }
+
+  .tabs {
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding-bottom: 8px;
+  }
+
+  .tabs button {
+    white-space: nowrap;
+  }
+
+  .hero-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sticky-actions {
+    position: static;
+  }
+}

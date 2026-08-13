@@ -1,211 +1,231 @@
-<div align="center">
+# Plataforma de Estudos — CRT-SP, DP-600, Programação e Dados
 
-# Plataforma Multi-Concurso
+Site estático em HTML, CSS e JavaScript puro publicado no Vercel:
 
-### Simulados, treinos e acompanhamento de desempenho para concursos públicos
+```text
+https://crt-sp-simulados.vercel.app
+```
 
-![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white)
-![CSS3](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?logo=javascript&logoColor=black)
-![Vercel](https://img.shields.io/badge/deploy-Vercel-black?logo=vercel)
-![Status](https://img.shields.io/badge/status-em%20evolução-orange)
-
-Aplicação web estática criada para organizar estudos, aplicar simulados autocorrigíveis e manter o progresso separado por usuário, concurso e cargo.
-
-[Ver aplicação](https://crt-sp-simulados.vercel.app)
-
-</div>
-
-## Visão geral
-
-A **Plataforma Multi-Concurso** reúne questões, treinos, simulados, revisão e indicadores de desempenho em uma interface única e responsiva.
-
-O projeto começou como uma ferramenta de preparação para o CRT-SP e evoluiu para suportar diferentes concursos, cargos, bancas e formatos de prova sem misturar o progresso dos usuários.
-
-Como a versão atual não depende de backend, os dados são armazenados no navegador por meio do `localStorage`. Essa abordagem permite publicação simples e rápida no Vercel, mantendo o projeto acessível e funcional.
-
-## Concursos disponíveis
-
-- **CRT-SP** — Técnico Administrativo e Fiscal da Baixada Santista.
-- **IBGE** — Agente Censitário de Qualidade e Analista Censitário em TI/Dados.
-- **Prefeitura de Santos** — Oficial de Administração.
-- **PM-SP** — Aluno-Soldado do Quadro de Praças.
+O foco principal continua sendo o concurso CRT-SP 2026 para Técnico Administrativo, com simulados Certo/Errado no estilo Quadrix. A plataforma também mantém o banco multi-concurso existente e adiciona trilhas de certificações, programação e dados com gamificação local.
 
 ## Funcionalidades
 
-- Seleção independente de usuário, concurso e cargo.
-- Dashboard com progresso e indicadores de estudo.
-- Treinos por matéria e assunto.
-- Simulados autocorrigíveis.
-- Histórico de desempenho.
-- Questões marcadas para revisão.
-- Metas e acompanhamento de evolução.
-- Explicação e fonte associadas às questões.
-- Layout responsivo para computador e celular.
-- Persistência local sem necessidade de cadastro em servidor.
+- Seleção obrigatória de usuário ao abrir ou recarregar o site: Kauã ou Vitória.
+- Dados separados por usuário via `localStorage`.
+- Dashboard com foguinho, maior streak, pontos, acessos, média, taxa de acerto e últimas tentativas.
+- Ranking Kauã x Vitória por pontos, acessos, foguinho, atividades e média.
+- Abas: Dashboard, CRT-SP, Prova real CRT-SP, Certificações, Programação, Dados, Estudos e Histórico.
+- Botão “Trocar usuário” disponível no topo.
+- Botão “Zerar meus dados locais”.
+- Recomendações personalizadas com base em erros, brancos e trilhas estudadas.
 
-## Banco de questões
-
-A base inicial possui **620 questões objetivas autorais**, distribuídas da seguinte forma:
-
-| Concurso e cargo | Quantidade inicial |
-|---|---:|
-| CRT-SP | 150 |
-| IBGE — Agente Censitário de Qualidade | 120 |
-| IBGE — Analista em TI/Dados | 80 |
-| Prefeitura de Santos | 150 |
-| PM-SP — Aluno-Soldado | 120 |
-
-As questões são inspiradas no conteúdo dos editais e no estilo das bancas, sem reprodução integral de provas protegidas. As principais referências estão documentadas em [`docs/editais/`](docs/editais/).
-
-## Arquitetura
-
-```text
-Navegador
-   |
-   ├── Interface HTML e CSS
-   ├── Lógica da aplicação em JavaScript
-   ├── Banco de questões estático
-   └── Progresso salvo no localStorage
-```
-
-Estrutura principal:
+## Estrutura
 
 ```text
 crt-sp-simulados/
-├── index.html           Estrutura principal da aplicação
-├── styles.css           Layout, componentes e responsividade
-├── app.js               Estado, navegação, simulados e progresso
-├── simulados.js         Usuários, concursos, cargos e questões
+├── index.html
+├── styles.css
+├── app.js
+├── simulados.js
+├── questions-bank.js
+├── data/
+├── docs/
 ├── scripts/
-│   └── build.mjs        Geração do diretório de produção
-├── docs/                Arquitetura, editais e fontes
-├── dist/                Build estático publicado
-└── vercel.json          Configuração de deploy
+│   ├── build.mjs
+│   └── rotate-daily-questions.mjs
+└── vercel.json
 ```
 
-## Tecnologias
+## CRT-SP
 
-| Área | Tecnologias |
-|---|---|
-| Interface | HTML5 e CSS3 |
-| Aplicação | JavaScript puro |
-| Persistência | localStorage |
-| Build | Node.js e script próprio |
-| Hospedagem | Vercel |
-| Versionamento | Git e GitHub |
+A aba CRT-SP possui:
 
-## Executar localmente
+- Simulado diário com 40 itens.
+- Distribuição: 12 básicos, 8 complementares e 20 específicos.
+- Certo, Errado e Em branco.
+- Pontuação Quadrix: +1 por acerto, -1 por erro e 0 em branco.
+- Seed determinística por data no fuso `America/Sao_Paulo`.
+- Gabarito comentado apenas após finalizar.
+- Botão “Gerar outro questionário CRT-SP”, evitando repetir exatamente o simulado diário.
 
-### Requisitos
+## Prova real CRT-SP
 
-- Node.js
-- npm
-- Git
+Modo com 120 itens:
 
-### Instalação
+- 40 conhecimentos básicos.
+- 30 conhecimentos complementares.
+- 50 conhecimentos específicos.
+- Duração sugerida de 3 horas.
+- Relatório por bloco/disciplina.
+- Mínimos configuráveis:
+
+```js
+MINIMOS_PROVA_REAL = { basicos: 10, complementares: 8, especificos: 17, total: 36 }
+```
+
+O relatório informa zona segura, atenção ou risco de eliminação.
+
+## Certificações
+
+Trilha inicial:
+
+- Microsoft DP-600 — Fabric Analytics Engineer Associate.
+
+Modos:
+
+- Questões rápidas.
+- Simulado 30 questões.
+- Revisão por tema.
+- Modo difícil.
+- Erros frequentes.
+
+O banco usa questões autorais baseadas nos tópicos públicos do guia de estudo da Microsoft Learn, sem copiar questões oficiais protegidas.
+
+## Programação
+
+Subtrilhas iniciais:
+
+- Python.
+- SQL.
+- Java.
+- JavaScript.
+- HTML.
+- CSS.
+- Git/GitHub.
+- Lógica.
+- Estruturas de dados.
+
+Tipos de treino incluem múltipla escolha, Certo/Errado, saída de código e identificação de erro.
+
+## Dados
+
+Trilhas práticas:
+
+- Fundamentos de Dados.
+- SQL para Dados.
+- Python para Dados.
+- Power BI.
+- Engenharia de Dados.
+- Analytics e Negócio.
+- Desafios práticos.
+
+Inclui cenários sobre qualidade, métricas, joins, pandas, Power BI, modelagem, ETL/ELT e indicadores.
+
+## Tipos de questões
+
+O sistema suporta:
+
+- `trueFalse`
+- `multipleChoice`
+- `codeOutput`
+- `findError`
+- `completeCode`
+- `explainCode`
+- `sqlQuery`
+- `daxMeasure`
+- `caseStudy`
+- `orderSteps`
+
+Correção automática completa na primeira versão:
+
+- `trueFalse`
+- `multipleChoice`
+- `codeOutput`
+- `findError`
+
+Tipos abertos são exibidos em `textarea` e preparados para autoavaliação.
+
+## Rotação
+
+A função principal é:
+
+```js
+selectRotatingQuestions({ pool, count, difficulty, seedKey, avoidIds })
+```
+
+Ela:
+
+- usa seed por data, usuário, trilha, dificuldade e tentativa;
+- evita IDs recentes salvos por usuário;
+- permite repetição quando o banco filtrado é pequeno;
+- usa dificuldade Fácil, Médio, Difícil ou Misto.
+
+O simulado diário CRT-SP usa seed por data para manter o mesmo conjunto durante todo o dia.
+
+Além disso, o repositório mantém a rotação agendada em GitHub Actions para os arquivos:
+
+- `data/daily-selection.json`
+- `data/daily-history.json`
+
+## Banco de questões
+
+Arquivos:
+
+- `simulados.js`: banco CRT-SP e concursos existentes.
+- `questions-bank.js`: banco inicial de DP-600, Programação e Dados.
+
+Quantidade inicial usada pela plataforma:
+
+- CRT-SP: 150 itens Certo/Errado vindos de `simulados.js`.
+- DP-600: 60 questões.
+- Programação: 80 questões.
+- Dados: 80 questões.
+
+Para adicionar novas questões em `questions-bank.js`, use campos como:
+
+```js
+{
+  id: "DP600-061",
+  area: "certificacoes",
+  trilha: "DP-600",
+  disciplina: "Microsoft Fabric",
+  assunto: "Lakehouse",
+  tipo: "multipleChoice",
+  dificuldade: "medio",
+  enunciado: "...",
+  alternativas: [{ label: "A", text: "..." }],
+  gabarito: 0,
+  comentario: "...",
+  tags: ["dp-600", "fabric"]
+}
+```
+
+## Como rodar localmente
 
 ```bash
-git clone https://github.com/Kauaji/crt-sp-simulados.git
-cd crt-sp-simulados
-npm install
 npm run build
 npm start
 ```
 
-Depois, acesse:
+Abra:
 
 ```text
 http://localhost:8080
 ```
 
-Por ser uma aplicação estática, também é possível servir a raiz do projeto com outro servidor HTTP local.
-
 ## Deploy no Vercel
 
-Configuração recomendada:
+O projeto é estático:
 
-| Campo | Valor |
-|---|---|
-| Framework Preset | Other |
-| Install Command | `npm install` |
-| Build Command | `npm run build` |
-| Output Directory | `dist` |
-| Production Branch | `main` |
+- Build Command: `npm run build`
+- Output Directory: `dist`
+- Production Branch: `main`
 
-O arquivo `vercel.json` já contém a configuração necessária:
+Ao fazer push na `main`, o Vercel atualiza automaticamente o projeto conectado.
 
-```json
-{
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "cleanUrls": true,
-  "trailingSlash": false
-}
-```
+## Limitações do localStorage
 
-Cada atualização mesclada na branch `main` inicia um novo deploy de produção no projeto conectado ao Vercel.
+Os dados ficam apenas no navegador atual. Se limpar cache, trocar de navegador ou acessar em outro aparelho, o histórico local não acompanha.
 
-## Estrutura das questões
+Ideias futuras:
 
-Cada questão mantém os principais campos de identificação, conteúdo e rastreabilidade:
+- Supabase para sincronizar usuários e histórico.
+- Vercel KV ou banco serverless para ranking compartilhado.
+- Painel administrativo para cadastrar questões.
 
-```text
-id
-concurso_id
-cargo_id
-cargos_compativeis
-materia_id
-assunto_id
-enunciado
-alternativas
-resposta_correta
-explicacao
-dificuldade
-banca
-ano
-origem
-fonte
-link
-status
-criado_em
-atualizado_em
-```
+## Cuidados
 
-## Atualização do conteúdo
-
-Após editar o banco de questões, valide o build antes de publicar:
-
-```bash
-npm run build
-git checkout -b content/atualiza-questoes
-git add .
-git commit -m "content: atualiza banco de questões"
-git push -u origin content/atualiza-questoes
-```
-
-Em seguida, abra um Pull Request para a branch `main`. Essa prática mantém o histórico organizado e permite revisar as alterações antes do deploy.
-
-## Limitações atuais
-
-- Os dados ficam armazenados somente no navegador utilizado.
-- Não existe sincronização automática entre dispositivos.
-- Os perfis locais não possuem autenticação real por senha.
-- Ranking em nuvem e administração centralizada exigirão backend.
-- Exercícios de redação podem ser registrados, mas não possuem correção automática.
-
-## Próximos passos
-
-- Adicionar backend e autenticação real.
-- Sincronizar progresso entre dispositivos.
-- Criar painel administrativo para questões e fontes.
-- Aprimorar auditoria de duplicidade e qualidade do conteúdo.
-- Expandir relatórios de desempenho por matéria e assunto.
-- Adicionar novos concursos de forma modular.
-
-## Autor
-
-**Kauã Marques**  
-Técnico de Informática e estudante de Análise e Desenvolvimento de Sistemas.
-
-O projeto combina desenvolvimento web, organização de dados, automação de conteúdo e uma necessidade real de preparação para concursos públicos.
+- Não usar senha real.
+- Não inserir dados sensíveis.
+- Não copiar questões oficiais protegidas.
+- Manter CRT-SP com Certo/Errado, diário com 40 itens e prova real com 120 itens.

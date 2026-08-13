@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Plataforma estática de estudos, questões e simulados para CRT-SP, IBGE, Prefeitura de Santos e PM-SP.">
+  <meta name="description" content="Plataforma estática gamificada para CRT-SP, DP-600, programação e dados.">
   <meta name="theme-color" content="#12372a">
-  <title>Simulados de Concursos — CRT-SP, IBGE, Santos e PM-SP</title>
+  <title>Plataforma de Estudos — CRT-SP, DP-600, Programação e Dados</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2312372a'/%3E%3Cpath d='M18 33.5 27 42l19-21' fill='none' stroke='%23d7f4df' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <section id="login-screen" class="login-screen" aria-labelledby="login-title">
     <div class="login-card">
-      <p class="eyebrow">Simulados públicos · dados locais · sem senha</p>
+      <p class="eyebrow">Estudos gamificados · dados locais · sem senha</p>
       <h1 id="login-title">Quem vai estudar hoje?</h1>
-      <p>Escolha um perfil para separar histórico, progresso, favoritas, simulados e metas. Nada é misturado entre usuários, concursos ou cargos.</p>
+      <p>Escolha Kauã ou Vitória para separar histórico, foguinho, ranking, simulados e recomendações. Nada é misturado entre usuários.</p>
       <div id="profile-options" class="profile-options" aria-label="Perfis disponíveis"></div>
       <p class="login-note">Os dados ficam salvos neste navegador via localStorage. Para sincronizar entre aparelhos, uma versão futura pode usar Supabase.</p>
     </div>
@@ -24,7 +24,7 @@
     <header class="hero">
       <div class="hero__inner">
         <nav class="topbar" aria-label="Sessão">
-          <span class="brand-mark">Prova<span>/</span>Mapa</span>
+          <span class="brand-mark">Estudo<span>/</span>Game</span>
           <div class="topbar__session">
             <span id="top-user-name"></span>
             <button id="change-contest" class="text-button" type="button" hidden>Trocar concurso</button>
@@ -34,10 +34,10 @@
 
         <div class="hero-grid">
           <div>
-            <p id="hero-eyebrow" class="eyebrow">Escolha um concurso para começar</p>
-            <h1 id="hero-title">Simulados segmentados por concurso</h1>
-            <p id="hero-copy" class="hero__copy">CRT-SP, IBGE, Prefeitura de Santos e PM-SP em áreas independentes: banco de questões, simulados, revisão, progresso e estatísticas por usuário, concurso e cargo.</p>
-            <div id="hero-notice" class="hero-notice">Selecione um card abaixo para carregar o edital, o formato da prova e suas matérias.</div>
+            <p id="hero-eyebrow" class="eyebrow">Plataforma gamificada</p>
+            <h1 id="hero-title">CRT-SP, DP-600, Programação e Dados</h1>
+            <p id="hero-copy" class="hero__copy">Simulados rotativos, prova real, dashboard, foguinho, ranking e recomendações personalizadas por usuário.</p>
+            <div id="hero-notice" class="hero-notice">Selecione um perfil para começar.</div>
           </div>
           <aside id="active-contest-card" class="active-contest-card" aria-live="polite"></aside>
         </div>
@@ -55,12 +55,13 @@
     </main>
 
     <footer>
-      <p>Material independente, gratuito e autoral. Não há vínculo oficial com CRT-SP, CFT, IBGE, Prefeitura de Santos, Quadrix, Instituto Avalia ou IBAM. Questões inéditas criadas com base em editais e fontes públicas.</p>
+      <p>Material independente, gratuito e autoral. Não há vínculo oficial com CRT-SP, CFT, Microsoft, Quadrix ou qualquer banca. Questões inéditas criadas com base em editais, guias públicos e fundamentos abertos.</p>
     </footer>
   </div>
 
   <script src="supabase-config.js"></script>
   <script src="simulados.js"></script>
+  <script src="questions-bank.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

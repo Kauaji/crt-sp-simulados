@@ -1,42 +1,46 @@
-/* global STUDY_DATA */
 "use strict";
 
-(function runApp() {
-  const DATA = window.STUDY_DATA;
-  const BLANK = "__blank";
-  const STORE_KEY = "multiconcurso.study.v1";
-  const SESSION_KEY = "multiconcurso.session.v1";
-  const DAILY_SELECTION_URL = "data/daily-selection.json";
-  const DAILY_TIMEZONE = "America/Sao_Paulo";
+(function initStudyPlatform() {
+  const DATA = window.STUDY_DATA || { questoes: [], sources: {} };
+  const EXTRA_BANK = window.QUESTION_BANK || [];
+  const STORE_KEY = "crtsp-gamified-study-v1";
+  const TIMEZONE = "America/Sao_Paulo";
+  const BLANK = "__blank__";
+  const MINIMOS_PROVA_REAL = { basicos: 10, complementares: 8, especificos: 17, total: 36 };
+
+  const USERS = [
+    { id: "kaua", nome: "Kauã", initial: "K", accent: "verde" },
+    { id: "vitoria", nome: "Vitória", initial: "V", accent: "coral" },
+  ];
+
   const TABS = [
     ["dashboard", "Dashboard"],
-    ["treino", "Treino"],
-    ["simulado", "Simulado"],
-    ["revisao", "Revisão"],
-    ["materias", "Matérias"],
+    ["crt", "CRT-SP"],
+    ["prova-real", "Prova real CRT-SP"],
+    ["certificacoes", "Certificações"],
+    ["programacao", "Programação"],
+    ["dados", "Dados"],
+    ["estudos", "Estudos"],
     ["historico", "Histórico"],
-    ["metas", "Metas"],
   ];
+
+  const OPEN_TYPES = new Set(["explainCode", "sqlQuery", "daxMeasure", "completeCode", "orderSteps", "caseStudy"]);
+  const DIFFICULTY_POINTS = { facil: 1, medio: 2, dificil: 3 };
+  const CRT_ROLE_ID = "crt-tecnico-administrativo-bs";
 
   const state = {
     currentUserId: null,
-    activeContestId: null,
-    activeRoleId: null,
     activeTab: "dashboard",
-    showContestPicker: true,
-    practice: {
-      queueIds: [],
-      answered: {},
-      startedAt: {},
-      mode: "modo-treino",
-    },
-    mock: null,
-    timerInterval: null,
-    dailySelection: null,
+    difficulty: "misto",
+    crtExtraAttempt: 0,
+    certMode: "rapidas",
+    certTopic: "Microsoft Fabric",
+    programmingTrack: "Python",
+    dataTrack: "Fundamentos de Dados",
+    activeQuiz: null,
   };
 
   const $ = (selector) => document.querySelector(selector);
-  const $$ = (selector) => [...document.querySelectorAll(selector)];
 
   function escapeHtml(value) {
     return String(value ?? "")
@@ -47,20 +51,9 @@
       .replaceAll("'", "&#039;");
   }
 
-  function percent(part, total, decimals = 0) {
-    if (!total) return "0";
-    return ((part / total) * 100).toFixed(decimals);
-  }
-
-  function formatDate(dateString) {
-    if (!dateString) return "—";
-    const [year, month, day] = dateString.split("-").map(Number);
-    return new Intl.DateTimeFormat("pt-BR", { dateStyle: "short" }).format(new Date(year, month - 1, day));
-  }
-
-  function saoPauloDateKey(date = new Date()) {
+  function getTodayKey(date = new Date()) {
     const parts = new Intl.DateTimeFormat("en-CA", {
-      timeZone: DAILY_TIMEZONE,
+      timeZone: TIMEZONE,
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
@@ -69,145 +62,18 @@
     return `${values.year}-${values.month}-${values.day}`;
   }
 
-  function daysUntil(dateString) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const [year, month, day] = dateString.split("-").map(Number);
-    const target = new Date(year, month - 1, day);
-    target.setHours(0, 0, 0, 0);
-    return Math.ceil((target - today) / 86400000);
+  function addDays(dateKey, days) {
+    const [year, month, day] = dateKey.split("-").map(Number);
+    return new Date(Date.UTC(year, month - 1, day + days, 12)).toISOString().slice(0, 10);
   }
 
-  function nowIso() {
-    return new Date().toISOString();
-  }
-
-  function safeNumber(value, fallback = 0) {
-    const number = Number(value);
-    return Number.isFinite(number) ? number : fallback;
-  }
-
-  function normalizeAnswer(answer) {
-    return answer === undefined || answer === null || answer === "" ? BLANK : answer;
-  }
-
-  function isBlank(answer) {
-    return normalizeAnswer(answer) === BLANK;
-  }
-
-  function contestById(contestId = state.activeContestId) {
-    return DATA.concursos.find((contest) => contest.id === contestId);
-  }
-
-  function roleById(contestId = state.activeContestId, roleId = state.activeRoleId) {
-    return contestById(contestId)?.roles.find((role) => role.id === roleId);
-  }
-
-  function currentUserDef() {
-    return DATA.users.find((user) => user.id === state.currentUserId);
-  }
-
-  function loadStore() {
-    try {
-      const parsed = JSON.parse(localStorage.getItem(STORE_KEY) || "{}");
-      return parsed && typeof parsed === "object" ? parsed : { users: {} };
-    } catch {
-      return { users: {} };
-    }
-  }
-
-  function saveStore(store) {
-    localStorage.setItem(STORE_KEY, JSON.stringify(store));
-  }
-
-  function withStore(mutator) {
-    const store = loadStore();
-    store.users = store.users || {};
-    DATA.users.forEach((user) => {
-      store.users[user.id] = store.users[user.id] || makeUserRecord(user.id);
-    });
-    const result = mutator(store);
-    saveStore(store);
-    return result;
-  }
-
-  function makeUserRecord(userId) {
-    return {
-      userId,
-      selectedContestId: null,
-      selectedRoleByContest: {},
-      scopes: {},
-      createdAt: nowIso(),
-    };
-  }
-
-  function currentUserRecord(store = loadStore()) {
-    store.users = store.users || {};
-    store.users[state.currentUserId] = store.users[state.currentUserId] || makeUserRecord(state.currentUserId);
-    return store.users[state.currentUserId];
-  }
-
-  function scopeKey(contestId = state.activeContestId, roleId = state.activeRoleId) {
-    return `${contestId}::${roleId}`;
-  }
-
-  function makeScope() {
-    return {
-      answers: {},
-      history: [],
-      mocks: [],
-      favorites: {},
-      notes: {},
-      reports: {},
-      revisionMarked: {},
-      goals: {
-        dailyQuestions: 30,
-        weeklyMocks: 2,
-        reviewWrong: 20,
-        targetAccuracy: 80,
-      },
-      createdAt: nowIso(),
-    };
-  }
-
-  function getScope(store = loadStore(), contestId = state.activeContestId, roleId = state.activeRoleId) {
-    const user = currentUserRecord(store);
-    const key = scopeKey(contestId, roleId);
-    user.scopes[key] = user.scopes[key] || makeScope();
-    return user.scopes[key];
-  }
-
-  function persistScope(mutator) {
-    return withStore((store) => {
-      const scope = getScope(store);
-      return mutator(scope, store);
-    });
-  }
-
-  function questionsFor(contestId = state.activeContestId, roleId = state.activeRoleId) {
-    return DATA.questoes.filter((question) => (
-      question.concurso_id === contestId
-      && question.cargos_compativeis.includes(roleId)
-      && !["redacao", "discursiva"].includes(question.tipo)
-    ));
-  }
-
-  function mattersFor(contestId = state.activeContestId, roleId = state.activeRoleId) {
-    const contest = contestById(contestId);
-    return (contest?.materias || []).filter((matter) => !matter.roleIds || matter.roleIds.includes(roleId));
-  }
-
-  function hashSeed(text) {
+  function seededRandom(seedKey) {
     let hash = 2166136261;
-    for (let index = 0; index < text.length; index += 1) {
-      hash ^= text.charCodeAt(index);
+    for (let index = 0; index < String(seedKey).length; index += 1) {
+      hash ^= String(seedKey).charCodeAt(index);
       hash = Math.imul(hash, 16777619);
     }
-    return hash >>> 0;
-  }
-
-  function seededRandom(seedText) {
-    let stateValue = hashSeed(seedText);
+    let stateValue = hash >>> 0;
     return () => {
       stateValue += 0x6D2B79F5;
       let value = stateValue;
@@ -217,9 +83,9 @@
     };
   }
 
-  function shuffle(items, seedText = String(Date.now())) {
+  function shuffleWithSeed(items, seedKey) {
     const output = [...items];
-    const random = seededRandom(seedText);
+    const random = seededRandom(seedKey);
     for (let index = output.length - 1; index > 0; index -= 1) {
       const swapIndex = Math.floor(random() * (index + 1));
       [output[index], output[swapIndex]] = [output[swapIndex], output[index]];
@@ -227,1469 +93,1013 @@
     return output;
   }
 
-  function evaluateAnswer(question, answer) {
-    const role = roleById(question.concurso_id, state.activeRoleId);
-    const scoring = role?.exam?.scoring || { correct: 1, wrong: 0, blank: 0 };
-    const normalized = normalizeAnswer(answer);
-    if (normalized === BLANK) {
-      return {
-        answer: BLANK,
-        correct: false,
-        blank: true,
-        score: scoring.blank,
-        result: "blank",
-      };
+  function selectRotatingQuestions({ pool, count, difficulty = "misto", seedKey, avoidIds = [] }) {
+    const avoid = new Set(avoidIds);
+    let candidates = pool.filter((question) => question.status !== "inativo");
+
+    if (difficulty !== "misto") {
+      const preferred = candidates.filter((question) => question.dificuldade === difficulty);
+      candidates = preferred.length >= count ? preferred : candidates;
     }
-    const correct = normalized === question.resposta_correta;
-    return {
-      answer: normalized,
-      correct,
-      blank: false,
-      score: correct ? scoring.correct : scoring.wrong,
-      result: correct ? "correct" : "wrong",
-    };
-  }
 
-  function recordAnswer(question, answer, mode, startedAt, simuladoId = null) {
-    const evaluation = evaluateAnswer(question, answer);
-    const timeSpentMs = startedAt ? Math.max(0, Date.now() - startedAt) : 0;
-    const record = {
-      id: `${Date.now()}-${question.id}-${Math.random().toString(16).slice(2)}`,
-      user_id: state.currentUserId,
-      concurso_id: state.activeContestId,
-      cargo_id: state.activeRoleId,
-      questao_id: question.id,
-      materia_id: question.materia_id,
-      materia: question.materia,
-      assunto_id: question.assunto_id,
-      assunto: question.assunto,
-      subassunto: question.subassunto,
-      dificuldade: question.dificuldade,
-      resposta_marcada: evaluation.answer,
-      resposta_correta: question.resposta_correta,
-      correto: evaluation.correct,
-      em_branco: evaluation.blank,
-      pontuacao: evaluation.score,
-      tempo_ms: timeSpentMs,
-      data: nowIso(),
-      simulado_id: simuladoId,
-      modo: mode,
-    };
-
-    persistScope((scope) => {
-      const previous = scope.answers[question.id] || {
-        questao_id: question.id,
-        attempts: 0,
-        correctAttempts: 0,
-        wrongAttempts: 0,
-        blankAttempts: 0,
-        totalTimeMs: 0,
-        firstAnsweredAt: record.data,
-      };
-      previous.attempts += 1;
-      previous.correctAttempts += evaluation.correct ? 1 : 0;
-      previous.wrongAttempts += evaluation.result === "wrong" ? 1 : 0;
-      previous.blankAttempts += evaluation.blank ? 1 : 0;
-      previous.totalTimeMs += timeSpentMs;
-      previous.lastAnswer = evaluation.answer;
-      previous.lastCorrect = evaluation.correct;
-      previous.lastBlank = evaluation.blank;
-      previous.lastScore = evaluation.score;
-      previous.lastMode = mode;
-      previous.lastAnsweredAt = record.data;
-      previous.lastTimeMs = timeSpentMs;
-      scope.answers[question.id] = previous;
-      scope.history.unshift(record);
-      scope.history = scope.history.slice(0, 1500);
-    });
-
-    return record;
-  }
-
-  function summaryFromScope(scope, questionSet = questionsFor()) {
-    const answerValues = Object.values(scope.answers || {}).filter((answer) => questionSet.some((question) => question.id === answer.questao_id));
-    const uniqueAnswered = answerValues.length;
-    const history = (scope.history || []).filter((record) => record.concurso_id === state.activeContestId && record.cargo_id === state.activeRoleId);
-    const correct = history.filter((record) => record.correto).length;
-    const wrong = history.filter((record) => !record.correto && !record.em_branco).length;
-    const blank = history.filter((record) => record.em_branco).length;
-    const total = correct + wrong + blank;
-    const score = history.reduce((sum, record) => sum + safeNumber(record.pontuacao), 0);
-    return {
-      totalQuestions: questionSet.length,
-      uniqueAnswered,
-      progress: Number(percent(uniqueAnswered, questionSet.length, 1)),
-      correct,
-      wrong,
-      blank,
-      attempts: total,
-      accuracy: Number(percent(correct, correct + wrong, 1)),
-      score,
-      mocks: scope.mocks?.length || 0,
-      favorites: Object.keys(scope.favorites || {}).length,
-      avgTimeSeconds: total ? Math.round(history.reduce((sum, record) => sum + safeNumber(record.tempo_ms), 0) / total / 1000) : 0,
-    };
-  }
-
-  function performanceByMatter(scope, questionSet = questionsFor()) {
-    const matterMap = Object.fromEntries(mattersFor().map((matter) => [matter.id, {
-      id: matter.id,
-      nome: matter.nome,
-      bloco: matter.bloco,
-      total: questionSet.filter((question) => question.materia_id === matter.id).length,
-      answered: 0,
-      correct: 0,
-      wrong: 0,
-      blank: 0,
-      lastAt: null,
-    }]));
-
-    Object.values(scope.answers || {}).forEach((answer) => {
-      const question = questionSet.find((item) => item.id === answer.questao_id);
-      if (!question || !matterMap[question.materia_id]) return;
-      const matter = matterMap[question.materia_id];
-      matter.answered += 1;
-      matter.correct += answer.lastCorrect ? 1 : 0;
-      matter.wrong += !answer.lastCorrect && !answer.lastBlank ? 1 : 0;
-      matter.blank += answer.lastBlank ? 1 : 0;
-      matter.lastAt = answer.lastAnsweredAt;
-    });
-
-    return Object.values(matterMap).map((matter) => ({
-      ...matter,
-      progress: Number(percent(matter.answered, matter.total, 1)),
-      accuracy: Number(percent(matter.correct, matter.correct + matter.wrong, 1)),
-      priority: matter.answered === 0 ? "Alta" : matter.accuracy < 60 ? "Alta" : matter.accuracy < 75 ? "Média" : "Manutenção",
-    }));
-  }
-
-  function weakTopics(scope, limit = 8) {
-    const questionSet = questionsFor();
-    const buckets = {};
-    Object.values(scope.answers || {}).forEach((answer) => {
-      const question = questionSet.find((item) => item.id === answer.questao_id);
-      if (!question) return;
-      if (answer.lastCorrect) return;
-      const key = `${question.materia} — ${question.assunto}`;
-      buckets[key] = buckets[key] || { label: key, count: 0, blank: 0, wrong: 0 };
-      buckets[key].count += 1;
-      buckets[key].blank += answer.lastBlank ? 1 : 0;
-      buckets[key].wrong += !answer.lastBlank ? 1 : 0;
-    });
-    return Object.values(buckets).sort((a, b) => b.count - a.count).slice(0, limit);
-  }
-
-  function smartRevisionQuestions(scope, limit = 15) {
-    const questionSet = questionsFor();
-    const scored = questionSet.map((question) => {
-      const answer = scope.answers[question.id];
-      const favorite = Boolean(scope.favorites?.[question.id]);
-      const marked = Boolean(scope.revisionMarked?.[question.id]);
-      const notAnswered = !answer;
-      const wrong = answer && !answer.lastCorrect && !answer.lastBlank;
-      const blank = answer && answer.lastBlank;
-      const slow = answer && answer.lastTimeMs > 90000;
-      let score = 0;
-      if (wrong) score += 7;
-      if (blank) score += 5;
-      if (favorite) score += 4;
-      if (marked) score += 4;
-      if (slow) score += 3;
-      if (notAnswered) score += 2;
-      if (question.dificuldade === "dificil") score += 1;
-      return { question, score };
-    });
-    return scored
-      .filter((item) => item.score > 0)
-      .sort((a, b) => b.score - a.score)
-      .slice(0, limit)
-      .map((item) => item.question);
-  }
-
-  async function loadDailySelection() {
-    try {
-      const response = await fetch(DAILY_SELECTION_URL, { cache: "no-store" });
-      if (!response.ok) return null;
-      const payload = await response.json();
-      if (
-        payload?.timezone !== DAILY_TIMEZONE
-        || payload?.date !== saoPauloDateKey()
-        || !payload?.selections
-        || typeof payload.selections !== "object"
-      ) {
-        return null;
+    if (difficulty === "misto") {
+      const selected = [];
+      const byDifficulty = ["facil", "medio", "dificil"].map((level) => (
+        shuffleWithSeed(candidates.filter((question) => question.dificuldade === level && !avoid.has(question.id)), `${seedKey}-${level}`)
+      ));
+      const targetByLevel = Math.floor(count / 3);
+      for (const list of byDifficulty) selected.push(...list.slice(0, targetByLevel));
+      const remaining = candidates.filter((question) => !selected.some((picked) => picked.id === question.id) && !avoid.has(question.id));
+      selected.push(...shuffleWithSeed(remaining, `${seedKey}-fill`).slice(0, count - selected.length));
+      if (selected.length < count) {
+        const fallback = candidates.filter((question) => !selected.some((picked) => picked.id === question.id));
+        selected.push(...shuffleWithSeed(fallback, `${seedKey}-fallback`).slice(0, count - selected.length));
       }
-      state.dailySelection = payload;
-      return payload;
-    } catch {
-      state.dailySelection = null;
-      return null;
+      return selected.slice(0, count);
     }
+
+    const fresh = candidates.filter((question) => !avoid.has(question.id));
+    const usable = fresh.length >= count ? fresh : candidates;
+    return shuffleWithSeed(usable, seedKey).slice(0, Math.min(count, usable.length));
   }
 
-  async function init() {
-    await loadDailySelection();
-    renderProfiles();
-    bindEvents();
-    withStore(() => null);
-
-    const session = readSession();
-    if (session?.currentUserId && DATA.users.some((user) => user.id === session.currentUserId)) {
-      login(session.currentUserId, { silent: true });
-    } else {
-      showLogin();
-    }
-  }
-
-  function readSession() {
+  function loadStore() {
     try {
-      return JSON.parse(localStorage.getItem(SESSION_KEY) || "null");
+      const parsed = JSON.parse(localStorage.getItem(STORE_KEY) || "{}");
+      return parsed && typeof parsed === "object" ? parsed : {};
     } catch {
-      return null;
+      return {};
     }
   }
 
-  function writeSession() {
-    localStorage.setItem(SESSION_KEY, JSON.stringify({
-      currentUserId: state.currentUserId,
-      activeContestId: state.activeContestId,
-      activeRoleId: state.activeRoleId,
-    }));
+  function saveStore(store) {
+    localStorage.setItem(STORE_KEY, JSON.stringify(store));
   }
 
-  function showLogin() {
+  function makeUserStats(userId) {
+    const user = USERS.find((item) => item.id === userId);
+    return {
+      nome: user?.nome || userId,
+      totalAcessos: 0,
+      ultimoDiaAcessado: null,
+      streakAtual: 0,
+      maiorStreak: 0,
+      pontosTotais: 0,
+      simuladosCrtFinalizados: 0,
+      provasReaisCrtFinalizadas: 0,
+      questionariosCertificacaoFinalizados: 0,
+      questionariosProgramacaoFinalizados: 0,
+      questionariosDadosFinalizados: 0,
+      melhorPontuacaoLiquidaGeral: null,
+      ultimaPontuacaoLiquida: 0,
+      mediaPontuacao: 0,
+      totalQuestoesRespondidas: 0,
+      totalAcertos: 0,
+      totalErros: 0,
+      totalBrancos: 0,
+      historicoUltimosResultados: [],
+      materiasComMaisErro: {},
+      materiasComMaisBranco: {},
+      trilhasEstudadas: {},
+      recentQuestionIds: {},
+    };
+  }
+
+  function getCurrentUser() {
+    return USERS.find((user) => user.id === state.currentUserId);
+  }
+
+  function setCurrentUser(userId) {
+    state.currentUserId = userId;
+  }
+
+  function loadUserStats(userId = state.currentUserId) {
+    const store = loadStore();
+    store.users = store.users || {};
+    store.users[userId] = store.users[userId] || makeUserStats(userId);
+    saveStore(store);
+    return store.users[userId];
+  }
+
+  function saveUserStats(stats, userId = state.currentUserId) {
+    const store = loadStore();
+    store.users = store.users || {};
+    store.users[userId] = stats;
+    saveStore(store);
+  }
+
+  function registerUserAccess(userId) {
+    setCurrentUser(userId);
+    const stats = loadUserStats(userId);
+    const today = getTodayKey();
+    updateUserStreak(stats, today);
+    if (stats.ultimoDiaAcessado !== today) {
+      stats.totalAcessos += 1;
+      stats.ultimoDiaAcessado = today;
+    }
+    saveUserStats(stats, userId);
+  }
+
+  function updateUserStreak(stats, today = getTodayKey()) {
+    if (!stats.ultimoDiaAcessado) {
+      stats.streakAtual = 1;
+    } else if (stats.ultimoDiaAcessado === today) {
+      stats.streakAtual = Math.max(1, stats.streakAtual || 1);
+    } else if (stats.ultimoDiaAcessado === addDays(today, -1)) {
+      stats.streakAtual = (stats.streakAtual || 0) + 1;
+    } else {
+      stats.streakAtual = 1;
+    }
+    stats.maiorStreak = Math.max(stats.maiorStreak || 0, stats.streakAtual || 0);
+  }
+
+  function crtPool() {
+    return DATA.questoes
+      .filter((question) => (
+        question.concurso_id === "crt-sp"
+        && question.cargos_compativeis?.includes(CRT_ROLE_ID)
+        && question.tipo === "certo_errado"
+      ))
+      .map((question) => ({
+        id: question.id,
+        area: "crt-sp",
+        trilha: "CRT-SP",
+        bloco: question.bloco,
+        disciplina: question.materia,
+        assunto: question.subassunto || question.assunto,
+        tipo: "trueFalse",
+        dificuldade: question.dificuldade || "medio",
+        enunciado: question.enunciado,
+        gabarito: question.resposta_correta,
+        comentario: question.explicacao,
+        fonte: question.fonte,
+        link: question.link,
+        tags: question.tags || [],
+      }));
+  }
+
+  function poolByArea(area) {
+    if (area === "crt-sp") return crtPool();
+    return EXTRA_BANK.filter((question) => question.area === area);
+  }
+
+  function getRecentIds(scopeKey) {
+    const stats = loadUserStats();
+    return stats.recentQuestionIds?.[scopeKey] || [];
+  }
+
+  function selectCrtByDistribution({ countBasicos, countComplementares, countEspecificos, seedKey, difficulty = "misto", avoidIds = [] }) {
+    const pool = crtPool();
+    const blocks = [
+      ["Conhecimentos básicos", countBasicos],
+      ["Conhecimentos complementares", countComplementares],
+      ["Conhecimentos específicos", countEspecificos],
+    ];
+    const selected = [];
+    for (const [block, count] of blocks) {
+      const questions = pool.filter((question) => question.bloco === block && !selected.some((picked) => picked.id === question.id));
+      selected.push(...selectRotatingQuestions({
+        pool: questions,
+        count,
+        difficulty,
+        seedKey: `${seedKey}-${block}`,
+        avoidIds,
+      }));
+    }
+    return selected;
+  }
+
+  function updateStatsAfterActivity(result) {
+    const stats = loadUserStats();
+    stats.totalQuestoesRespondidas += result.total;
+    stats.totalAcertos += result.correct;
+    stats.totalErros += result.wrong;
+    stats.totalBrancos += result.blank;
+    stats.pontosTotais += result.gamifiedPoints;
+    stats.ultimaPontuacaoLiquida = result.score;
+    stats.melhorPontuacaoLiquidaGeral = stats.melhorPontuacaoLiquidaGeral === null
+      ? result.score
+      : Math.max(stats.melhorPontuacaoLiquidaGeral, result.score);
+
+    if (result.kind === "crt-daily" || result.kind === "crt-extra") stats.simuladosCrtFinalizados += 1;
+    if (result.kind === "crt-real") stats.provasReaisCrtFinalizadas += 1;
+    if (result.area === "certificacoes") stats.questionariosCertificacaoFinalizados += 1;
+    if (result.area === "programacao") stats.questionariosProgramacaoFinalizados += 1;
+    if (result.area === "dados") stats.questionariosDadosFinalizados += 1;
+
+    stats.trilhasEstudadas[result.trilha] = (stats.trilhasEstudadas[result.trilha] || 0) + 1;
+
+    for (const item of result.items) {
+      if (!item.correct && !item.blank) {
+        stats.materiasComMaisErro[item.disciplina] = (stats.materiasComMaisErro[item.disciplina] || 0) + 1;
+      }
+      if (item.blank) {
+        stats.materiasComMaisBranco[item.disciplina] = (stats.materiasComMaisBranco[item.disciplina] || 0) + 1;
+      }
+    }
+
+    const attempts = stats.historicoUltimosResultados || [];
+    attempts.unshift({
+      id: `${Date.now()}-${result.kind}`,
+      data: new Date().toISOString(),
+      titulo: result.title,
+      area: result.area,
+      trilha: result.trilha,
+      total: result.total,
+      acertos: result.correct,
+      erros: result.wrong,
+      brancos: result.blank,
+      pontuacao: result.score,
+      percentual: result.percent,
+    });
+    stats.historicoUltimosResultados = attempts.slice(0, 50);
+    const scores = stats.historicoUltimosResultados.map((item) => item.pontuacao);
+    stats.mediaPontuacao = scores.length ? Math.round((scores.reduce((sum, score) => sum + score, 0) / scores.length) * 10) / 10 : 0;
+
+    const recent = stats.recentQuestionIds || {};
+    recent[result.scopeKey] = [...result.items.map((item) => item.id), ...(recent[result.scopeKey] || [])].slice(0, 220);
+    stats.recentQuestionIds = recent;
+
+    saveUserStats(stats);
+  }
+
+  function renderUserSelection() {
     $("#login-screen").hidden = false;
     $("#app-shell").hidden = true;
     state.currentUserId = null;
-    state.activeContestId = null;
-    state.activeRoleId = null;
-    stopTimer();
-  }
-
-  function login(userId, options = {}) {
-    state.currentUserId = userId;
-    const store = loadStore();
-    const record = currentUserRecord(store);
-    const savedContestId = record.selectedContestId;
-    const session = readSession();
-    const contestId = session?.currentUserId === userId && session?.activeContestId ? session.activeContestId : savedContestId;
-    state.activeContestId = DATA.concursos.some((contest) => contest.id === contestId) ? contestId : null;
-    state.activeRoleId = state.activeContestId
-      ? record.selectedRoleByContest[state.activeContestId] || contestById(state.activeContestId).defaultRoleId
-      : null;
-    state.showContestPicker = !state.activeContestId;
-    $("#login-screen").hidden = true;
-    $("#app-shell").hidden = false;
-    writeSession();
-    resetTransientState();
-    renderApp();
-    if (!options.silent && !state.activeContestId) {
-      $("#contest-picker")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  }
-
-  function resetTransientState() {
-    state.practice = { queueIds: [], answered: {}, startedAt: {}, mode: "modo-treino" };
-    state.mock = null;
-    stopTimer();
-  }
-
-  function selectContest(contestId) {
-    withStore((store) => {
-      const user = currentUserRecord(store);
-      const contest = contestById(contestId);
-      user.selectedContestId = contestId;
-      user.selectedRoleByContest[contestId] = user.selectedRoleByContest[contestId] || contest.defaultRoleId;
-      state.activeContestId = contestId;
-      state.activeRoleId = user.selectedRoleByContest[contestId];
-      getScope(store, state.activeContestId, state.activeRoleId);
-    });
-    state.activeTab = "dashboard";
-    state.showContestPicker = false;
-    resetTransientState();
-    writeSession();
-    renderApp();
-  }
-
-  function changeRole(roleId) {
-    const contest = contestById();
-    if (!contest.roles.some((role) => role.id === roleId)) return;
-    withStore((store) => {
-      const user = currentUserRecord(store);
-      user.selectedRoleByContest[state.activeContestId] = roleId;
-      state.activeRoleId = roleId;
-      getScope(store, state.activeContestId, state.activeRoleId);
-    });
-    state.activeTab = "dashboard";
-    resetTransientState();
-    writeSession();
-    renderApp();
-  }
-
-  function renderProfiles() {
-    $("#profile-options").innerHTML = DATA.users.map((user) => `
+    const target = $("#profile-options");
+    target.innerHTML = USERS.map((user) => `
       <button class="profile-card" type="button" data-login-user="${escapeHtml(user.id)}">
         <span class="profile-card__avatar profile-card__avatar--${escapeHtml(user.accent)}">${escapeHtml(user.initial)}</span>
-        <span><strong>${escapeHtml(user.displayName)}</strong><small>@${escapeHtml(user.username)} · Entrar no painel</small></span>
-        <span aria-hidden="true">→</span>
+        <span>
+          <strong>${escapeHtml(user.nome)}</strong>
+          <small>Entrar no meu painel, foguinho, ranking e histórico local</small>
+        </span>
+        <span aria-hidden="true">🚀</span>
       </button>
     `).join("");
   }
 
-  function renderApp() {
-    renderHeader();
-    renderContestPicker();
-    if (!state.activeContestId || state.showContestPicker) {
-      $("#workspace").hidden = true;
-      $("#contest-picker").hidden = false;
-      return;
-    }
-    $("#workspace").hidden = false;
-    $("#contest-picker").hidden = true;
-    renderTabs();
-    renderActiveTab();
-  }
-
   function renderHeader() {
-    const user = currentUserDef();
-    $("#top-user-name").textContent = user ? `Olá, ${user.displayName}` : "";
-    $("#change-contest").hidden = !state.activeContestId;
-
-    const contest = contestById();
-    const role = roleById();
-    if (!contest || state.showContestPicker) {
-      $("#hero-eyebrow").textContent = "Escolha seu concurso";
-      $("#hero-title").textContent = "Plataforma de estudos segmentada";
-      $("#hero-copy").textContent = "Selecione CRT-SP, IBGE ou Prefeitura de Santos para carregar matérias, formato da banca, questões, simulados e estatísticas independentes.";
-      $("#hero-notice").textContent = "Nada se mistura: usuário + concurso + cargo têm progresso próprio.";
-      $("#active-contest-card").innerHTML = `
-        <span class="chip">3 concursos</span>
-        <h2>Mapa de prova</h2>
-        <p>CRT-SP em prioridade máxima, IBGE em segundo plano e Santos como terceira trilha.</p>
-      `;
-      return;
-    }
-
-    const total = questionsFor().length;
-    const days = daysUntil(contest.dataProva);
-    $("#hero-eyebrow").textContent = `${contest.orgao} · ${contest.banca}`;
-    $("#hero-title").innerHTML = `${escapeHtml(contest.nome)}<br><span>${escapeHtml(role.nome)}</span>`;
-    $("#hero-copy").textContent = `${contest.edital}. Prova em ${formatDate(contest.dataProva)}. Banco atual com ${total} questões para este cargo e progresso separado do restante.`;
-    $("#hero-notice").textContent = contest.scoringDescription;
+    const user = getCurrentUser();
+    const stats = loadUserStats();
+    $("#top-user-name").textContent = user ? `${user.nome} · 🔥 ${stats.streakAtual}` : "";
+    $("#change-contest").hidden = true;
+    $("#hero-eyebrow").textContent = "Plataforma gamificada";
+    $("#hero-title").textContent = "CRT-SP, DP-600, Programação e Dados";
+    $("#hero-copy").textContent = "Estude com simulados rotativos, histórico por usuário, foguinho, ranking e recomendações personalizadas. Tudo salvo localmente neste navegador.";
+    $("#hero-notice").textContent = `Hoje: ${getTodayKey()} (${TIMEZONE}). O simulado diário do CRT-SP permanece igual durante o dia e muda automaticamente amanhã.`;
     $("#active-contest-card").innerHTML = `
-      <span class="chip chip--active">Concurso ativo</span>
-      <h2>${escapeHtml(contest.nome)}</h2>
-      <p>${escapeHtml(role.nome)}</p>
-      <div class="mini-grid">
-        <span><strong>${total}</strong><small>questões</small></span>
-        <span><strong>${days >= 0 ? days : 0}</strong><small>dias</small></span>
-        <span><strong>${role.exam.totalQuestoes}</strong><small>itens/prova</small></span>
-      </div>
-      ${renderRoleSelector(contest, role)}
+      <h2>Foco principal</h2>
+      <p>CRT-SP 2026 — Técnico Administrativo</p>
+      <dl>
+        <div><dt>Diário</dt><dd>40 itens</dd></div>
+        <div><dt>Prova real</dt><dd>120 itens</dd></div>
+        <div><dt>Pontuação</dt><dd>+1 / -1 / 0</dd></div>
+      </dl>
     `;
   }
 
-  function renderRoleSelector(contest, activeRole) {
-    if (contest.roles.length < 2) return "";
+  function renderTabs() {
+    $("#tabs").innerHTML = TABS.map(([id, label]) => `
+      <button type="button" class="${state.activeTab === id ? "active" : ""}" data-tab="${escapeHtml(id)}">${escapeHtml(label)}</button>
+    `).join("");
+  }
+
+  function metricCard(label, value, detail = "") {
+    return `<article class="metric-card"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong><small>${escapeHtml(detail)}</small></article>`;
+  }
+
+  function getTopKey(map) {
+    const entries = Object.entries(map || {}).sort((a, b) => b[1] - a[1]);
+    return entries[0]?.[0] || "Ainda sem dados";
+  }
+
+  function renderRanking() {
+    const rows = USERS.map((user) => {
+      const stats = loadUserStats(user.id);
+      const activities = stats.simuladosCrtFinalizados + stats.provasReaisCrtFinalizadas + stats.questionariosCertificacaoFinalizados + stats.questionariosProgramacaoFinalizados + stats.questionariosDadosFinalizados;
+      return { user, stats, activities };
+    });
+    const score = (row) => (row.stats.pontosTotais || 0) + (row.stats.maiorStreak || 0) * 5 + row.activities * 3 + (row.stats.mediaPontuacao || 0);
+    const winner = [...rows].sort((a, b) => score(b) - score(a))[0];
+
     return `
-      <label class="field field--compact">
-        <span>Cargo</span>
-        <select id="role-select">
-          ${contest.roles.map((role) => `<option value="${escapeHtml(role.id)}" ${role.id === activeRole.id ? "selected" : ""}>${escapeHtml(role.nome)}</option>`).join("")}
+      <section class="panel">
+        <div class="section-heading">
+          <p class="eyebrow">Ranking local</p>
+          <h2>🏆 Kauã x Vitória</h2>
+        </div>
+        <div class="ranking-grid">
+          ${rows.map((row) => `
+            <article class="ranking-card">
+              <h3>${escapeHtml(row.user.nome)}</h3>
+              <p><strong>${row.stats.pontosTotais}</strong> pontos · 🔥 ${row.stats.maiorStreak} maior foguinho</p>
+              <ul>
+                <li>Acessos: ${row.stats.totalAcessos}</li>
+                <li>Atividades: ${row.activities}</li>
+                <li>Média: ${row.stats.mediaPontuacao}</li>
+              </ul>
+            </article>
+          `).join("")}
+        </div>
+        <p class="notice">Vencedor atual: <strong>${escapeHtml(winner?.user.nome || "ninguém ainda")}</strong>.</p>
+      </section>
+    `;
+  }
+
+  function renderDashboard() {
+    const stats = loadUserStats();
+    const accuracy = stats.totalQuestoesRespondidas ? Math.round((stats.totalAcertos / stats.totalQuestoesRespondidas) * 100) : 0;
+    const recent = stats.historicoUltimosResultados || [];
+
+    $("#dashboard").innerHTML = "";
+    $("#tab-content").innerHTML = `
+      <section class="panel">
+        <div class="section-heading">
+          <p class="eyebrow">Dashboard</p>
+          <h2>Olá, ${escapeHtml(stats.nome)}. Bora estudar hoje? 🔥</h2>
+        </div>
+        <div class="dashboard-grid">
+          ${metricCard("Foguinho atual", `🔥 ${stats.streakAtual}`, `recorde: ${stats.maiorStreak}`)}
+          ${metricCard("Pontos totais", stats.pontosTotais, "gamificação local")}
+          ${metricCard("Acessos", stats.totalAcessos, `último: ${stats.ultimoDiaAcessado || "—"}`)}
+          ${metricCard("Taxa de acerto", `${accuracy}%`, `${stats.totalAcertos}/${stats.totalQuestoesRespondidas}`)}
+          ${metricCard("Simulados CRT-SP", stats.simuladosCrtFinalizados, "diários e extras")}
+          ${metricCard("Provas reais", stats.provasReaisCrtFinalizadas, "120 itens")}
+          ${metricCard("DP-600", stats.questionariosCertificacaoFinalizados, "questionários finalizados")}
+          ${metricCard("Programação", stats.questionariosProgramacaoFinalizados, "questionários finalizados")}
+          ${metricCard("Dados", stats.questionariosDadosFinalizados, "questionários finalizados")}
+          ${metricCard("Melhor pontuação", stats.melhorPontuacaoLiquidaGeral ?? "—", `última: ${stats.ultimaPontuacaoLiquida}`)}
+          ${metricCard("Média geral", stats.mediaPontuacao, "últimos resultados")}
+          ${metricCard("Trilha mais estudada", getTopKey(stats.trilhasEstudadas), "por atividades")}
+        </div>
+        <div class="action-row">
+          <button class="secondary-button" type="button" data-switch-user>Trocar usuário</button>
+          <button class="danger-button" type="button" data-reset-user>Zerar meus dados locais</button>
+        </div>
+      </section>
+      ${renderRanking()}
+      <section class="panel">
+        <div class="section-heading">
+          <p class="eyebrow">Últimas 5 tentativas</p>
+          <h2>Histórico rápido</h2>
+        </div>
+        ${recent.length ? `<div class="history-list">${recent.slice(0, 5).map(renderHistoryItem).join("")}</div>` : "<p class='muted'>Finalize um questionário para aparecer aqui.</p>"}
+      </section>
+    `;
+  }
+
+  function difficultySelect() {
+    return `
+      <label class="field">
+        <span>Dificuldade</span>
+        <select data-difficulty>
+          <option value="misto" ${state.difficulty === "misto" ? "selected" : ""}>Misto</option>
+          <option value="facil" ${state.difficulty === "facil" ? "selected" : ""}>Fácil</option>
+          <option value="medio" ${state.difficulty === "medio" ? "selected" : ""}>Médio</option>
+          <option value="dificil" ${state.difficulty === "dificil" ? "selected" : ""}>Difícil</option>
         </select>
       </label>
     `;
   }
 
-  function renderContestPicker() {
-    if (!state.currentUserId) return;
-    const store = loadStore();
-    const user = currentUserRecord(store);
-    const cards = [...DATA.concursos].sort((a, b) => a.priority - b.priority).map((contest) => {
-      const roleId = user.selectedRoleByContest[contest.id] || contest.defaultRoleId;
-      const role = roleById(contest.id, roleId);
-      const scope = getScope(store, contest.id, roleId);
-      const questionSet = questionsFor(contest.id, roleId);
-      const summary = summaryFromExternalScope(scope, questionSet, contest.id, roleId);
-      const active = state.activeContestId === contest.id && !state.showContestPicker;
-      return `
-        <article class="contest-card ${active ? "contest-card--active" : ""}">
-          <div class="contest-card__top">
-            <span class="priority">Prioridade ${contest.priority}</span>
-            <span class="chip">${escapeHtml(contest.status)}</span>
-          </div>
-          <h3>${escapeHtml(contest.nome)}</h3>
-          <p>${escapeHtml(contest.orgao)}</p>
-          <dl class="contest-facts">
-            <div><dt>Banca</dt><dd>${escapeHtml(contest.banca)}</dd></div>
-            <div><dt>Cargo</dt><dd>${escapeHtml(role.nome)}</dd></div>
-            <div><dt>Nível</dt><dd>${escapeHtml(role.escolaridade || contest.nivel)}</dd></div>
-            <div><dt>Prova</dt><dd>${formatDate(contest.dataProva)}</dd></div>
-          </dl>
-          <div class="contest-progress" aria-label="Progresso em ${escapeHtml(contest.nome)}">
-            <span style="width:${summary.progress}%"></span>
-          </div>
-          <div class="mini-grid">
-            <span><strong>${questionSet.length}</strong><small>questões</small></span>
-            <span><strong>${summary.progress}%</strong><small>progresso</small></span>
-            <span><strong>${summary.mocks}</strong><small>simulados</small></span>
-            <span><strong>${summary.accuracy}%</strong><small>acertos</small></span>
-          </div>
-          <button class="primary-button" type="button" data-select-contest="${escapeHtml(contest.id)}">${active ? "Continuar" : "Estudar este concurso"}</button>
-        </article>
-      `;
-    }).join("");
+  function renderCrtDaily() {
+    const today = getTodayKey();
+    const daily = selectCrtByDistribution({
+      countBasicos: 12,
+      countComplementares: 8,
+      countEspecificos: 20,
+      seedKey: `crt-diario-${today}`,
+    });
+    const subjects = [...new Set(daily.map((question) => question.assunto))].slice(0, 14);
 
-    $("#contest-picker").innerHTML = `
-      <div class="section-heading">
-        <p class="eyebrow">Seleção independente</p>
-        <h2 id="contest-picker-title">Escolha o concurso</h2>
-        <p>Ao entrar em um card, dashboard, simulados, matérias, revisão e histórico passam a usar só aquele concurso e cargo.</p>
-      </div>
-      <div class="contest-grid">${cards}</div>
+    $("#tab-content").innerHTML = `
+      <section class="panel">
+        <div class="section-heading">
+          <p class="eyebrow">CRT-SP diário · ${today}</p>
+          <h2>Simulado CRT-SP — Técnico Administrativo</h2>
+        </div>
+        <p>40 itens Certo/Errado/Em branco no padrão Quadrix: +1 por acerto, -1 por erro e 0 em branco.</p>
+        <div class="dashboard-grid">
+          ${metricCard("Básicos", 12, "Português, RLM e informática")}
+          ${metricCard("Complementares", 8, "Ética, LAI, LGPD e leis")}
+          ${metricCard("Específicos", 20, "CRT/CFT, rotinas e administração")}
+        </div>
+        <p><strong>Assuntos cobrados hoje:</strong> ${subjects.map(escapeHtml).join(", ")}.</p>
+        <div class="action-row">
+          <button class="primary-button" type="button" data-start-crt-daily>Iniciar simulado diário</button>
+          ${difficultySelect()}
+          <button class="secondary-button" type="button" data-start-crt-extra>Gerar outro questionário CRT-SP</button>
+        </div>
+      </section>
     `;
   }
 
-  function summaryFromExternalScope(scope, questionSet, contestId, roleId) {
-    const answerValues = Object.values(scope.answers || {}).filter((answer) => questionSet.some((question) => question.id === answer.questao_id));
-    const history = (scope.history || []).filter((record) => record.concurso_id === contestId && record.cargo_id === roleId);
-    const correct = history.filter((record) => record.correto).length;
-    const wrong = history.filter((record) => !record.correto && !record.em_branco).length;
-    return {
-      progress: Number(percent(answerValues.length, questionSet.length, 0)),
-      accuracy: Number(percent(correct, correct + wrong, 0)),
-      mocks: scope.mocks?.length || 0,
-    };
+  function renderCrtRealExam() {
+    $("#tab-content").innerHTML = `
+      <section class="panel">
+        <div class="section-heading">
+          <p class="eyebrow">Modo prova real</p>
+          <h2>Prova real CRT-SP — 120 itens</h2>
+        </div>
+        <p>Duração sugerida: 3 horas. Pontuação líquida Quadrix: +1, -1, 0. Gabarito comentado só depois de finalizar.</p>
+        <div class="dashboard-grid">
+          ${metricCard("Básicos", 40, `mínimo: ${MINIMOS_PROVA_REAL.basicos}`)}
+          ${metricCard("Complementares", 30, `mínimo: ${MINIMOS_PROVA_REAL.complementares}`)}
+          ${metricCard("Específicos", 50, `mínimo: ${MINIMOS_PROVA_REAL.especificos}`)}
+          ${metricCard("Mínimo total", MINIMOS_PROVA_REAL.total, "pontuação líquida")}
+        </div>
+        <button class="primary-button" type="button" data-start-crt-real>Iniciar prova real CRT-SP</button>
+      </section>
+    `;
   }
 
-  function renderTabs() {
-    $("#tabs").innerHTML = TABS.map(([id, label]) => `
-      <button class="tab-button ${state.activeTab === id ? "is-active" : ""}" type="button" data-tab="${id}">${label}</button>
-    `).join("");
+  function renderCertificationTab() {
+    const topics = [...new Set(poolByArea("certificacoes").map((question) => question.disciplina))];
+    $("#tab-content").innerHTML = `
+      <section class="panel">
+        <div class="section-heading">
+          <p class="eyebrow">Certificações</p>
+          <h2>Microsoft DP-600 — Fabric Analytics Engineer Associate</h2>
+        </div>
+        <p>Questões autorais baseadas nos tópicos públicos do guia de estudo. Preparado para DP-700, PL-300, AI-900, AZ-900 e DP-900 no futuro.</p>
+        <div class="form-grid">
+          <label class="field">
+            <span>Modo</span>
+            <select data-cert-mode>
+              <option value="rapidas" ${state.certMode === "rapidas" ? "selected" : ""}>DP-600 — Questões rápidas</option>
+              <option value="simulado" ${state.certMode === "simulado" ? "selected" : ""}>DP-600 — Simulado 30 questões</option>
+              <option value="tema" ${state.certMode === "tema" ? "selected" : ""}>DP-600 — Revisão por tema</option>
+              <option value="dificil" ${state.certMode === "dificil" ? "selected" : ""}>DP-600 — Modo difícil</option>
+              <option value="erros" ${state.certMode === "erros" ? "selected" : ""}>DP-600 — Erros frequentes</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Tema</span>
+            <select data-cert-topic>
+              ${topics.map((topic) => `<option value="${escapeHtml(topic)}" ${state.certTopic === topic ? "selected" : ""}>${escapeHtml(topic)}</option>`).join("")}
+            </select>
+          </label>
+          ${difficultySelect()}
+        </div>
+        <div class="tag-cloud">${topics.map((topic) => `<span>${escapeHtml(topic)}</span>`).join("")}</div>
+        <button class="primary-button" type="button" data-start-cert>Iniciar DP-600</button>
+      </section>
+    `;
+  }
+
+  function renderProgrammingTab() {
+    const tracks = [...new Set(poolByArea("programacao").map((question) => question.trilha))];
+    $("#tab-content").innerHTML = `
+      <section class="panel">
+        <div class="section-heading">
+          <p class="eyebrow">Programação</p>
+          <h2>Lógica, código, SQL, Git, HTML/CSS e linguagens</h2>
+        </div>
+        <p>Treine leitura de código, identificação de bug, fundamentos e interpretação de saída.</p>
+        <div class="form-grid">
+          <label class="field">
+            <span>Subtrilha</span>
+            <select data-programming-track>
+              ${tracks.map((track) => `<option value="${escapeHtml(track)}" ${state.programmingTrack === track ? "selected" : ""}>${escapeHtml(track)}</option>`).join("")}
+            </select>
+          </label>
+          ${difficultySelect()}
+        </div>
+        <button class="primary-button" type="button" data-start-programming>Iniciar questionário de Programação</button>
+      </section>
+    `;
+  }
+
+  function renderDataTab() {
+    const tracks = [...new Set(poolByArea("dados").map((question) => question.trilha))];
+    $("#tab-content").innerHTML = `
+      <section class="panel">
+        <div class="section-heading">
+          <p class="eyebrow">Dados</p>
+          <h2>Trilhas práticas para evoluir na área de dados 📊</h2>
+        </div>
+        <p>Fundamentos, SQL, Python/Pandas, Power BI, engenharia de dados, analytics e desafios práticos.</p>
+        <div class="form-grid">
+          <label class="field">
+            <span>Trilha</span>
+            <select data-data-track>
+              ${tracks.map((track) => `<option value="${escapeHtml(track)}" ${state.dataTrack === track ? "selected" : ""}>${escapeHtml(track)}</option>`).join("")}
+            </select>
+          </label>
+          ${difficultySelect()}
+        </div>
+        <button class="primary-button" type="button" data-start-data>Iniciar questionário de Dados</button>
+      </section>
+    `;
+  }
+
+  function getPersonalizedRecommendations() {
+    const stats = loadUserStats();
+    if (!stats.historicoUltimosResultados?.length) {
+      return ["Faça pelo menos um questionário para liberar recomendações personalizadas."];
+    }
+    const weakError = getTopKey(stats.materiasComMaisErro);
+    const weakBlank = getTopKey(stats.materiasComMaisBranco);
+    const accuracy = stats.totalQuestoesRespondidas ? stats.totalAcertos / stats.totalQuestoesRespondidas : 0;
+    return [
+      `Revise primeiro: ${weakError}.`,
+      `Reduza brancos em: ${weakBlank}.`,
+      `Sugestão de dificuldade: ${accuracy >= 0.75 ? "difícil" : accuracy >= 0.55 ? "médio" : "fácil"}.`,
+      `Próximo questionário sugerido: ${getTopKey(stats.trilhasEstudadas) === "CRT-SP" ? "DP-600 ou Dados" : "CRT-SP diário"}.`,
+    ];
+  }
+
+  function renderStudyTab() {
+    const recommendations = getPersonalizedRecommendations();
+    $("#tab-content").innerHTML = `
+      <section class="panel">
+        <div class="section-heading">
+          <p class="eyebrow">Estudos</p>
+          <h2>Plano de estudo e recomendações</h2>
+        </div>
+        <div class="study-grid">
+          ${studyCard("CRT-SP", ["Lei seca do Sistema CFT/CRT-SP", "Quadrix: cuidado com exceções e termos absolutos", "Priorize Lei 13.639/2018, Lei 9.784/1999, LAI, LGPD, protocolo e redação oficial"], [["Quadrix CRT-SP", DATA.sources?.crt_edital?.url], ["Lei 13.639/2018", DATA.sources?.lei_13639?.url]])}
+          ${studyCard("DP-600", ["Microsoft Learn", "Fabric, Lakehouse, Warehouse e Semantic Model", "Treine SQL, DAX, KQL, Direct Lake, RLS e deployment pipelines"], [["Guia DP-600", "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-600"], ["Curso DP-600", "https://learn.microsoft.com/en-us/training/courses/dp-600t00"]])}
+          ${studyCard("Programação", ["1. lógica", "2. Python", "3. SQL", "4. Git", "5. HTML/CSS", "6. JavaScript", "7. Java", "8. projetos práticos"], [["MDN", "https://developer.mozilla.org/pt-BR/"], ["Python", "https://docs.python.org/pt-br/3/"]])}
+          ${studyCard("Dados", ["SQL forte", "Python/Pandas", "Power BI", "Modelagem", "ETL/ELT", "Fabric", "Portfólio: chamados de TI, ordens de serviço, estoque e atendimento"], [["Power BI Learn", "https://learn.microsoft.com/pt-br/power-bi/"], ["Pandas", "https://pandas.pydata.org/docs/"]])}
+        </div>
+      </section>
+      <section class="panel">
+        <div class="section-heading">
+          <p class="eyebrow">Recomendação personalizada</p>
+          <h2>O que estudar hoje</h2>
+        </div>
+        <ul class="check-list">${recommendations.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+      </section>
+    `;
+  }
+
+  function studyCard(title, items, links) {
+    return `
+      <article class="study-card">
+        <h3>${escapeHtml(title)}</h3>
+        <ul>${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+        <div class="link-list">
+          ${links.filter(([, url]) => url).map(([label, url]) => `<a href="${escapeHtml(url)}" target="_blank" rel="noreferrer">${escapeHtml(label)}</a>`).join("")}
+        </div>
+      </article>
+    `;
+  }
+
+  function renderHistoryItem(item) {
+    return `
+      <article class="history-item">
+        <strong>${escapeHtml(item.titulo)}</strong>
+        <span>${new Date(item.data).toLocaleString("pt-BR")} · ${item.acertos} acertos · ${item.erros} erros · ${item.brancos} brancos · pontuação ${item.pontuacao}</span>
+      </article>
+    `;
+  }
+
+  function renderHistory() {
+    const stats = loadUserStats();
+    const history = stats.historicoUltimosResultados || [];
+    $("#tab-content").innerHTML = `
+      <section class="panel">
+        <div class="section-heading">
+          <p class="eyebrow">Histórico</p>
+          <h2>${history.length} tentativas salvas neste navegador</h2>
+        </div>
+        ${history.length ? `<div class="history-list">${history.map(renderHistoryItem).join("")}</div>` : "<p class='muted'>Nenhum questionário finalizado ainda.</p>"}
+      </section>
+    `;
   }
 
   function renderActiveTab() {
+    renderHeader();
+    renderTabs();
     const renderers = {
       dashboard: renderDashboard,
-      treino: renderTreino,
-      simulado: renderSimulado,
-      revisao: renderRevisao,
-      materias: renderMaterias,
-      historico: renderHistorico,
-      metas: renderMetas,
+      crt: renderCrtDaily,
+      "prova-real": renderCrtRealExam,
+      certificacoes: renderCertificationTab,
+      programacao: renderProgrammingTab,
+      dados: renderDataTab,
+      estudos: renderStudyTab,
+      historico: renderHistory,
     };
-    renderDashboardStrip();
     renderers[state.activeTab]?.();
   }
 
-  function renderDashboardStrip() {
-    const contest = contestById();
-    const scope = getScope();
-    const questionSet = questionsFor();
-    const summary = summaryFromScope(scope, questionSet);
-    const days = daysUntil(contest.dataProva);
-
-    $("#dashboard").innerHTML = `
-      <div class="dashboard-grid">
-        ${metricCard("Progresso", `${summary.progress}%`, `${summary.uniqueAnswered}/${summary.totalQuestions} questões únicas`)}
-        ${metricCard("Acertos", `${summary.accuracy}%`, `${summary.correct} certas · ${summary.wrong} erradas`)}
-        ${metricCard("Pontuação líquida", summary.score, contest.scoringDescription)}
-        ${metricCard("Até a prova", days >= 0 ? `${days} dias` : "Prova passada", formatDate(contest.dataProva))}
-      </div>
-    `;
+  function startQuiz(config) {
+    state.activeQuiz = {
+      ...config,
+      startedAt: Date.now(),
+      answers: {},
+      submitted: false,
+      selfEvaluations: {},
+    };
+    renderQuiz();
   }
 
-  function renderDashboard() {
-    const contest = contestById();
-    const role = roleById();
-    const scope = getScope();
-    const questionSet = questionsFor();
-    const summary = summaryFromScope(scope, questionSet);
-    const performances = performanceByMatter(scope, questionSet);
-    const best = [...performances].filter((item) => item.answered).sort((a, b) => b.accuracy - a.accuracy).slice(0, 3);
-    const worst = [...performances].sort((a, b) => (a.answered ? a.accuracy : -1) - (b.answered ? b.accuracy : -1)).slice(0, 3);
-    const weak = weakTopics(scope, 6);
-
-    $("#tab-content").innerHTML = `
-      <div class="panel-grid panel-grid--wide">
-        <section class="panel">
-          <div class="section-heading section-heading--compact">
-            <p class="eyebrow">${escapeHtml(contest.banca)} · ${escapeHtml(role.exam.formato.replace("_", "/"))}</p>
-            <h2>${escapeHtml(contest.nome)} — ${escapeHtml(role.nome)}</h2>
-            <p>${escapeHtml(contest.edital)} · ${escapeHtml(contest.scoringDescription)}</p>
-          </div>
-          <div class="exam-map">
-            ${role.exam.distribution.map((item) => `
-              <div>
-                <span>${escapeHtml(item.label)}</span>
-                <strong>${item.count}</strong>
-              </div>
-            `).join("")}
-          </div>
-          <ul class="check-list">
-            ${contest.criterios.map((criterion) => `<li>${escapeHtml(criterion)}</li>`).join("")}
-          </ul>
-        </section>
-
-        <section class="panel">
-          <div class="section-heading section-heading--compact">
-            <p class="eyebrow">Revisão de hoje</p>
-            <h2>Estudo diário sugerido</h2>
-          </div>
-          ${renderDailyStudy(contest, weak)}
-        </section>
-      </div>
-
-      <div class="panel-grid">
-        <section class="panel">
-          <h3>Melhores matérias</h3>
-          ${renderPerformanceList(best, "Ainda não há matérias respondidas. Faça um treino rápido para começar.")}
-        </section>
-        <section class="panel">
-          <h3>Piores matérias / prioridade</h3>
-          ${renderPerformanceList(worst, "Sem dados suficientes. As matérias aparecem aqui depois das primeiras respostas.")}
-        </section>
-        <section class="panel">
-          <h3>Últimos simulados</h3>
-          ${renderMockList(scope.mocks?.slice(0, 5) || [])}
-        </section>
-      </div>
-    `;
+  function normalizeOptions(question) {
+    return (question.alternativas || []).map((option, index) => (
+      typeof option === "string"
+        ? { label: String.fromCharCode(65 + index), text: option, value: String(index) }
+        : { label: option.label || String.fromCharCode(65 + index), text: option.text, value: String(index) }
+    ));
   }
 
-  function metricCard(label, value, hint) {
-    return `
-      <article class="metric-card">
-        <span>${escapeHtml(label)}</span>
-        <strong>${escapeHtml(value)}</strong>
-        <small>${escapeHtml(hint)}</small>
-      </article>
-    `;
-  }
-
-  function renderDailyStudy(contest, weak) {
-    const base = contest.studySuggestions || [];
-    const weakItems = weak.length
-      ? weak.map((item) => `<li>Revisar <strong>${escapeHtml(item.label)}</strong> (${item.wrong} erros, ${item.blank} em branco).</li>`).join("")
-      : "<li>Responder 20 questões novas e marcar dúvidas para revisão inteligente.</li>";
-    return `
-      <ol class="study-plan">
-        <li>20 min de teoria/lei seca do edital ativo.</li>
-        <li>30 min de questões no modo treino, com explicação aberta após responder.</li>
-        <li>15 min revisando erros e brancos.</li>
-        ${weakItems}
-      </ol>
-      <div class="tip-box">
-        ${base.map((item) => `<p>${escapeHtml(item)}</p>`).join("")}
-      </div>
-    `;
-  }
-
-  function renderPerformanceList(items, empty) {
-    if (!items.length) return `<p class="empty">${escapeHtml(empty)}</p>`;
-    return `
-      <div class="matter-list">
-        ${items.map((item) => `
-          <article class="matter-mini">
-            <div>
-              <strong>${escapeHtml(item.nome)}</strong>
-              <small>${escapeHtml(item.bloco)} · ${item.answered}/${item.total} respondidas</small>
-            </div>
-            <span>${item.accuracy}%</span>
-          </article>
-        `).join("")}
-      </div>
-    `;
-  }
-
-  function renderMockList(mocks) {
-    if (!mocks.length) return `<p class="empty">Nenhum simulado finalizado neste concurso/cargo ainda.</p>`;
-    return `
-      <div class="history-list">
-        ${mocks.map((mock) => `
-          <article class="history-item">
-            <strong>${escapeHtml(mock.title)}</strong>
-            <span>${mock.correct} acertos · ${mock.wrong} erros · ${mock.blank} brancos · ${mock.score} pontos</span>
-            <small>${formatDate(mock.finishedAt.slice(0, 10))}</small>
-          </article>
-        `).join("")}
-      </div>
-    `;
-  }
-
-  function renderTreino() {
-    const matters = mattersFor();
-    const subjects = [...new Set(questionsFor().map((question) => question.assunto))].sort();
-    if (!state.practice.queueIds.length) {
-      state.practice.queueIds = buildPracticeQueue({ mode: "modo-treino", quantity: 10 }).map((question) => question.id);
-      state.practice.startedAt = Object.fromEntries(state.practice.queueIds.map((id) => [id, Date.now()]));
-    }
-    const queue = state.practice.queueIds.map((id) => questionsFor().find((question) => question.id === id)).filter(Boolean);
-
-    $("#tab-content").innerHTML = `
-      <section class="panel">
-        <div class="section-heading section-heading--compact">
-          <p class="eyebrow">Modos de estudo</p>
-          <h2>Treino com correção imediata</h2>
-          <p>Depois de responder, o card mostra se você acertou, a explicação, a fonte, links de estudo, favorita, denúncia e anotação.</p>
-        </div>
-        <div class="filters">
-          <label class="field">
-            <span>Modo</span>
-            <select id="practice-mode">
-              <option value="modo-treino">Modo treino</option>
-              <option value="por-materia">Estudar por matéria</option>
-              <option value="por-assunto">Estudar por assunto</option>
-              <option value="aleatorias">Questões aleatórias</option>
-              <option value="nao-respondidas">Questões não respondidas</option>
-              <option value="erradas">Questões erradas</option>
-              <option value="favoritas">Questões favoritas</option>
-              <option value="revisao-rapida">Revisão rápida</option>
-            </select>
-          </label>
-          <label class="field">
-            <span>Matéria</span>
-            <select id="practice-matter">
-              <option value="">Todas</option>
-              ${matters.map((matter) => `<option value="${escapeHtml(matter.id)}">${escapeHtml(matter.nome)}</option>`).join("")}
-            </select>
-          </label>
-          <label class="field">
-            <span>Assunto</span>
-            <select id="practice-subject">
-              <option value="">Todos</option>
-              ${subjects.map((subject) => `<option value="${escapeHtml(subject)}">${escapeHtml(subject)}</option>`).join("")}
-            </select>
-          </label>
-          <label class="field">
-            <span>Dificuldade</span>
-            <select id="practice-difficulty">
-              <option value="">Mista</option>
-              <option value="facil">Fácil</option>
-              <option value="medio">Média</option>
-              <option value="dificil">Difícil</option>
-            </select>
-          </label>
-          <label class="field">
-            <span>Quantidade</span>
-            <input id="practice-quantity" type="number" min="1" max="50" value="10">
-          </label>
-          <button class="primary-button" type="button" data-generate-practice>Gerar lista</button>
-        </div>
-      </section>
-      <section class="question-stack">
-        ${queue.length ? queue.map((question, index) => renderQuestionCard(question, { context: "practice", index })).join("") : renderEmptyQuestions()}
-      </section>
-    `;
-    restorePracticeFilters();
-  }
-
-  function restorePracticeFilters() {
-    $("#practice-mode").value = state.practice.mode || "modo-treino";
-  }
-
-  function buildPracticeQueue(options = {}) {
-    const scope = getScope();
-    const mode = options.mode || $("#practice-mode")?.value || "modo-treino";
-    const matterId = options.matterId ?? $("#practice-matter")?.value ?? "";
-    const subject = options.subject ?? $("#practice-subject")?.value ?? "";
-    const difficulty = options.difficulty ?? $("#practice-difficulty")?.value ?? "";
-    const quantity = safeNumber(options.quantity ?? $("#practice-quantity")?.value, 10);
-    let list = questionsFor();
-
-    if (mode === "por-materia" && matterId) list = list.filter((question) => question.materia_id === matterId);
-    if (mode === "por-assunto" && subject) list = list.filter((question) => question.assunto === subject);
-    if (mode === "nao-respondidas") list = list.filter((question) => !scope.answers[question.id]);
-    if (mode === "erradas") list = list.filter((question) => scope.answers[question.id] && !scope.answers[question.id].lastCorrect && !scope.answers[question.id].lastBlank);
-    if (mode === "favoritas") list = list.filter((question) => scope.favorites[question.id]);
-    if (mode === "revisao-rapida") list = smartRevisionQuestions(scope, Math.max(quantity, 15));
-    if (mode === "aleatorias" || mode === "modo-treino") {
-      if (matterId) list = list.filter((question) => question.materia_id === matterId);
-      if (subject) list = list.filter((question) => question.assunto === subject);
-    }
-    if (difficulty) list = list.filter((question) => question.dificuldade === difficulty);
-
-    return shuffle(list, `${state.currentUserId}-${state.activeContestId}-${state.activeRoleId}-${mode}-${Date.now()}`).slice(0, Math.max(1, quantity));
-  }
-
-  function generatePracticeFromFilters() {
-    const mode = $("#practice-mode").value;
-    const queue = buildPracticeQueue({
-      mode,
-      matterId: $("#practice-matter").value,
-      subject: $("#practice-subject").value,
-      difficulty: $("#practice-difficulty").value,
-      quantity: $("#practice-quantity").value,
-    });
-    state.practice.mode = mode;
-    state.practice.queueIds = queue.map((question) => question.id);
-    state.practice.answered = {};
-    state.practice.startedAt = Object.fromEntries(queue.map((question) => [question.id, Date.now()]));
-    renderTreino();
-  }
-
-  function renderEmptyQuestions() {
-    return `
-      <article class="panel empty-state">
-        <h3>Nenhuma questão encontrada</h3>
-        <p>Troque o filtro ou responda mais questões para alimentar este modo.</p>
-      </article>
-    `;
-  }
-
-  function renderQuestionCard(question, options = {}) {
-    const scope = getScope();
-    const isPractice = options.context === "practice" || options.context === "revision";
-    const isMock = options.context === "mock";
-    const mockAnswer = isMock ? normalizeAnswer(state.mock?.answers?.[question.id]) : undefined;
-    const practiceAnswer = state.practice.answered[question.id];
-    const selected = isMock ? mockAnswer : normalizeAnswer(practiceAnswer);
-    const showCorrection = options.showCorrection || (!isMock && practiceAnswer !== undefined);
-    const evaluation = showCorrection ? evaluateAnswer(question, selected) : null;
-    const favorite = Boolean(scope.favorites?.[question.id]);
-    const note = scope.notes?.[question.id];
-    const answeredBefore = scope.answers?.[question.id];
-    const cardClass = showCorrection
-      ? evaluation.blank ? "question-card--blank" : evaluation.correct ? "question-card--correct" : "question-card--wrong"
-      : "";
-
-    return `
-      <article class="question-card ${cardClass}" id="q-${escapeHtml(question.id)}">
-        <button class="question-card__summary" type="button" data-toggle-question="${escapeHtml(question.id)}">
-          <span class="question-number">${escapeHtml(options.index !== undefined ? options.index + 1 : question.id)}</span>
-          <span>
-            <strong>${escapeHtml(question.materia)}</strong>
-            <small>${escapeHtml(question.assunto)} · ${escapeHtml(question.dificuldade)} · ${escapeHtml(question.tipo.replace("_", "/"))}</small>
-          </span>
-          ${showCorrection ? renderResultBadge(evaluation) : answeredBefore ? `<span class="badge badge--neutral">já respondida</span>` : `<span class="badge badge--neutral">nova</span>`}
-        </button>
-
-        <div class="question-card__body">
-          <p class="statement">${escapeHtml(question.enunciado)}</p>
-          <div class="meta-row">
-            <span>${escapeHtml(question.banca)}</span>
-            <span>${escapeHtml(question.origem)}</span>
-            <span>${escapeHtml(question.fonte)}</span>
-          </div>
-          ${renderAnswerButtons(question, { isPractice, isMock, selected, showCorrection })}
-          <div class="question-actions">
-            <button class="ghost-button" type="button" data-toggle-favorite="${escapeHtml(question.id)}">${favorite ? "★ Favorita" : "☆ Favoritar"}</button>
-            <button class="ghost-button" type="button" data-mark-review="${escapeHtml(question.id)}">Marcar revisão</button>
-            <button class="ghost-button" type="button" data-add-note="${escapeHtml(question.id)}">Anotação</button>
-            <button class="ghost-button ghost-button--danger" type="button" data-report-question="${escapeHtml(question.id)}">Denunciar erro</button>
-          </div>
-          ${note ? `<p class="note-box"><strong>Sua anotação:</strong> ${escapeHtml(note)}</p>` : ""}
-          ${showCorrection ? renderExplanation(question, evaluation, isMock) : `<p class="locked-explanation">${isMock ? "Explicação bloqueada até finalizar o simulado." : "Responda para liberar explicação, fonte e links de estudo."}</p>`}
-        </div>
-      </article>
-    `;
-  }
-
-  function renderResultBadge(evaluation) {
-    if (evaluation.blank) return `<span class="badge badge--blank">Em branco</span>`;
-    if (evaluation.correct) return `<span class="badge badge--correct">Certa</span>`;
-    return `<span class="badge badge--wrong">Errada</span>`;
-  }
-
-  function renderAnswerButtons(question, context) {
-    if (question.tipo === "certo_errado" || question.tipo === "verdadeiro_falso") {
+  function renderAnswerControls(question, index) {
+    const quiz = state.activeQuiz;
+    const name = `q-${index}`;
+    const current = quiz.answers[question.id];
+    if (question.tipo === "trueFalse") {
       return `
-        <div class="answer-grid answer-grid--ce">
-          ${choiceButton(question, "C", "Certo", context)}
-          ${choiceButton(question, "E", "Errado", context)}
-          ${choiceButton(question, BLANK, "Em branco", context)}
+        <div class="answer-grid">
+          ${["C", "E", BLANK].map((value) => `
+            <label class="answer-option ${current === value ? "selected" : ""}">
+              <input type="radio" name="${name}" value="${escapeHtml(value)}" data-answer="${escapeHtml(question.id)}" ${current === value ? "checked" : ""}>
+              ${value === "C" ? "Certo" : value === "E" ? "Errado" : "Em branco"}
+            </label>
+          `).join("")}
         </div>
       `;
     }
-
+    if (OPEN_TYPES.has(question.tipo)) {
+      return `
+        <textarea class="open-answer" data-open-answer="${escapeHtml(question.id)}" placeholder="Escreva sua resposta para autoavaliação">${escapeHtml(current || "")}</textarea>
+      `;
+    }
     return `
-      <div class="answer-grid">
-        ${question.alternativas.map((option) => choiceButton(question, option.label, `${option.label}) ${option.text}`, context)).join("")}
-        ${choiceButton(question, BLANK, "Em branco", context)}
+      <div class="answer-list">
+        ${normalizeOptions(question).map((option) => `
+          <label class="answer-option ${current === option.value ? "selected" : ""}">
+            <input type="radio" name="${name}" value="${escapeHtml(option.value)}" data-answer="${escapeHtml(question.id)}" ${current === option.value ? "checked" : ""}>
+            <strong>${escapeHtml(option.label)}</strong> ${escapeHtml(option.text)}
+          </label>
+        `).join("")}
       </div>
     `;
   }
 
-  function choiceButton(question, value, label, context) {
-    const selected = normalizeAnswer(context.selected) === value;
-    const correctChoice = value === question.resposta_correta;
-    const shouldMark = context.showCorrection;
-    const classes = [
-      "answer-button",
-      selected ? "is-selected" : "",
-      shouldMark && correctChoice ? "is-correct-choice" : "",
-      shouldMark && selected && !correctChoice && value !== BLANK ? "is-wrong-choice" : "",
-      shouldMark && selected && value === BLANK ? "is-blank-choice" : "",
-    ].filter(Boolean).join(" ");
-    const attr = context.isMock ? `data-mock-answer="${escapeHtml(question.id)}" data-answer="${escapeHtml(value)}"` : `data-practice-answer="${escapeHtml(question.id)}" data-answer="${escapeHtml(value)}"`;
-    const disabled = context.showCorrection && !context.isMock ? "disabled" : "";
-    return `<button class="${classes}" type="button" ${attr} ${disabled}>${escapeHtml(label)}</button>`;
-  }
-
-  function renderExplanation(question, evaluation, compact = false) {
-    const links = studyLinks(question);
-    return `
-      <details class="explanation" ${compact ? "" : "open"}>
-        <summary>${compact ? "Ver explicação e fonte" : "Explicação"}</summary>
-        <p>${escapeHtml(question.explicacao)}</p>
-        <p><strong>Gabarito:</strong> ${escapeHtml(question.resposta_correta)} · <strong>Sua resposta:</strong> ${escapeHtml(evaluation.answer === BLANK ? "Em branco" : evaluation.answer)} · <strong>Pontuação:</strong> ${evaluation.score}</p>
-        <div class="study-links">
-          ${links.map((link) => `<a href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(link.label)}</a>`).join("")}
-        </div>
-      </details>
-    `;
-  }
-
-  function studyLinks(question) {
-    const links = [{ label: question.fonte, url: question.link }];
-    const contest = contestById(question.concurso_id);
-    if (contest?.editalUrl && contest.editalUrl !== question.link) {
-      links.push({ label: `Edital ${contest.nome}`, url: contest.editalUrl });
+  function evaluateQuestion(question, answer, quiz) {
+    const blank = answer === undefined || answer === "" || answer === BLANK;
+    if (OPEN_TYPES.has(question.tipo)) {
+      const marked = quiz.selfEvaluations[question.id];
+      return { blank: !answer && !marked, correct: marked === "correct", wrong: marked === "wrong" };
     }
-    if (question.tags.includes("portugues")) links.push({ label: "Manual de Redação oficial", url: DATA.sources.manual_redacao.url });
-    if (question.tags.includes("lgpd")) links.push({ label: "Lei 13.709/2018", url: DATA.sources.lgpd.url });
-    if (question.tags.includes("lai")) links.push({ label: "Lei 12.527/2011", url: DATA.sources.lai.url });
-    if (question.tags.includes("sistema-cft-crt") || question.tags.includes("lei-13639")) links.push({ label: "Lei 13.639/2018", url: DATA.sources.lei_13639.url });
-    return links.slice(0, 4);
+    if (blank) return { blank: true, correct: false, wrong: false };
+    const expected = question.tipo === "trueFalse" ? question.gabarito : String(question.gabarito);
+    const correct = String(answer) === String(expected);
+    return { blank: false, correct, wrong: !correct };
   }
 
-  function renderSimulado() {
-    const contest = contestById();
-    const role = roleById();
-    if (state.mock) {
-      renderActiveMock();
-      return;
-    }
-
-    const matters = mattersFor();
-    $("#tab-content").innerHTML = `
-      <div class="panel-grid panel-grid--wide">
-        <section class="panel">
-          <div class="section-heading section-heading--compact">
-            <p class="eyebrow">Simulado completo</p>
-            <h2>Modelo do edital ativo</h2>
-            <p>${escapeHtml(contest.nome)} · ${escapeHtml(role.nome)} · ${role.exam.totalQuestoes} questões · ${role.exam.duracaoMinutos} minutos.</p>
-          </div>
-          <div class="exam-map">
-            ${role.exam.distribution.map((item) => `<div><span>${escapeHtml(item.label)}</span><strong>${item.count}</strong></div>`).join("")}
-          </div>
-          <div class="button-row">
-            <button class="primary-button" type="button" data-start-mock="complete" data-mock-mode="prova">Iniciar modo prova</button>
-            <button class="secondary-button" type="button" data-start-mock="complete" data-mock-mode="treino">Completo com correção no fim</button>
-          </div>
-        </section>
-
-        <section class="panel">
-          <div class="section-heading section-heading--compact">
-            <p class="eyebrow">Simulado personalizado</p>
-            <h2>Escolha filtros</h2>
-            <p>Permite concurso/cargo ativo, matérias, quantidade, dificuldade, novas, erradas, favoritas, tempo e modo de correção.</p>
-          </div>
-          <div class="filters filters--compact">
-            <label class="field">
-              <span>Matéria</span>
-              <select id="custom-matter">
-                <option value="">Todas</option>
-                ${matters.map((matter) => `<option value="${escapeHtml(matter.id)}">${escapeHtml(matter.nome)}</option>`).join("")}
-              </select>
-            </label>
-            <label class="field">
-              <span>Fonte de questões</span>
-              <select id="custom-source">
-                <option value="todas">Todas</option>
-                <option value="novas">Novas</option>
-                <option value="erradas">Erradas</option>
-                <option value="favoritas">Favoritas</option>
-              </select>
-            </label>
-            <label class="field">
-              <span>Dificuldade</span>
-              <select id="custom-difficulty">
-                <option value="">Mista</option>
-                <option value="facil">Fácil</option>
-                <option value="medio">Média</option>
-                <option value="dificil">Difícil</option>
-              </select>
-            </label>
-            <label class="field">
-              <span>Quantidade</span>
-              <input id="custom-quantity" type="number" min="5" max="${questionsFor().length}" value="20">
-            </label>
-            <label class="field">
-              <span>Tempo em minutos</span>
-              <input id="custom-time" type="number" min="5" value="${Math.min(60, role.exam.duracaoMinutos)}">
-            </label>
-            <label class="field">
-              <span>Correção</span>
-              <select id="custom-mode">
-                <option value="prova">Modo prova</option>
-                <option value="treino">Modo treino</option>
-              </select>
-            </label>
-            <button class="primary-button" type="button" data-start-mock="custom">Iniciar personalizado</button>
-          </div>
-        </section>
-      </div>
-      ${renderWritingBox(role)}
-    `;
-  }
-
-  function renderWritingBox(role) {
-    if (!role.exam.writing) return "";
-    return `
-      <section class="panel">
-        <div class="section-heading section-heading--compact">
-          <p class="eyebrow">Redação prevista no edital</p>
-          <h2>Treino manual de redação</h2>
-          <p>O site não corrige redação automaticamente. Use as propostas abaixo para treinar ${escapeHtml(role.exam.writing.linhas)} e conferir coesão, clareza e fuga ao tema.</p>
-        </div>
-        <div class="writing-prompts">
-          ${role.exam.writing.propostas.map((prompt) => `<article>${escapeHtml(prompt)}</article>`).join("")}
-        </div>
-      </section>
-    `;
-  }
-
-  function dailyQueueForActiveScope() {
-    const role = roleById();
-    const scopeKey = `${state.activeContestId}::${state.activeRoleId}`;
-    const ids = state.dailySelection?.selections?.[scopeKey];
-    if (!Array.isArray(ids) || ids.length !== role.exam.totalQuestoes) return null;
-    if (new Set(ids).size !== ids.length) return null;
-
-    const all = questionsFor();
-    const byId = new Map(all.map((question) => [question.id, question]));
-    const queue = ids.map((id) => byId.get(id));
-    if (queue.some((question) => !question)) return null;
-
-    const matchesFormat = queue.every((question) => (
-      role.exam.formato === "certo_errado"
-        ? question.tipo === "certo_errado"
-        : question.tipo === "multipla_escolha"
-    ));
-    if (!matchesFormat) return null;
-
-    const matchesDistribution = role.exam.distribution.every((item) => {
-      const availableInDistribution = all.filter((question) => (
-        item.kind === "bloco" ? question.bloco === item.id : question.materia_id === item.id
-      )).length;
-      const required = Math.min(item.count, availableInDistribution);
-      const total = queue.filter((question) => (
-        item.kind === "bloco" ? question.bloco === item.id : question.materia_id === item.id
-      )).length;
-      return total >= required;
+  function buildResult(quiz) {
+    const items = quiz.questions.map((question) => {
+      const evaluation = evaluateQuestion(question, quiz.answers[question.id], quiz);
+      return {
+        ...evaluation,
+        id: question.id,
+        disciplina: question.disciplina || question.bloco || question.trilha,
+        assunto: question.assunto,
+        score: quiz.scoring === "quadrix" ? (evaluation.correct ? 1 : evaluation.wrong ? -1 : 0) : (evaluation.correct ? DIFFICULTY_POINTS[question.dificuldade] || 1 : 0),
+      };
     });
-
-    return matchesDistribution ? queue : null;
-  }
-
-  function buildExamQueue() {
-    const dailyQueue = dailyQueueForActiveScope();
-    if (dailyQueue) return dailyQueue;
-
-    const role = roleById();
-    const selected = [];
-    const all = questionsFor();
-    role.exam.distribution.forEach((item) => {
-      const pool = all.filter((question) => (
-        item.kind === "bloco" ? question.bloco === item.id : question.materia_id === item.id
-      ) && !selected.includes(question));
-      selected.push(...shuffle(pool, `${state.currentUserId}-${item.id}-${Date.now()}`).slice(0, item.count));
-    });
-    if (selected.length < role.exam.totalQuestoes) {
-      const fill = shuffle(all.filter((question) => !selected.includes(question)), `${state.currentUserId}-fill-${Date.now()}`)
-        .slice(0, role.exam.totalQuestoes - selected.length);
-      selected.push(...fill);
-    }
-    return selected.slice(0, role.exam.totalQuestoes);
-  }
-
-  function buildCustomMockQueue() {
-    const scope = getScope();
-    const matterId = $("#custom-matter").value;
-    const source = $("#custom-source").value;
-    const difficulty = $("#custom-difficulty").value;
-    const quantity = safeNumber($("#custom-quantity").value, 20);
-    let pool = questionsFor();
-    if (matterId) pool = pool.filter((question) => question.materia_id === matterId);
-    if (difficulty) pool = pool.filter((question) => question.dificuldade === difficulty);
-    if (source === "novas") pool = pool.filter((question) => !scope.answers[question.id]);
-    if (source === "erradas") pool = pool.filter((question) => scope.answers[question.id] && !scope.answers[question.id].lastCorrect && !scope.answers[question.id].lastBlank);
-    if (source === "favoritas") pool = pool.filter((question) => scope.favorites[question.id]);
-    return shuffle(pool, `${state.currentUserId}-custom-${Date.now()}`).slice(0, quantity);
-  }
-
-  function startMock(kind, mode) {
-    const role = roleById();
-    const queue = kind === "complete" ? buildExamQueue() : buildCustomMockQueue();
-    if (!queue.length) {
-      alert("Nenhuma questão encontrada para esse simulado. Ajuste os filtros.");
-      return;
-    }
-    const durationMinutes = kind === "complete" ? role.exam.duracaoMinutos : safeNumber($("#custom-time")?.value, role.exam.duracaoMinutos);
-    state.mock = {
-      id: `sim-${Date.now()}`,
-      title: kind === "complete" ? "Simulado completo" : "Simulado personalizado",
-      kind,
-      mode,
-      queueIds: queue.map((question) => question.id),
-      answers: {},
-      startedAt: Date.now(),
-      durationSeconds: durationMinutes * 60,
-      finished: false,
-      result: null,
+    const correct = items.filter((item) => item.correct).length;
+    const wrong = items.filter((item) => item.wrong).length;
+    const blank = items.filter((item) => item.blank).length;
+    const score = items.reduce((sum, item) => sum + item.score, 0);
+    const gamifiedPoints = quiz.scoring === "quadrix"
+      ? Math.max(0, correct * 2 + (quiz.kind === "crt-real" ? 20 : 0))
+      : score + Math.min(10, loadUserStats().streakAtual || 0);
+    return {
+      title: quiz.title,
+      kind: quiz.kind,
+      area: quiz.area,
+      trilha: quiz.trilha,
+      scopeKey: quiz.scopeKey,
+      total: quiz.questions.length,
+      correct,
+      wrong,
+      blank,
+      score,
+      percent: quiz.questions.length ? Math.round((correct / quiz.questions.length) * 100) : 0,
+      gamifiedPoints,
+      items,
     };
-    startTimer();
-    renderActiveMock();
   }
 
-  function startTimer() {
-    stopTimer();
-    state.timerInterval = window.setInterval(() => {
-      const timer = $("#timer");
-      if (!timer || !state.mock || state.mock.finished) return;
-      timer.textContent = formatRemaining();
-      if (remainingSeconds() <= 0) {
-        finishMock();
-      }
-    }, 1000);
-  }
-
-  function stopTimer() {
-    if (state.timerInterval) {
-      window.clearInterval(state.timerInterval);
-      state.timerInterval = null;
-    }
-  }
-
-  function remainingSeconds() {
-    if (!state.mock) return 0;
-    const elapsed = Math.floor((Date.now() - state.mock.startedAt) / 1000);
-    return Math.max(0, state.mock.durationSeconds - elapsed);
-  }
-
-  function formatRemaining() {
-    const seconds = state.mock?.finished ? state.mock.remainingAtFinish ?? 0 : remainingSeconds();
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = seconds % 60;
-    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-  }
-
-  function renderActiveMock() {
-    const queue = state.mock.queueIds.map((id) => questionsFor().find((question) => question.id === id)).filter(Boolean);
-    const answered = Object.keys(state.mock.answers).length;
-    const resultHtml = state.mock.finished ? renderMockResult(queue) : "";
+  function renderQuiz() {
+    const quiz = state.activeQuiz;
+    const elapsed = Math.max(0, Math.round((Date.now() - quiz.startedAt) / 1000));
+    const answered = Object.values(quiz.answers).filter((value) => value !== undefined && value !== "").length;
+    $("#dashboard").innerHTML = "";
+    $("#tabs").innerHTML = "";
     $("#tab-content").innerHTML = `
-      <section class="panel mock-bar">
-        <div>
-          <p class="eyebrow">${escapeHtml(state.mock.title)} · ${escapeHtml(state.mock.mode === "prova" ? "Modo prova" : "Modo treino")}</p>
-          <h2>${answered}/${queue.length} respondidas</h2>
-          <p>${state.mock.finished ? "Simulado finalizado. Clique em cada questão para abrir a explicação." : "As explicações ficam bloqueadas até finalizar."}</p>
+      <section class="panel">
+        <div class="section-heading">
+          <p class="eyebrow">${escapeHtml(quiz.trilha)} · ${quiz.questions.length} questões</p>
+          <h2>${escapeHtml(quiz.title)}</h2>
         </div>
-        <div class="timer" id="timer">${formatRemaining()}</div>
-        <div class="button-row">
-          ${state.mock.finished ? `<button class="secondary-button" type="button" data-reset-mock>Novo simulado</button>` : `<button class="primary-button" type="button" data-finish-mock>Finalizar simulado</button>`}
-          <button class="ghost-button" type="button" data-reset-mock>Reiniciar</button>
+        <div class="quiz-toolbar">
+          <span>Respondidas: ${answered}/${quiz.questions.length}</span>
+          <span>Tempo: ${Math.floor(elapsed / 60)}min ${elapsed % 60}s</span>
+          ${quiz.durationMinutes ? `<span>Duração sugerida: ${quiz.durationMinutes}min</span>` : ""}
         </div>
-      </section>
-      ${resultHtml}
-      <section class="question-stack">
-        ${queue.map((question, index) => renderQuestionCard(question, { context: "mock", index, showCorrection: state.mock.finished })).join("")}
+        <div class="question-stack">
+          ${quiz.questions.map((question, index) => renderQuestion(question, index)).join("")}
+        </div>
+        <div class="sticky-actions">
+          <button class="secondary-button" type="button" data-cancel-quiz>Voltar sem finalizar</button>
+          <button class="primary-button" type="button" data-finish-quiz>Finalizar</button>
+        </div>
       </section>
     `;
   }
 
-  function finishMock() {
-    if (!state.mock || state.mock.finished) return;
-    const queue = state.mock.queueIds.map((id) => questionsFor().find((question) => question.id === id)).filter(Boolean);
-    const simuladoId = state.mock.id;
-    const startedAt = state.mock.startedAt;
-    const records = queue.map((question) => {
-      const answer = state.mock.answers[question.id] || BLANK;
-      return recordAnswer(question, answer, `simulado-${state.mock.mode}`, startedAt, simuladoId);
-    });
-    const result = calculateMockResult(queue, records);
-    state.mock.finished = true;
-    state.mock.remainingAtFinish = remainingSeconds();
-    state.mock.result = result;
-    stopTimer();
-    persistScope((scope) => {
-      scope.mocks.unshift({
-        id: simuladoId,
-        title: state.mock.title,
-        kind: state.mock.kind,
-        mode: state.mock.mode,
-        concurso_id: state.activeContestId,
-        cargo_id: state.activeRoleId,
-        total: result.total,
-        correct: result.correct,
-        wrong: result.wrong,
-        blank: result.blank,
-        score: result.score,
-        accuracy: result.accuracy,
-        finishedAt: nowIso(),
-      });
-      scope.mocks = scope.mocks.slice(0, 100);
-    });
-    renderDashboardStrip();
-    renderActiveMock();
-  }
-
-  function calculateMockResult(queue, records) {
-    const byQuestion = Object.fromEntries(records.map((record) => [record.questao_id, record]));
-    const totals = queue.reduce((acc, question) => {
-      const record = byQuestion[question.id];
-      if (record.correto) acc.correct += 1;
-      else if (record.em_branco) acc.blank += 1;
-      else acc.wrong += 1;
-      acc.score += safeNumber(record.pontuacao);
-      const key = question.bloco || question.materia;
-      acc.byBlock[key] = acc.byBlock[key] || { label: key, total: 0, correct: 0, wrong: 0, blank: 0, score: 0 };
-      acc.byBlock[key].total += 1;
-      acc.byBlock[key].correct += record.correto ? 1 : 0;
-      acc.byBlock[key].wrong += !record.correto && !record.em_branco ? 1 : 0;
-      acc.byBlock[key].blank += record.em_branco ? 1 : 0;
-      acc.byBlock[key].score += safeNumber(record.pontuacao);
-      return acc;
-    }, { total: queue.length, correct: 0, wrong: 0, blank: 0, score: 0, byBlock: {} });
-    totals.accuracy = Number(percent(totals.correct, totals.correct + totals.wrong, 1));
-    return totals;
-  }
-
-  function renderMockResult(queue) {
-    const result = state.mock.result || calculateMockResult(queue, []);
-    const blocks = Object.values(result.byBlock || {});
-    const weak = queue
-      .filter((question) => {
-        const answer = normalizeAnswer(state.mock.answers[question.id]);
-        const evaluation = evaluateAnswer(question, answer);
-        return !evaluation.correct;
-      })
-      .reduce((acc, question) => {
-        const key = `${question.materia} — ${question.assunto}`;
-        acc[key] = (acc[key] || 0) + 1;
-        return acc;
-      }, {});
-    const weakList = Object.entries(weak).sort((a, b) => b[1] - a[1]).slice(0, 8);
-
+  function renderQuestion(question, index) {
     return `
-      <section class="panel result-panel">
-        <div class="section-heading section-heading--compact">
-          <p class="eyebrow">Resultado do simulado</p>
-          <h2>${result.correct} acertos · ${result.wrong} erros · ${result.blank} em branco</h2>
-          <p>Pontuação líquida total: <strong>${result.score}</strong> · Aproveitamento: <strong>${result.accuracy}%</strong></p>
+      <article class="question-card">
+        <div class="question-meta">
+          <span>Questão ${index + 1}</span>
+          <span>${escapeHtml(question.disciplina || question.trilha)}</span>
+          <span>${escapeHtml(question.dificuldade)}</span>
+          <span>${escapeHtml(question.tipo)}</span>
+        </div>
+        <p>${escapeHtml(question.enunciado)}</p>
+        ${question.codigo ? `<pre><code>${escapeHtml(question.codigo)}</code></pre>` : ""}
+        ${renderAnswerControls(question, index)}
+      </article>
+    `;
+  }
+
+  function finishQuiz() {
+    const quiz = state.activeQuiz;
+    if (!quiz) return;
+    quiz.submitted = true;
+    const result = buildResult(quiz);
+    updateStatsAfterActivity(result);
+    renderResults(result);
+  }
+
+  function blockReport(result, quiz) {
+    const byBlock = {};
+    for (const item of result.items) {
+      const question = quiz.questions.find((candidate) => candidate.id === item.id);
+      const block = question?.bloco || question?.disciplina || "Geral";
+      byBlock[block] = byBlock[block] || { total: 0, correct: 0, wrong: 0, blank: 0, score: 0 };
+      byBlock[block].total += 1;
+      byBlock[block].correct += item.correct ? 1 : 0;
+      byBlock[block].wrong += item.wrong ? 1 : 0;
+      byBlock[block].blank += item.blank ? 1 : 0;
+      byBlock[block].score += item.score;
+    }
+    return byBlock;
+  }
+
+  function renderResults(result) {
+    const quiz = state.activeQuiz;
+    const report = blockReport(result, quiz);
+    const real = quiz.kind === "crt-real";
+    const basics = report["Conhecimentos básicos"]?.score || 0;
+    const comp = report["Conhecimentos complementares"]?.score || 0;
+    const spec = report["Conhecimentos específicos"]?.score || 0;
+    const inside = basics >= MINIMOS_PROVA_REAL.basicos && comp >= MINIMOS_PROVA_REAL.complementares && spec >= MINIMOS_PROVA_REAL.especificos && result.score >= MINIMOS_PROVA_REAL.total;
+    const attention = result.score >= MINIMOS_PROVA_REAL.total || [basics >= MINIMOS_PROVA_REAL.basicos, comp >= MINIMOS_PROVA_REAL.complementares, spec >= MINIMOS_PROVA_REAL.especificos].filter(Boolean).length >= 2;
+    const status = !real ? "" : inside ? "Dentro da zona segura" : attention ? "Atenção" : "Risco de eliminação";
+    const weak = result.items.filter((item) => item.wrong || item.blank).slice(0, 12);
+
+    $("#tab-content").innerHTML = `
+      <section class="panel">
+        <div class="section-heading">
+          <p class="eyebrow">Resultado</p>
+          <h2>${result.correct} acertos · ${result.wrong} erros · ${result.blank} brancos</h2>
         </div>
         <div class="dashboard-grid">
-          ${metricCard("Acertos", result.correct, "itens corretos")}
-          ${metricCard("Erros", result.wrong, "itens incorretos")}
-          ${metricCard("Em branco", result.blank, "sem penalização quando aplicável")}
-          ${metricCard("Pontuação", result.score, "conforme edital ativo")}
+          ${metricCard("Pontuação", result.score, quiz.scoring === "quadrix" ? "+1/-1/0" : "sem penalidade")}
+          ${metricCard("Percentual", `${result.percent}%`, "acertos sobre o total")}
+          ${metricCard("Pontos gamificados", result.gamifiedPoints, "salvos no dashboard")}
+          ${metricCard("Segurança", `${Math.max(0, Math.round((result.score / result.total) * 100))}%`, real ? status : "desempenho líquido")}
         </div>
-        <h3>Desempenho por bloco/matéria</h3>
-        <div class="result-table">
-          ${blocks.map((block) => `
-            <div>
-              <strong>${escapeHtml(block.label)}</strong>
-              <span>${block.correct}/${block.total} acertos · ${block.wrong} erros · ${block.blank} brancos · ${block.score} pts</span>
-            </div>
-          `).join("")}
-        </div>
-        <h3>Assuntos para revisar</h3>
-        ${weakList.length ? `<ul class="check-list">${weakList.map(([label, count]) => `<li>${escapeHtml(label)} — ${count} questão(ões)</li>`).join("")}</ul>` : `<p class="empty">Sem erros ou brancos neste simulado. Brabo.</p>`}
-      </section>
-    `;
-  }
-
-  function renderRevisao() {
-    const scope = getScope();
-    const queue = smartRevisionQuestions(scope, 20);
-    state.practice.startedAt = Object.fromEntries(queue.map((question) => [question.id, Date.now()]));
-    $("#tab-content").innerHTML = `
-      <section class="panel">
-        <div class="section-heading section-heading--compact">
-          <p class="eyebrow">Revisão inteligente</p>
-          <h2>Erros, brancos, favoritas, lentas e difíceis</h2>
-          <p>A seleção respeita apenas ${escapeHtml(contestById().nome)} · ${escapeHtml(roleById().nome)}.</p>
-        </div>
-      </section>
-      <section class="question-stack">
-        ${queue.length ? queue.map((question, index) => renderQuestionCard(question, { context: "revision", index })).join("") : renderEmptyQuestions()}
-      </section>
-    `;
-  }
-
-  function renderMaterias() {
-    const scope = getScope();
-    const performances = performanceByMatter(scope, questionsFor());
-    $("#tab-content").innerHTML = `
-      <section class="panel">
-        <div class="section-heading section-heading--compact">
-          <p class="eyebrow">Conteúdo programático</p>
-          <h2>Matérias do concurso ativo</h2>
-          <p>Lista derivada do edital do concurso/cargo selecionado. Cada card tem progresso e prioridade próprios.</p>
-        </div>
-        <div class="matter-grid">
-          ${performances.map((matter) => `
-            <article class="matter-card">
-              <span class="chip">${escapeHtml(matter.bloco)}</span>
-              <h3>${escapeHtml(matter.nome)}</h3>
-              <div class="contest-progress"><span style="width:${matter.progress}%"></span></div>
-              <dl class="contest-facts">
-                <div><dt>Questões</dt><dd>${matter.total}</dd></div>
-                <div><dt>Concluído</dt><dd>${matter.progress}%</dd></div>
-                <div><dt>Acertos</dt><dd>${matter.accuracy}%</dd></div>
-                <div><dt>Prioridade</dt><dd>${escapeHtml(matter.priority)}</dd></div>
-              </dl>
-              <p><strong>Assuntos:</strong> ${escapeHtml((mattersFor().find((item) => item.id === matter.id)?.assuntos || []).join(", "))}</p>
-              <p><strong>Último estudo:</strong> ${matter.lastAt ? formatDate(matter.lastAt.slice(0, 10)) : "ainda não estudado"}</p>
-            </article>
-          `).join("")}
-        </div>
-      </section>
-      <section class="panel">
-        <h3>Fontes utilizadas neste concurso</h3>
-        <div class="study-links">
-          ${sourceLinksForContest().map((link) => `<a href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(link.label)}</a>`).join("")}
-        </div>
-      </section>
-    `;
-  }
-
-  function sourceLinksForContest() {
-    const contest = contestById();
-    const sources = [
-      { label: contest.edital, url: contest.editalUrl },
-    ];
-    if (contest.id === "crt-sp") {
-      sources.push(
-        { label: "Edital PDF CRT-SP", url: DATA.sources.crt_pdf.url },
-        { label: "Lei 13.639/2018", url: DATA.sources.lei_13639.url },
-        { label: "Lei 5.524/1968", url: DATA.sources.lei_5524.url },
-        { label: "Decreto 90.922/1985", url: DATA.sources.decreto_90922.url },
-        { label: "Resoluções CFT", url: DATA.sources.cft_resolucoes.url },
-      );
-    }
-    if (contest.id === "ibge") {
-      sources.push(
-        { label: "Edital PDF IBGE", url: DATA.sources.ibge_pdf.url },
-        { label: "Conteúdo programático IBGE", url: DATA.sources.ibge_conteudo.url },
-      );
-    }
-    if (contest.id === "santos-oficial") {
-      sources.push(
-        { label: "Edital PDF Santos", url: DATA.sources.santos_pdf.url },
-        { label: "Notícia oficial Santos", url: DATA.sources.santos_noticia.url },
-      );
-    }
-    if (contest.id === "pm-sp") {
-      sources.push(
-        { label: "VUNESP PMES2601", url: DATA.sources.pmsp_vunesp.url },
-        { label: "Concursos PM-SP", url: DATA.sources.pmsp_concursos.url },
-        { label: "Agência SP — concurso PM-SP", url: DATA.sources.pmsp_agencia_sp.url },
-      );
-    }
-    return sources;
-  }
-
-  function renderHistorico() {
-    const scope = getScope();
-    const history = (scope.history || []).slice(0, 120);
-    $("#tab-content").innerHTML = `
-      <section class="panel">
-        <div class="section-heading section-heading--compact">
-          <p class="eyebrow">Histórico independente</p>
-          <h2>${history.length} registros neste concurso/cargo</h2>
-          <p>Não aparecem respostas de outros concursos, cargos ou usuários.</p>
-        </div>
-        ${history.length ? `
-          <div class="history-list">
-            ${history.map((record) => `
-              <article class="history-item">
-                <strong>${escapeHtml(record.materia)} — ${escapeHtml(record.assunto)}</strong>
-                <span>${record.correto ? "Certa" : record.em_branco ? "Em branco" : "Errada"} · marcada: ${escapeHtml(record.resposta_marcada === BLANK ? "Em branco" : record.resposta_marcada)} · gabarito: ${escapeHtml(record.resposta_correta)}</span>
-                <small>${new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" }).format(new Date(record.data))} · ${escapeHtml(record.modo)}</small>
-              </article>
-            `).join("")}
+        ${real ? `
+          <div class="real-status">
+            <p><strong>Status:</strong> ${escapeHtml(status)}</p>
+            <ul>
+              <li>Básicos: ${basics} — mínimo ${MINIMOS_PROVA_REAL.basicos} ${basics >= MINIMOS_PROVA_REAL.basicos ? "✅" : "⚠️"}</li>
+              <li>Complementares: ${comp} — mínimo ${MINIMOS_PROVA_REAL.complementares} ${comp >= MINIMOS_PROVA_REAL.complementares ? "✅" : "⚠️"}</li>
+              <li>Específicos: ${spec} — mínimo ${MINIMOS_PROVA_REAL.especificos} ${spec >= MINIMOS_PROVA_REAL.especificos ? "✅" : "⚠️"}</li>
+              <li>Total: ${result.score} — mínimo ${MINIMOS_PROVA_REAL.total} ${result.score >= MINIMOS_PROVA_REAL.total ? "✅" : "⚠️"}</li>
+            </ul>
           </div>
-        ` : `<p class="empty">Sem histórico neste escopo ainda.</p>`}
-      </section>
-    `;
-  }
-
-  function renderMetas() {
-    const scope = getScope();
-    const goals = scope.goals || makeScope().goals;
-    const summary = summaryFromScope(scope);
-    $("#tab-content").innerHTML = `
-      <section class="panel">
-        <div class="section-heading section-heading--compact">
-          <p class="eyebrow">Metas separadas</p>
-          <h2>Metas para ${escapeHtml(contestById().nome)} · ${escapeHtml(roleById().nome)}</h2>
-          <p>Alterar estas metas não afeta outros concursos nem outros usuários.</p>
-        </div>
-        <div class="filters">
-          <label class="field">
-            <span>Questões por dia</span>
-            <input id="goal-daily" type="number" min="1" value="${escapeHtml(goals.dailyQuestions)}">
-          </label>
-          <label class="field">
-            <span>Simulados por semana</span>
-            <input id="goal-weekly" type="number" min="0" value="${escapeHtml(goals.weeklyMocks)}">
-          </label>
-          <label class="field">
-            <span>Erradas para revisar</span>
-            <input id="goal-review" type="number" min="0" value="${escapeHtml(goals.reviewWrong)}">
-          </label>
-          <label class="field">
-            <span>Meta de acertos (%)</span>
-            <input id="goal-accuracy" type="number" min="0" max="100" value="${escapeHtml(goals.targetAccuracy)}">
-          </label>
-          <button class="primary-button" type="button" data-save-goals>Salvar metas</button>
-        </div>
+        ` : ""}
       </section>
       <section class="panel">
-        <h3>Status das metas</h3>
+        <h2>Desempenho por bloco/disciplina</h2>
         <div class="dashboard-grid">
-          ${metricCard("Questões únicas", summary.uniqueAnswered, `meta diária: ${goals.dailyQuestions}`)}
-          ${metricCard("Simulados", summary.mocks, `meta semanal: ${goals.weeklyMocks}`)}
-          ${metricCard("Favoritas", summary.favorites, "revisão manual")}
-          ${metricCard("Acertos", `${summary.accuracy}%`, `meta: ${goals.targetAccuracy}%`)}
+          ${Object.entries(report).map(([block, values]) => metricCard(block, `${values.correct}/${values.total}`, `${values.wrong} erros · ${values.blank} brancos · ${values.score} pts`)).join("")}
         </div>
+      </section>
+      <section class="panel">
+        <h2>Assuntos para revisar</h2>
+        ${weak.length ? `<ul class="check-list">${weak.map((item) => `<li>${escapeHtml(item.disciplina)} — ${escapeHtml(item.assunto || "revisar teoria")}</li>`).join("")}</ul>` : "<p class='notice'>Mandou bem: nenhum erro ou branco para revisar neste questionário.</p>"}
+      </section>
+      <section class="panel">
+        <h2>Gabarito comentado</h2>
+        <div class="question-stack">
+          ${quiz.questions.map((question, index) => renderAnsweredQuestion(question, index, result.items.find((item) => item.id === question.id))).join("")}
+        </div>
+        <button class="primary-button" type="button" data-back-tabs>Voltar para as abas</button>
       </section>
     `;
   }
 
-  function bindEvents() {
-    document.addEventListener("click", (event) => {
-      const target = event.target.closest("button");
-      if (!target) return;
+  function renderAnsweredQuestion(question, index, item) {
+    const answer = state.activeQuiz.answers[question.id];
+    const expected = question.tipo === "trueFalse" ? question.gabarito : normalizeOptions(question)[Number(question.gabarito)]?.label;
+    const marked = question.tipo === "trueFalse"
+      ? answer === BLANK || answer === undefined ? "Em branco" : answer === "C" ? "Certo" : "Errado"
+      : answer === undefined ? "Em branco" : normalizeOptions(question)[Number(answer)]?.label || answer;
+    return `
+      <article class="question-card ${item.correct ? "is-correct" : item.wrong ? "is-wrong" : "is-blank"}">
+        <div class="question-meta">
+          <span>Questão ${index + 1}</span>
+          <span>${item.correct ? "✅ certa" : item.wrong ? "❌ errada" : "⬜ branco"}</span>
+        </div>
+        <p>${escapeHtml(question.enunciado)}</p>
+        ${question.codigo ? `<pre><code>${escapeHtml(question.codigo)}</code></pre>` : ""}
+        <p><strong>Sua resposta:</strong> ${escapeHtml(marked)} · <strong>Gabarito:</strong> ${escapeHtml(expected ?? question.gabarito)}</p>
+        <details open>
+          <summary>Ver explicação e fonte</summary>
+          <p>${escapeHtml(question.comentario || "Revise o assunto indicado.")}</p>
+          ${question.link ? `<a href="${escapeHtml(question.link)}" target="_blank" rel="noreferrer">Link de estudo/fonte</a>` : ""}
+        </details>
+      </article>
+    `;
+  }
 
-      const loginUser = target.dataset.loginUser;
-      if (loginUser) {
-        login(loginUser);
-        return;
-      }
-
-      if (target.id === "switch-user") {
-        localStorage.removeItem(SESSION_KEY);
-        showLogin();
-        return;
-      }
-
-      if (target.id === "change-contest") {
-        state.showContestPicker = true;
-        stopTimer();
-        renderApp();
-        return;
-      }
-
-      const contestId = target.dataset.selectContest;
-      if (contestId) {
-        selectContest(contestId);
-        return;
-      }
-
-      const tab = target.dataset.tab;
-      if (tab) {
-        state.activeTab = tab;
-        stopTimer();
-        renderTabs();
-        renderActiveTab();
-        return;
-      }
-
-      if (target.dataset.generatePractice !== undefined) {
-        generatePracticeFromFilters();
-        return;
-      }
-
-      const practiceQuestionId = target.dataset.practiceAnswer;
-      if (practiceQuestionId) {
-        const question = questionsFor().find((item) => item.id === practiceQuestionId);
-        state.practice.answered[practiceQuestionId] = target.dataset.answer;
-        recordAnswer(question, target.dataset.answer, state.practice.mode || "modo-treino", state.practice.startedAt[practiceQuestionId]);
-        renderActiveTab();
-        return;
-      }
-
-      const mockQuestionId = target.dataset.mockAnswer;
-      if (mockQuestionId && state.mock && !state.mock.finished) {
-        state.mock.answers[mockQuestionId] = target.dataset.answer;
-        renderActiveMock();
-        return;
-      }
-
-      const startMockKind = target.dataset.startMock;
-      if (startMockKind) {
-        const mode = target.dataset.mockMode || $("#custom-mode")?.value || "prova";
-        startMock(startMockKind, mode);
-        return;
-      }
-
-      if (target.dataset.finishMock !== undefined) {
-        finishMock();
-        return;
-      }
-
-      if (target.dataset.resetMock !== undefined) {
-        state.mock = null;
-        stopTimer();
-        renderSimulado();
-        return;
-      }
-
-      const favoriteId = target.dataset.toggleFavorite;
-      if (favoriteId) {
-        persistScope((scope) => {
-          scope.favorites[favoriteId] = !scope.favorites[favoriteId];
-          if (!scope.favorites[favoriteId]) delete scope.favorites[favoriteId];
-        });
-        renderActiveTab();
-        return;
-      }
-
-      const markId = target.dataset.markReview;
-      if (markId) {
-        persistScope((scope) => {
-          scope.revisionMarked[markId] = true;
-        });
-        target.textContent = "Marcada";
-        return;
-      }
-
-      const noteId = target.dataset.addNote;
-      if (noteId) {
-        const scope = getScope();
-        const previous = scope.notes?.[noteId] || "";
-        const note = window.prompt("Anotação para esta questão:", previous);
-        if (note !== null) {
-          persistScope((innerScope) => {
-            if (note.trim()) innerScope.notes[noteId] = note.trim();
-            else delete innerScope.notes[noteId];
-          });
-          renderActiveTab();
-        }
-        return;
-      }
-
-      const reportId = target.dataset.reportQuestion;
-      if (reportId) {
-        persistScope((scope) => {
-          scope.reports[reportId] = scope.reports[reportId] || [];
-          scope.reports[reportId].push({ at: nowIso(), reason: "Marcada pelo usuário" });
-        });
-        target.textContent = "Erro denunciado";
-        return;
-      }
-    });
-
-    document.addEventListener("change", (event) => {
-      if (event.target.id === "role-select") {
-        changeRole(event.target.value);
-      }
+  function startCrtDaily() {
+    const today = getTodayKey();
+    startQuiz({
+      title: `Simulado diário CRT-SP — ${today}`,
+      kind: "crt-daily",
+      area: "crt-sp",
+      trilha: "CRT-SP",
+      scopeKey: "crt-daily",
+      scoring: "quadrix",
+      questions: selectCrtByDistribution({ countBasicos: 12, countComplementares: 8, countEspecificos: 20, seedKey: `crt-diario-${today}` }),
     });
   }
 
-  document.addEventListener("DOMContentLoaded", init);
+  function startCrtExtra() {
+    state.crtExtraAttempt += 1;
+    const dailyIds = selectCrtByDistribution({ countBasicos: 12, countComplementares: 8, countEspecificos: 20, seedKey: `crt-diario-${getTodayKey()}` }).map((question) => question.id);
+    startQuiz({
+      title: `Questionário extra CRT-SP #${state.crtExtraAttempt}`,
+      kind: "crt-extra",
+      area: "crt-sp",
+      trilha: "CRT-SP",
+      scopeKey: "crt-extra",
+      scoring: "quadrix",
+      questions: selectCrtByDistribution({
+        countBasicos: 12,
+        countComplementares: 8,
+        countEspecificos: 20,
+        seedKey: `${getTodayKey()}-${state.currentUserId}-crt-extra-${state.crtExtraAttempt}-${state.difficulty}`,
+        difficulty: state.difficulty,
+        avoidIds: [...dailyIds, ...getRecentIds("crt-extra")],
+      }),
+    });
+  }
+
+  function startCrtRealExam() {
+    startQuiz({
+      title: "Prova real CRT-SP — Técnico Administrativo",
+      kind: "crt-real",
+      area: "crt-sp",
+      trilha: "CRT-SP",
+      scopeKey: "crt-real",
+      scoring: "quadrix",
+      durationMinutes: 180,
+      questions: selectCrtByDistribution({ countBasicos: 40, countComplementares: 30, countEspecificos: 50, seedKey: `${getTodayKey()}-${state.currentUserId}-crt-real-${Date.now()}` }),
+    });
+  }
+
+  function startCertificationQuiz() {
+    let pool = poolByArea("certificacoes");
+    let count = 10;
+    let difficulty = state.difficulty;
+    if (state.certMode === "simulado") count = 30;
+    if (state.certMode === "tema") pool = pool.filter((question) => question.disciplina === state.certTopic);
+    if (state.certMode === "dificil") {
+      difficulty = "dificil";
+      count = 15;
+    }
+    if (state.certMode === "erros") count = 15;
+    startQuiz({
+      title: `DP-600 — ${state.certMode}`,
+      kind: "certificacoes",
+      area: "certificacoes",
+      trilha: "DP-600",
+      scopeKey: `dp600-${state.certMode}`,
+      scoring: "positive",
+      questions: selectRotatingQuestions({ pool, count, difficulty, seedKey: `${getTodayKey()}-${state.currentUserId}-dp600-${state.certMode}-${state.certTopic}-${Date.now()}`, avoidIds: getRecentIds(`dp600-${state.certMode}`) }),
+    });
+  }
+
+  function startProgrammingQuiz() {
+    const pool = poolByArea("programacao").filter((question) => question.trilha === state.programmingTrack);
+    startQuiz({
+      title: `Programação — ${state.programmingTrack}`,
+      kind: "programacao",
+      area: "programacao",
+      trilha: state.programmingTrack,
+      scopeKey: `programacao-${state.programmingTrack}`,
+      scoring: "positive",
+      questions: selectRotatingQuestions({ pool, count: 15, difficulty: state.difficulty, seedKey: `${getTodayKey()}-${state.currentUserId}-prog-${state.programmingTrack}-${Date.now()}`, avoidIds: getRecentIds(`programacao-${state.programmingTrack}`) }),
+    });
+  }
+
+  function startDataQuiz() {
+    const pool = poolByArea("dados").filter((question) => question.trilha === state.dataTrack);
+    startQuiz({
+      title: `Dados — ${state.dataTrack}`,
+      kind: "dados",
+      area: "dados",
+      trilha: state.dataTrack,
+      scopeKey: `dados-${state.dataTrack}`,
+      scoring: "positive",
+      questions: selectRotatingQuestions({ pool, count: 15, difficulty: state.difficulty, seedKey: `${getTodayKey()}-${state.currentUserId}-dados-${state.dataTrack}-${Date.now()}`, avoidIds: getRecentIds(`dados-${state.dataTrack}`) }),
+    });
+  }
+
+  function login(userId) {
+    registerUserAccess(userId);
+    state.activeTab = "dashboard";
+    $("#login-screen").hidden = true;
+    $("#app-shell").hidden = false;
+    $("#contest-picker").hidden = true;
+    $("#workspace").hidden = false;
+    renderActiveTab();
+  }
+
+  function resetCurrentUserData() {
+    const user = getCurrentUser();
+    if (!user || !confirm(`Zerar todos os dados locais de ${user.nome}?`)) return;
+    const fresh = makeUserStats(user.id);
+    fresh.totalAcessos = 1;
+    fresh.ultimoDiaAcessado = getTodayKey();
+    fresh.streakAtual = 1;
+    fresh.maiorStreak = 1;
+    saveUserStats(fresh, user.id);
+    renderActiveTab();
+  }
+
+  document.addEventListener("click", (event) => {
+    const target = event.target.closest("button, a");
+    if (!target) return;
+
+    const loginUser = target.dataset.loginUser;
+    if (loginUser) login(loginUser);
+    if (target.dataset.switchUser !== undefined || target.id === "switch-user") renderUserSelection();
+    if (target.dataset.resetUser !== undefined) resetCurrentUserData();
+    if (target.dataset.tab) {
+      state.activeTab = target.dataset.tab;
+      state.activeQuiz = null;
+      renderActiveTab();
+    }
+    if (target.dataset.startCrtDaily !== undefined) startCrtDaily();
+    if (target.dataset.startCrtExtra !== undefined) startCrtExtra();
+    if (target.dataset.startCrtReal !== undefined) startCrtRealExam();
+    if (target.dataset.startCert !== undefined) startCertificationQuiz();
+    if (target.dataset.startProgramming !== undefined) startProgrammingQuiz();
+    if (target.dataset.startData !== undefined) startDataQuiz();
+    if (target.dataset.cancelQuiz !== undefined || target.dataset.backTabs !== undefined) {
+      state.activeQuiz = null;
+      renderActiveTab();
+    }
+    if (target.dataset.finishQuiz !== undefined) finishQuiz();
+  });
+
+  document.addEventListener("change", (event) => {
+    const target = event.target;
+    if (target.matches("[data-difficulty]")) state.difficulty = target.value;
+    if (target.matches("[data-cert-mode]")) state.certMode = target.value;
+    if (target.matches("[data-cert-topic]")) state.certTopic = target.value;
+    if (target.matches("[data-programming-track]")) state.programmingTrack = target.value;
+    if (target.matches("[data-data-track]")) state.dataTrack = target.value;
+    if (target.matches("[data-answer]") && state.activeQuiz) {
+      state.activeQuiz.answers[target.dataset.answer] = target.value;
+      target.closest(".question-card")?.querySelectorAll(".answer-option").forEach((option) => option.classList.remove("selected"));
+      target.closest(".answer-option")?.classList.add("selected");
+    }
+  });
+
+  document.addEventListener("input", (event) => {
+    const target = event.target;
+    if (target.matches("[data-open-answer]") && state.activeQuiz) {
+      state.activeQuiz.answers[target.dataset.openAnswer] = target.value;
+    }
+  });
+
+  window.MINIMOS_PROVA_REAL = MINIMOS_PROVA_REAL;
+  window.selectRotatingQuestions = selectRotatingQuestions;
+
+  renderUserSelection();
 })();
