@@ -24,7 +24,11 @@
     <header class="hero">
       <div class="hero__inner">
         <nav class="topbar" aria-label="Sessão">
-          <span class="brand-mark">Estudo<span>/</span>Game</span>
+          <div id="study-mode-switch" class="mode-switch" role="group" aria-label="Alternar área de estudo">
+            <span class="mode-switch__thumb" aria-hidden="true"></span>
+            <button class="mode-switch__button active" type="button" data-mode-switch="concursos">Concursos</button>
+            <button class="mode-switch__button" type="button" data-mode-switch="tech">Tech</button>
+          </div>
           <div class="topbar__session">
             <span id="top-user-name"></span>
             <button id="change-contest" class="text-button" type="button" hidden>Trocar concurso</button>
@@ -37,7 +41,7 @@
             <p id="hero-eyebrow" class="eyebrow">Plataforma gamificada</p>
             <h1 id="hero-title">Central de Simulados</h1>
             <p id="hero-copy" class="hero__copy">CRT-SP, Santos IBAM, DP-600, programação e dados com simulados rotativos, dashboard, foguinho, ranking e recomendações por usuário.</p>
-            <div id="hero-notice" class="hero-notice">Selecione um perfil para começar.</div>
+            <div id="hero-notice" class="hero-notice" hidden></div>
           </div>
           <aside id="active-contest-card" class="active-contest-card" aria-live="polite"></aside>
         </div>

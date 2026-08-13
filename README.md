@@ -10,11 +10,13 @@ O foco principal continua sendo o concurso CRT-SP 2026 para Técnico Administrat
 
 ## Funcionalidades
 
-- Seleção obrigatória de usuário ao abrir ou recarregar o site: Kauã, Vitória ou Caio.
+- Seleção obrigatória de usuário ao abrir ou recarregar o site: Kauã, Vitória, Caio ou Mequis.
 - Dados separados por usuário via `localStorage`.
 - Dashboard com foguinho, maior streak, pontos, acessos, média, taxa de acerto e últimas tentativas.
 - Ranking dos perfis por pontos, acessos, foguinho, atividades e média.
-- Abas: Dashboard, CRT-SP, Prova real CRT-SP, Certificações, Programação, Dados, Academia de Dados, Concursos Santos — IBAM, Estudos e Histórico.
+- Switch animado entre **Concursos públicos** e **Tech**.
+- No modo Concursos, a interface fica mais clara e mostra Dashboard, Concursos Santos — IBAM, Estudos e Histórico.
+- No modo Tech, a interface fica escura e mostra Dashboard, Certificações, Programação, Dados, Academia de Dados, Estudos e Histórico.
 - Botão “Trocar usuário” disponível no topo.
 - Botão “Zerar meus dados locais”.
 - Recomendações personalizadas com base em erros, brancos e trilhas estudadas.

@@ -13,20 +13,24 @@
     { id: "kaua", nome: "Kauã", initial: "K", accent: "verde" },
     { id: "vitoria", nome: "Vitória", initial: "V", accent: "coral" },
     { id: "caio", nome: "Caio", initial: "C", accent: "azul" },
+    { id: "mequis", nome: "Mequis", initial: "M", accent: "roxo" },
   ];
 
   const TABS = [
     ["dashboard", "Dashboard"],
-    ["crt", "CRT-SP"],
-    ["prova-real", "Prova real CRT-SP"],
+    ["santos-ibam", "Concursos Santos — IBAM"],
     ["certificacoes", "Certificações"],
     ["programacao", "Programação"],
     ["dados", "Dados"],
     ["academia-dados", "Academia de Dados"],
-    ["santos-ibam", "Concursos Santos — IBAM"],
     ["estudos", "Estudos"],
     ["historico", "Histórico"],
   ];
+
+  const MODE_TABS = {
+    concursos: ["dashboard", "santos-ibam", "estudos", "historico"],
+    tech: ["dashboard", "certificacoes", "programacao", "dados", "academia-dados", "estudos", "historico"],
+  };
 
   const OPEN_TYPES = new Set(["explainCode", "explainConcept", "sqlQuery", "daxMeasure", "completeCode", "orderSteps", "caseStudy", "businessQuestion", "administrativeWriting"]);
   const DIFFICULTY_POINTS = { facil: 1, medio: 2, dificil: 3 };
@@ -34,7 +38,8 @@
 
   const state = {
     currentUserId: null,
-    activeTab: "dashboard",
+    activeTab: "santos-ibam",
+    studyMode: "concursos",
     difficulty: "misto",
     crtExtraAttempt: 0,
     certMode: "rapidas",
@@ -471,6 +476,7 @@
   function renderUserSelection() {
     $("#login-screen").hidden = false;
     $("#app-shell").hidden = true;
+    document.body.classList.remove("mode-concursos", "mode-tech");
     state.currentUserId = null;
     const target = $("#profile-options");
     target.innerHTML = USERS.map((user) => `
@@ -488,25 +494,35 @@
   function renderHeader() {
     const user = getCurrentUser();
     const stats = loadUserStats();
+    const concursosMode = state.studyMode === "concursos";
+    document.body.classList.toggle("mode-concursos", concursosMode);
+    document.body.classList.toggle("mode-tech", !concursosMode);
     $("#top-user-name").textContent = user ? `${user.nome} · 🔥 ${stats.streakAtual}` : "";
     $("#change-contest").hidden = true;
-    $("#hero-eyebrow").textContent = "Plataforma gamificada";
-    $("#hero-title").textContent = "Central de Simulados";
-    $("#hero-copy").textContent = "CRT-SP, Santos IBAM, DP-600, programação e dados com simulados rotativos, histórico por usuário, foguinho, ranking, pontuação por banca e recomendações personalizadas.";
-    $("#hero-notice").textContent = `Hoje: ${getTodayKey()} (${TIMEZONE}). O CRT-SP mantém Certo/Errado Quadrix; Santos IBAM usa múltipla escolha ponderada por pesos.`;
+    $("#hero-eyebrow").textContent = concursosMode ? "Concursos públicos" : "Modo tech";
+    $("#hero-title").textContent = concursosMode ? "Escolha seu concurso" : "Trilhas de tecnologia";
+    $("#hero-copy").textContent = concursosMode
+      ? "Comece pelos concursos ativos, veja os cargos e gere simulados por banca com pontuação do edital."
+      : "Ative programação, dados, certificações e academia prática em um ambiente escuro para treino intensivo.";
+    $("#hero-notice").hidden = true;
+    $("#study-mode-switch")?.classList.toggle("is-tech", !concursosMode);
+    document.querySelectorAll("[data-mode-switch]").forEach((button) => {
+      button.classList.toggle("active", button.dataset.modeSwitch === state.studyMode);
+    });
     $("#active-contest-card").innerHTML = `
-      <h2>Foco principal</h2>
-      <p>CRT-SP 2026 — Técnico Administrativo</p>
-      <dl>
-        <div><dt>Diário</dt><dd>40 itens</dd></div>
-        <div><dt>Prova real</dt><dd>120 itens</dd></div>
-        <div><dt>Pontuação</dt><dd>+1 / -1 / 0</dd></div>
-      </dl>
+      <p class="eyebrow">${concursosMode ? "Selecionado" : "Disponível"}</p>
+      <h2>${concursosMode ? "Santos — IBAM" : "Tech"}</h2>
+      <p>${concursosMode ? "Agente, Inspetor e Oficial" : "DP-600, Programação e Dados"}</p>
+      <div class="compact-facts">
+        <span>${concursosMode ? "3 cargos" : "4 trilhas"}</span>
+        <span>${concursosMode ? "IBAM" : "modo escuro"}</span>
+      </div>
     `;
   }
 
   function renderTabs() {
-    $("#tabs").innerHTML = TABS.map(([id, label]) => `
+    const allowed = MODE_TABS[state.studyMode] || MODE_TABS.concursos;
+    $("#tabs").innerHTML = TABS.filter(([id]) => allowed.includes(id)).map(([id, label]) => `
       <button type="button" class="${state.activeTab === id ? "active" : ""}" data-tab="${escapeHtml(id)}">${escapeHtml(label)}</button>
     `).join("");
   }
@@ -570,36 +586,39 @@
     const accuracy = stats.totalQuestoesRespondidas ? Math.round((stats.totalAcertos / stats.totalQuestoesRespondidas) * 100) : 0;
     const recent = stats.historicoUltimosResultados || [];
     const santosHistory = recent.filter((item) => item.area === "concursos-santos-ibam");
+    const techHistory = recent.filter((item) => ["certificacoes", "programacao", "dados", "academia-dados"].includes(item.area));
     const bestSantos = [...santosHistory].sort((a, b) => (b.percentual || 0) - (a.percentual || 0))[0];
     const worstSantosSubject = getSantosWeakSubject(stats);
+    const isConcursos = state.studyMode === "concursos";
+    const visibleHistory = isConcursos ? santosHistory : techHistory;
+    const metrics = isConcursos
+      ? [
+        metricCard("Santos IBAM", stats.questionariosSantosIbamFinalizados || 0, "simulados finalizados"),
+        metricCard("Melhor cargo", bestSantos?.trilha || "—", bestSantos ? `${bestSantos.percentual}%` : "sem histórico"),
+        metricCard("Pior disciplina", worstSantosSubject, "por erros/brancos"),
+        metricCard("Melhor ponderada", stats.melhorPontuacaoPonderadaSantos ?? "—", "pontuação por pesos"),
+        metricCard("Taxa geral", `${accuracy}%`, `${stats.totalAcertos}/${stats.totalQuestoesRespondidas}`),
+        metricCard("Foguinho", `🔥 ${stats.streakAtual}`, `recorde: ${stats.maiorStreak}`),
+      ]
+      : [
+        metricCard("DP-600", stats.questionariosCertificacaoFinalizados, "questionários finalizados"),
+        metricCard("Programação", stats.questionariosProgramacaoFinalizados, "questionários finalizados"),
+        metricCard("Dados", stats.questionariosDadosFinalizados, "questionários finalizados"),
+        metricCard("Academia de Dados", stats.questionariosAcademiaDadosFinalizados || 0, "treinos práticos"),
+        metricCard("Taxa tech", `${accuracy}%`, `${stats.totalAcertos}/${stats.totalQuestoesRespondidas}`),
+        metricCard("Trilha mais estudada", getTopKey(stats.trilhasEstudadas), "por atividades"),
+      ];
 
     $("#dashboard").innerHTML = "";
     $("#tab-content").innerHTML = `
       <section class="panel">
         <div class="section-heading">
           <p class="eyebrow">Dashboard</p>
-          <h2>Olá, ${escapeHtml(stats.nome)}. Bora estudar hoje? 🔥</h2>
+          <h2>${escapeHtml(stats.nome)}, ${isConcursos ? "seu painel de concursos" : "seu painel tech"} 🔥</h2>
         </div>
-        <div class="dashboard-grid">
-          ${metricCard("Foguinho atual", `🔥 ${stats.streakAtual}`, `recorde: ${stats.maiorStreak}`)}
-          ${metricCard("Pontos totais", stats.pontosTotais, "gamificação local")}
-          ${metricCard("Acessos", stats.totalAcessos, `último: ${stats.ultimoDiaAcessado || "—"}`)}
-          ${metricCard("Taxa de acerto", `${accuracy}%`, `${stats.totalAcertos}/${stats.totalQuestoesRespondidas}`)}
-          ${metricCard("Simulados CRT-SP", stats.simuladosCrtFinalizados, "diários e extras")}
-          ${metricCard("Provas reais", stats.provasReaisCrtFinalizadas, "120 itens")}
-          ${metricCard("DP-600", stats.questionariosCertificacaoFinalizados, "questionários finalizados")}
-          ${metricCard("Programação", stats.questionariosProgramacaoFinalizados, "questionários finalizados")}
-          ${metricCard("Dados", stats.questionariosDadosFinalizados, "questionários finalizados")}
-          ${metricCard("Academia de Dados", stats.questionariosAcademiaDadosFinalizados || 0, "treinos práticos")}
-          ${metricCard("Santos IBAM", stats.questionariosSantosIbamFinalizados || 0, "simulados finalizados")}
-          ${metricCard("Melhor cargo IBAM", bestSantos?.trilha || "—", bestSantos ? `${bestSantos.percentual}%` : "sem histórico")}
-          ${metricCard("Pior disciplina IBAM", worstSantosSubject, "por erros/brancos")}
-          ${metricCard("Melhor ponderada IBAM", stats.melhorPontuacaoPonderadaSantos ?? "—", "pontuação por pesos")}
-          ${metricCard("Melhor pontuação", stats.melhorPontuacaoLiquidaGeral ?? "—", `última: ${stats.ultimaPontuacaoLiquida}`)}
-          ${metricCard("Média geral", stats.mediaPontuacao, "últimos resultados")}
-          ${metricCard("Trilha mais estudada", getTopKey(stats.trilhasEstudadas), "por atividades")}
-        </div>
+        <div class="dashboard-grid">${metrics.join("")}</div>
         <div class="action-row">
+          <button class="primary-button" type="button" data-tab="${isConcursos ? "santos-ibam" : "academia-dados"}">${isConcursos ? "Ver concursos" : "Treinar tech"}</button>
           <button class="secondary-button" type="button" data-switch-user>Trocar usuário</button>
           <button class="danger-button" type="button" data-reset-user>Zerar meus dados locais</button>
         </div>
@@ -610,7 +629,7 @@
           <p class="eyebrow">Últimas 5 tentativas</p>
           <h2>Histórico rápido</h2>
         </div>
-        ${recent.length ? `<div class="history-list">${recent.slice(0, 5).map(renderHistoryItem).join("")}</div>` : "<p class='muted'>Finalize um questionário para aparecer aqui.</p>"}
+        ${visibleHistory.length ? `<div class="history-list">${visibleHistory.slice(0, 5).map(renderHistoryItem).join("")}</div>` : "<p class='muted'>Finalize uma atividade deste modo para aparecer aqui.</p>"}
       </section>
     `;
   }
@@ -1337,6 +1356,10 @@
   }
 
   function renderActiveTab() {
+    const allowed = MODE_TABS[state.studyMode] || MODE_TABS.concursos;
+    if (!allowed.includes(state.activeTab)) {
+      state.activeTab = state.studyMode === "concursos" ? "santos-ibam" : "dashboard";
+    }
     renderHeader();
     renderTabs();
     const renderers = {
@@ -1792,7 +1815,8 @@
 
   function login(userId) {
     registerUserAccess(userId);
-    state.activeTab = "dashboard";
+    state.studyMode = "concursos";
+    state.activeTab = "santos-ibam";
     $("#login-screen").hidden = true;
     $("#app-shell").hidden = false;
     $("#contest-picker").hidden = true;
@@ -1819,6 +1843,12 @@
     const loginUser = target.dataset.loginUser;
     if (loginUser) login(loginUser);
     if (target.dataset.switchUser !== undefined || target.id === "switch-user") renderUserSelection();
+    if (target.dataset.modeSwitch) {
+      state.studyMode = target.dataset.modeSwitch;
+      state.activeTab = state.studyMode === "concursos" ? "santos-ibam" : "dashboard";
+      state.activeQuiz = null;
+      renderActiveTab();
+    }
     if (target.dataset.resetUser !== undefined) resetCurrentUserData();
     if (target.dataset.tab) {
       state.activeTab = target.dataset.tab;
