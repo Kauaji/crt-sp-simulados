@@ -59,6 +59,8 @@
     activeQuiz: null,
   };
 
+  let dailySelectionPromise = null;
+
   const DATA_ACADEMY_TRACKS = [
     { id: "Fundamentos de Dados", title: "Fundamentos de Dados", level: "Iniciante", description: "Base para pensar como analista: qualidade, nulos, duplicidade, granularidade, métricas, KPIs e insights." },
     { id: "SQL para Análise", title: "SQL para Análise", level: "Iniciante/intermediário", description: "SELECT, filtros, JOINs, GROUP BY, HAVING, CTEs, janelas e consultas para perguntas de negócio." },
@@ -159,7 +161,7 @@
       title: "Front-end Developer",
       level: "Iniciante",
       description: "Interfaces responsivas, HTML semântico, CSS moderno, JavaScript e consumo de dados.",
-      sourceTracks: ["HTML", "CSS", "JavaScript", "Git/GitHub", "Lógica"],
+      sourceTracks: ["HTML", "CSS", "JavaScript", "Git"],
       modules: ["HTML semântico", "CSS responsivo", "JavaScript DOM", "Git e deploy"],
       project: "Landing page responsiva com interação em JavaScript",
       image: "assets/careers/frontend.webp",
@@ -170,7 +172,7 @@
       title: "Back-end Developer",
       level: "Base forte",
       description: "Lógica, Python/Java, SQL, erros comuns, leitura de código e raciocínio de API.",
-      sourceTracks: ["Python", "Java", "SQL", "Git/GitHub", "Lógica"],
+      sourceTracks: ["Python", "Java", "SQL", "Git"],
       modules: ["Lógica aplicada", "Python ou Java", "SQL essencial", "Tratamento de erros"],
       project: "API conceitual de chamados com regras de negócio",
       image: "assets/careers/backend.webp",
@@ -181,7 +183,7 @@
       title: "Full Stack Web",
       level: "Prático",
       description: "Une tela, regra, dados e versionamento para construir aplicações completas.",
-      sourceTracks: ["HTML", "CSS", "JavaScript", "SQL", "Git/GitHub"],
+      sourceTracks: ["HTML", "CSS", "JavaScript", "SQL", "Git"],
       modules: ["Layout", "Eventos JS", "CRUD conceitual", "Deploy e GitHub"],
       project: "Mini sistema de tarefas com filtros e persistência local",
       image: "assets/careers/fullstack.webp",
@@ -192,7 +194,7 @@
       title: "Dados e BI",
       level: "Carreira de dados",
       description: "SQL, Python, leitura de base, indicadores e preparação para Power BI/Fabric.",
-      sourceTracks: ["Python", "SQL", "Estruturas de dados", "Git/GitHub", "Lógica"],
+      sourceTracks: ["Python", "SQL", "Git"],
       modules: ["SQL para análise", "Python básico", "Estruturas", "Git para portfólio"],
       project: "Análise de chamados com consultas e insights",
       image: "assets/careers/dados-bi.webp",
@@ -203,7 +205,7 @@
       title: "QA / Testes",
       level: "Iniciante",
       description: "Raciocínio de erro, leitura de requisitos, casos de teste e validação de comportamento.",
-      sourceTracks: ["Lógica", "JavaScript", "Git/GitHub", "HTML", "CSS"],
+      sourceTracks: ["JavaScript", "Git", "HTML", "CSS"],
       modules: ["Casos de teste", "Bugs comuns", "Validação de tela", "Versionamento"],
       project: "Checklist de testes para uma página de cadastro",
       image: "assets/careers/qa.webp",
@@ -214,7 +216,7 @@
       title: "DevOps Júnior",
       level: "Fundamentos",
       description: "Git, comandos, fluxo de deploy, automação simples e leitura de logs.",
-      sourceTracks: ["Git/GitHub", "Python", "SQL", "Lógica"],
+      sourceTracks: ["Git", "Python", "SQL"],
       modules: ["Git na prática", "Scripts simples", "Noção de banco", "Deploy estático"],
       project: "Pipeline manual: build, validação e publicação",
       image: "assets/careers/devops.webp",
@@ -242,6 +244,35 @@
     }).formatToParts(date);
     const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
     return `${values.year}-${values.month}-${values.day}`;
+  }
+
+  function validateDailySelectionPayload(payload) {
+    if (
+      !payload
+      || payload.date !== getTodayKey()
+      || payload.timezone !== TIMEZONE
+      || !payload.selections
+      || typeof payload.selections !== "object"
+    ) return null;
+
+    const lists = Object.values(payload.selections);
+    if (!lists.length || lists.some((ids) => (
+      !Array.isArray(ids)
+      || ids.some((id) => typeof id !== "string" || !id)
+      || new Set(ids).size !== ids.length
+    ))) return null;
+
+    return payload;
+  }
+
+  function loadDailySelection() {
+    if (!dailySelectionPromise) {
+      dailySelectionPromise = fetch("data/daily-selection.json", { cache: "no-store" })
+        .then((response) => (response.ok ? response.json() : null))
+        .then(validateDailySelectionPayload)
+        .catch(() => null);
+    }
+    return dailySelectionPromise;
   }
 
   function addDays(dateKey, days) {
@@ -275,34 +306,102 @@
     return output;
   }
 
+  function questionDiversityKey(question) {
+    const scope = question.trilha || question.cargo_id || question.concurso_id || question.area || "geral";
+    const subject = question.subassunto || question.assunto || question.disciplina || question.materia_id || question.id;
+    return `${scope}::${subject}`;
+  }
+
+  function takeDiverseQuestions(items, count, seedKey, alreadySelected = []) {
+    const remaining = shuffleWithSeed(items, seedKey);
+    const usage = new Map();
+    alreadySelected.forEach((question) => {
+      const key = questionDiversityKey(question);
+      usage.set(key, (usage.get(key) || 0) + 1);
+    });
+    const picked = [];
+
+    while (picked.length < count && remaining.length) {
+      let bestIndex = 0;
+      let bestUsage = Number.POSITIVE_INFINITY;
+      for (let index = 0; index < remaining.length; index += 1) {
+        const currentUsage = usage.get(questionDiversityKey(remaining[index])) || 0;
+        if (currentUsage < bestUsage) {
+          bestUsage = currentUsage;
+          bestIndex = index;
+          if (currentUsage === 0) break;
+        }
+      }
+      const [question] = remaining.splice(bestIndex, 1);
+      picked.push(question);
+      const key = questionDiversityKey(question);
+      usage.set(key, (usage.get(key) || 0) + 1);
+    }
+
+    return picked;
+  }
+
+  function takeFreshThenRecent(items, count, seedKey, avoid, alreadySelected = []) {
+    const fresh = items.filter((question) => !avoid.has(question.id));
+    const selected = takeDiverseQuestions(
+      fresh,
+      Math.min(count, fresh.length),
+      `${seedKey}-fresh`,
+      alreadySelected,
+    );
+
+    if (selected.length < count) {
+      const selectedIds = new Set(selected.map((question) => question.id));
+      const recent = items.filter((question) => !selectedIds.has(question.id));
+      selected.push(...takeDiverseQuestions(
+        recent,
+        count - selected.length,
+        `${seedKey}-recent`,
+        [...alreadySelected, ...selected],
+      ));
+    }
+
+    return selected;
+  }
+
   function selectRotatingQuestions({ pool, count, difficulty = "misto", seedKey, avoidIds = [] }) {
     const avoid = new Set(avoidIds);
-    let candidates = pool.filter((question) => question.status !== "inativo");
-
-    if (difficulty !== "misto") {
-      const preferred = candidates.filter((question) => question.dificuldade === difficulty);
-      candidates = preferred.length >= count ? preferred : candidates;
-    }
+    const candidates = pool.filter((question) => question.status !== "inativo");
 
     if (difficulty === "misto") {
       const selected = [];
       const byDifficulty = ["facil", "medio", "dificil"].map((level) => (
-        shuffleWithSeed(candidates.filter((question) => question.dificuldade === level && !avoid.has(question.id)), `${seedKey}-${level}`)
+        candidates.filter((question) => question.dificuldade === level && !avoid.has(question.id))
       ));
       const targetByLevel = Math.floor(count / 3);
-      for (const list of byDifficulty) selected.push(...list.slice(0, targetByLevel));
+      byDifficulty.forEach((list, index) => {
+        selected.push(...takeDiverseQuestions(list, targetByLevel, `${seedKey}-${index}`, selected));
+      });
       const remaining = candidates.filter((question) => !selected.some((picked) => picked.id === question.id) && !avoid.has(question.id));
-      selected.push(...shuffleWithSeed(remaining, `${seedKey}-fill`).slice(0, count - selected.length));
+      selected.push(...takeDiverseQuestions(remaining, count - selected.length, `${seedKey}-fill`, selected));
       if (selected.length < count) {
         const fallback = candidates.filter((question) => !selected.some((picked) => picked.id === question.id));
-        selected.push(...shuffleWithSeed(fallback, `${seedKey}-fallback`).slice(0, count - selected.length));
+        selected.push(...takeDiverseQuestions(fallback, count - selected.length, `${seedKey}-fallback`, selected));
       }
       return selected.slice(0, count);
     }
 
-    const fresh = candidates.filter((question) => !avoid.has(question.id));
-    const usable = fresh.length >= count ? fresh : candidates;
-    return shuffleWithSeed(usable, seedKey).slice(0, Math.min(count, usable.length));
+    const preferred = candidates.filter((question) => question.dificuldade === difficulty);
+    const selected = takeFreshThenRecent(preferred, Math.min(count, preferred.length), `${seedKey}-preferred`, avoid);
+
+    if (selected.length < count) {
+      const preferredIds = new Set(preferred.map((question) => question.id));
+      const fallback = candidates.filter((question) => !preferredIds.has(question.id));
+      selected.push(...takeFreshThenRecent(
+        fallback,
+        Math.min(count - selected.length, fallback.length),
+        `${seedKey}-fallback`,
+        avoid,
+        selected,
+      ));
+    }
+
+    return selected.slice(0, count);
   }
 
   function loadStore() {
@@ -533,9 +632,16 @@
     return (role?.distribution || []).reduce((sum, item) => sum + item.count * item.peso, 0);
   }
 
-  function getRecentIds(scopeKey) {
+  function getRecentIds(scopeKey, aliases = []) {
     const stats = loadUserStats();
-    return stats.recentQuestionIds?.[scopeKey] || [];
+    const recent = stats.recentQuestionIds || {};
+    return [...new Set(
+      [scopeKey, ...aliases].flatMap((key) => recent[key] || []),
+    )];
+  }
+
+  function santosScopeKey(roleId) {
+    return roleId.startsWith("santos-") ? roleId : `santos-${roleId}`;
   }
 
   function selectCrtByDistribution({ countBasicos, countComplementares, countEspecificos, seedKey, difficulty = "misto", avoidIds = [] }) {
@@ -557,6 +663,40 @@
       }));
     }
     return selected;
+  }
+
+  async function selectDailyCrtByDistribution({ countBasicos, countComplementares, countEspecificos, seedKey }) {
+    const fallback = () => selectCrtByDistribution({
+      countBasicos,
+      countComplementares,
+      countEspecificos,
+      seedKey,
+    });
+    const payload = await loadDailySelection();
+    const scopeKey = `crt-sp::${CRT_ROLE_ID}`;
+    const ids = payload?.selections?.[scopeKey];
+    if (!Array.isArray(ids)) return fallback();
+
+    const pool = crtPool();
+    const role = DATA.concursos
+      ?.find((contest) => contest.id === "crt-sp")
+      ?.roles?.find((item) => item.id === CRT_ROLE_ID);
+    if (!role || ids.length !== role.exam.totalQuestoes) return fallback();
+
+    const byId = new Map(pool.map((question) => [question.id, question]));
+    const selected = ids.map((id) => byId.get(id));
+    if (selected.some((question) => !question)) return fallback();
+
+    const blocks = [
+      ["Conhecimentos básicos", countBasicos],
+      ["Conhecimentos complementares", countComplementares],
+      ["Conhecimentos específicos", countEspecificos],
+    ];
+    const daily = blocks.flatMap(([block, count]) => (
+      selected.filter((question) => question.bloco === block).slice(0, count)
+    ));
+    const expected = countBasicos + countComplementares + countEspecificos;
+    return daily.length === expected ? daily : fallback();
   }
 
   function updateStatsAfterActivity(result) {
@@ -1706,7 +1846,9 @@
 
   function selectSantosByDistribution(role, count, mode) {
     const selected = [];
-    const avoidIds = getRecentIds(`santos-${role.id}-${mode}`);
+    const canonicalScope = santosScopeKey(role.id);
+    const legacyScopes = ["quick", "full", "real", "custom"].map((legacyMode) => `santos-${role.id}-${legacyMode}`);
+    const avoidIds = getRecentIds(canonicalScope, legacyScopes);
     for (const item of santosDistributionFor(role, count)) {
       const pool = santosPool(role.id).filter((question) => question.disciplina === item.disciplina && !selected.some((picked) => picked.id === question.id));
       selected.push(...selectRotatingQuestions({
@@ -1742,7 +1884,7 @@
       kind: `santos-${mode}`,
       area: "concursos-santos-ibam",
       trilha: role.cargo,
-      scopeKey: `santos-${role.id}-${mode}`,
+      scopeKey: santosScopeKey(role.id),
       scoring: "weighted",
       durationMinutes: mode === "real" ? role.durationMinutes : undefined,
       difficulty: state.difficulty,
@@ -2155,7 +2297,7 @@
     `;
   }
 
-  function startCrtDaily() {
+  async function startCrtDaily() {
     const today = getTodayKey();
     startQuiz({
       title: `Simulado diário CRT-SP — ${today}`,
@@ -2164,13 +2306,18 @@
       trilha: "CRT-SP",
       scopeKey: "crt-daily",
       scoring: "quadrix",
-      questions: selectCrtByDistribution({ countBasicos: 12, countComplementares: 8, countEspecificos: 20, seedKey: `crt-diario-${today}` }),
+      questions: await selectDailyCrtByDistribution({ countBasicos: 12, countComplementares: 8, countEspecificos: 20, seedKey: `crt-diario-${today}` }),
     });
   }
 
-  function startCrtExtra() {
+  async function startCrtExtra() {
     state.crtExtraAttempt += 1;
-    const dailyIds = selectCrtByDistribution({ countBasicos: 12, countComplementares: 8, countEspecificos: 20, seedKey: `crt-diario-${getTodayKey()}` }).map((question) => question.id);
+    const dailyIds = (await selectDailyCrtByDistribution({
+      countBasicos: 12,
+      countComplementares: 8,
+      countEspecificos: 20,
+      seedKey: `crt-diario-${getTodayKey()}`,
+    })).map((question) => question.id);
     startQuiz({
       title: `Questionário extra CRT-SP #${state.crtExtraAttempt}`,
       kind: "crt-extra",
@@ -2189,7 +2336,7 @@
     });
   }
 
-  function startCrtRealExam() {
+  async function startCrtRealExam() {
     startQuiz({
       title: "Prova real CRT-SP — Técnico Administrativo",
       kind: "crt-real",
@@ -2198,7 +2345,12 @@
       scopeKey: "crt-real",
       scoring: "quadrix",
       durationMinutes: 180,
-      questions: selectCrtByDistribution({ countBasicos: 40, countComplementares: 30, countEspecificos: 50, seedKey: `${getTodayKey()}-${state.currentUserId}-crt-real-${Date.now()}` }),
+      questions: await selectDailyCrtByDistribution({
+        countBasicos: 40,
+        countComplementares: 30,
+        countEspecificos: 50,
+        seedKey: `${getTodayKey()}-${state.currentUserId}-crt-real-${Date.now()}`,
+      }),
     });
   }
 
@@ -2213,14 +2365,17 @@
       count = 15;
     }
     if (state.certMode === "erros") count = 15;
+    const scopeKey = `cert-${state.certTrack}`;
+    const legacyScopes = ["rapidas", "simulado", "tema", "dificil", "erros"]
+      .map((mode) => `${state.certTrack}-${mode}`);
     startQuiz({
       title: `${state.certTrack} — ${state.certMode}`,
-      kind: "certificacoes",
+      kind: `certificacoes-${state.certMode}`,
       area: "certificacoes",
       trilha: state.certTrack,
-      scopeKey: `${state.certTrack}-${state.certMode}`,
+      scopeKey,
       scoring: "positive",
-      questions: selectRotatingQuestions({ pool, count, difficulty, seedKey: `${getTodayKey()}-${state.currentUserId}-${state.certTrack}-${state.certMode}-${state.certTopic}-${Date.now()}`, avoidIds: getRecentIds(`${state.certTrack}-${state.certMode}`) }),
+      questions: selectRotatingQuestions({ pool, count, difficulty, seedKey: `${getTodayKey()}-${state.currentUserId}-${state.certTrack}-${state.certMode}-${state.certTopic}-${Date.now()}`, avoidIds: getRecentIds(scopeKey, legacyScopes) }),
     });
   }
   function startProgrammingQuiz() {
@@ -2288,7 +2443,9 @@
     const count = challenge ? 8 : interview ? 8 : portfolio ? 6 : mode === "rapido" ? 10 : Number(state.academyQuantity) || 10;
     const difficulty = mode === "erro" ? state.difficulty : options.difficulty || state.difficulty;
     const pool = academyPoolForMode(mode, trackId);
-    const scope = `academia-${mode}-${trackId}`;
+    const scope = `academia-${trackId}`;
+    const legacyScopes = ["rapido", "trilha", "desafio", "entrevista", "erro", "portfolio"]
+      .map((legacyMode) => `academia-${legacyMode}-${trackId}`);
     state.academyAttempt += 1;
 
     startQuiz({
@@ -2304,8 +2461,8 @@
         pool,
         count,
         difficulty,
-        seedKey: `${getTodayKey()}-${state.currentUserId}-${scope}-${difficulty}-${state.academyAttempt}`,
-        avoidIds: getRecentIds(scope),
+        seedKey: `${getTodayKey()}-${state.currentUserId}-${scope}-${mode}-${difficulty}-${state.academyAttempt}`,
+        avoidIds: getRecentIds(scope, legacyScopes),
       }),
     });
   }
@@ -2354,9 +2511,9 @@
       state.programmingDetail = null;
       renderActiveTab();
     }
-    if (target.dataset.startCrtDaily !== undefined) startCrtDaily();
-    if (target.dataset.startCrtExtra !== undefined) startCrtExtra();
-    if (target.dataset.startCrtReal !== undefined) startCrtRealExam();
+    if (target.dataset.startCrtDaily !== undefined) void startCrtDaily();
+    if (target.dataset.startCrtExtra !== undefined) void startCrtExtra();
+    if (target.dataset.startCrtReal !== undefined) void startCrtRealExam();
     if (target.dataset.selectCert) {
       state.certTrack = target.dataset.selectCert;
       renderCertificationTab();
@@ -2471,6 +2628,7 @@
   window.MINIMOS_PROVA_REAL = MINIMOS_PROVA_REAL;
   window.selectRotatingQuestions = selectRotatingQuestions;
 
+  void loadDailySelection();
   renderUserSelection();
 })();
 

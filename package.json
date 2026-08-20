@@ -4,6 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "audit:questions": "node scripts/audit-questions.mjs",
+    "prebuild": "npm run audit:questions",
     "build": "node scripts/build.mjs",
     "export:data": "node scripts/export-question-json.mjs",
     "rotate:daily": "node scripts/rotate-daily-questions.mjs",
