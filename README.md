@@ -164,17 +164,27 @@ Além disso, o repositório mantém a rotação agendada em GitHub Actions para 
 Arquivos:
 
 - `simulados.js`: banco CRT-SP e concursos existentes.
-- `questions-bank.js`: banco inicial de DP-600, Programação, Dados e Academia de Dados.
+- `questions-bank.js`: banco de certificações, Programação, Dados e Academia de Dados.
 - `santos-ibam-bank.js`: banco e metadados dos concursos Santos — IBAM.
 
-Quantidade inicial usada pela plataforma:
+Quantidade atual usada pela plataforma (2.083 itens ativos):
 
-- CRT-SP: 150 itens Certo/Errado vindos de `simulados.js`.
-- DP-600: 60 questões.
-- Programação: 80 questões.
-- Dados: 80 questões.
-- Academia de Dados: 220 questões geradas por templates autorais, distribuídas entre fundamentos, SQL, Python/Pandas, Power BI/DAX, modelagem, engenharia, Fabric/DP-600 e analytics.
+- Banco principal: 685 questões em `simulados.js`, incluindo 180 registros CRT-SP, 205 IBGE, 180 Santos e 120 PM-SP.
+- Certificações: 360 questões distribuídas entre DP-600, PL-300, AZ-900, PL-900, DP-900 e DP-700.
+- Programação: 192 questões.
+- Dados: 192 questões.
+- Academia de Dados: 384 questões, 48 em cada uma das oito trilhas.
 - Santos IBAM: 80 questões para Agente de Portaria, 80 para Inspetor de Alunos e 100 objetivas + 10 propostas de redação para Oficial de Administração.
+
+## Auditoria de qualidade
+
+Execute a auditoria completa do banco com:
+
+```bash
+npm run audit:questions
+```
+
+Ela bloqueia IDs ou conteúdos duplicados, gabaritos inválidos ou concentrados, alternativas repetidas, textos corrompidos ou sem acentuação, explicações insuficientes, pistas pelo tamanho da resposta, pools menores que o questionário e distribuições incompatíveis com a prova. O comando também roda automaticamente antes de `npm run build`.
 
 ## Academia de Dados
 
