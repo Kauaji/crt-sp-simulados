@@ -14,20 +14,59 @@
     {
       id: "memorando",
       title: "Memorando sobre conferência patrimonial",
-      instruction: "Como Oficial de Administração, redija um memorando ao setor de patrimônio solicitando a conferência dos bens transferidos para uma nova unidade. Informe o motivo, a providência esperada e o prazo de cinco dias úteis.",
+      instruction: "Com base na coletânea, redija um memorando ao setor de patrimônio solicitando a conferência dos bens transferidos. Registre as divergências sem afirmar que houve extravio, indique a providência esperada e estabeleça prazo de cinco dias úteis.",
       focus: ["impessoalidade", "clareza do pedido", "prazo", "identificação da providência"],
+      supportMaterials: [
+        {
+          type: "text",
+          title: "Texto I — Registro de transferência",
+          body: "A Unidade Centro informou que a mudança de mobiliário e equipamentos para o novo posto foi concluída. O termo de transferência prevê conferência física e atualização da localização patrimonial antes do encerramento do processo.",
+        },
+        {
+          type: "table",
+          title: "Quadro I — Conferência preliminar",
+          columns: ["Grupo", "Relação", "Recebido"],
+          rows: [["Computadores", "18", "17"], ["Monitores", "22", "22"], ["Impressoras", "4", "5"]],
+        },
+      ],
     },
     {
       id: "comunicado",
       title: "Comunicado de alteração no atendimento",
-      instruction: "Redija um comunicado ao público sobre a interrupção temporária do atendimento presencial para manutenção. Indique período, canal alternativo e orientação para reagendamentos, sem criar informações além das fornecidas.",
+      instruction: "Com base na coletânea, redija um comunicado ao público sobre a interrupção temporária do atendimento presencial. Indique período, canais alternativos e orientação para reagendamentos, sem acrescentar informações não fornecidas.",
       focus: ["objetividade", "ordem das informações", "linguagem cidadã", "orientação completa"],
+      supportMaterials: [
+        {
+          type: "text",
+          title: "Texto I — Nota da manutenção",
+          body: "O atendimento presencial ficará suspenso em 14 de setembro, das 12h às 17h, para manutenção elétrica. Agendamentos desse período poderão ser remarcados pelo portal ou pelo telefone informado na confirmação do serviço.",
+        },
+        {
+          type: "chart",
+          title: "Gráfico I — Solicitações por canal no último mês",
+          rows: [["Presencial", 52], ["Portal", 31], ["Telefone", 17]],
+          unit: "%",
+        },
+      ],
     },
     {
       id: "despacho",
       title: "Despacho para regularização documental",
-      instruction: "Redija um despacho registrando que um requerimento não pode prosseguir por falta de documento obrigatório. Determine a ciência do interessado e o retorno do processo após a regularização.",
+      instruction: "Com base na coletânea, redija um despacho registrando por que o requerimento ainda não pode prosseguir. Determine a ciência do interessado e o retorno do processo à análise após a regularização.",
       focus: ["motivação", "encaminhamento", "formalidade", "registro administrativo"],
+      supportMaterials: [
+        {
+          type: "text",
+          title: "Texto I — Informação do processo",
+          body: "O requerimento nº 184/2026 solicita atualização cadastral. A conferência inicial localizou o formulário assinado e o comprovante de endereço, mas não encontrou a cópia do documento de identificação indicada na lista obrigatória.",
+        },
+        {
+          type: "table",
+          title: "Quadro I — Lista de conferência",
+          columns: ["Documento", "Situação"],
+          rows: [["Formulário assinado", "Recebido"], ["Comprovante de endereço", "Recebido"], ["Documento de identificação", "Pendente"]],
+        },
+      ],
     },
   ];
 
@@ -78,7 +117,6 @@
     santosCargo: "santos-agente-portaria",
     santosQuantity: 20,
     santosAttempt: 0,
-    essayPrompt: "memorando",
     essayText: "",
     essayFeedback: null,
     essayAnalyzing: false,
@@ -2065,8 +2103,66 @@
     `;
   }
 
+  function essayPromptOfToday() {
+    return shuffleWithSeed(
+      ESSAY_PROMPTS,
+      `redacao-${getTodayKey()}-${state.currentUserId || "visitante"}`,
+    )[0] || ESSAY_PROMPTS[0];
+  }
+
+  function essaySupportMarkup(prompt) {
+    return `
+      <section class="essay-support" aria-labelledby="essay-support-title">
+        <div class="essay-support__heading">
+          <div><span class="eyebrow">Coletânea de apoio</span><h3 id="essay-support-title">Leia os materiais antes de escrever</h3></div>
+          <small>Dados fictícios para treino</small>
+        </div>
+        <div class="essay-support__grid">
+          ${(prompt.supportMaterials || []).map((material, materialIndex) => {
+            if (material.type === "table") {
+              return `
+                <article class="essay-source essay-source--table">
+                  <span class="essay-source__number">${materialIndex + 1}</span>
+                  <h4>${escapeHtml(material.title)}</h4>
+                  <div class="essay-source__table-wrap"><table><thead><tr>${material.columns.map((column) => `<th>${escapeHtml(column)}</th>`).join("")}</tr></thead><tbody>${material.rows.map((row) => `<tr>${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>
+                </article>
+              `;
+            }
+            if (material.type === "chart") {
+              return `
+                <article class="essay-source essay-source--chart">
+                  <span class="essay-source__number">${materialIndex + 1}</span>
+                  <h4>${escapeHtml(material.title)}</h4>
+                  <div class="essay-chart">${material.rows.map(([label, value]) => `<div class="essay-chart__row"><span>${escapeHtml(label)}</span><div><i style="width:${Math.max(0, Math.min(100, Number(value) || 0))}%"></i></div><strong>${Number(value) || 0}${escapeHtml(material.unit || "")}</strong></div>`).join("")}</div>
+                </article>
+              `;
+            }
+            return `
+              <article class="essay-source essay-source--text">
+                <span class="essay-source__number">${materialIndex + 1}</span>
+                <h4>${escapeHtml(material.title)}</h4>
+                <p>${escapeHtml(material.body)}</p>
+              </article>
+            `;
+          }).join("")}
+        </div>
+        <p class="essay-support__note">Use os dados relevantes, relacione as fontes e escreva com suas próprias palavras. A coletânea não deve ser copiada integralmente.</p>
+      </section>
+    `;
+  }
+
+  function essayEvaluationContext(prompt) {
+    const materials = (prompt.supportMaterials || []).map((material) => {
+      if (material.type === "text") return `${material.title}: ${material.body}`;
+      const rows = material.rows.map((row) => row.join(" | ")).join("; ");
+      return `${material.title}: ${rows}`;
+    }).join("\n");
+    return `${prompt.instruction}\n\nCOLETÂNEA DE APOIO:\n${materials}`;
+  }
+
   function renderEssayTab() {
-    const prompt = ESSAY_PROMPTS.find((item) => item.id === state.essayPrompt) || ESSAY_PROMPTS[0];
+    const prompt = essayPromptOfToday();
+    const todayLabel = new Intl.DateTimeFormat("pt-BR", { timeZone: TIMEZONE, day: "2-digit", month: "long", year: "numeric" }).format(new Date());
     $("#tab-content").innerHTML = `
       <section class="panel essay-workspace">
         <div class="section-heading">
@@ -2075,10 +2171,11 @@
         </div>
         <div class="essay-layout">
           <div class="essay-editor">
-            <label class="field essay-prompt-select">
-              <span>Proposta</span>
-              <select data-essay-prompt>${ESSAY_PROMPTS.map((item) => `<option value="${escapeHtml(item.id)}" ${item.id === prompt.id ? "selected" : ""}>${escapeHtml(item.title)}</option>`).join("")}</select>
-            </label>
+            <div class="essay-auto-topic">
+              <div><span>Proposta automática · ${escapeHtml(todayLabel)}</span><h3>${escapeHtml(prompt.title)}</h3></div>
+              <strong>tema do dia</strong>
+            </div>
+            ${essaySupportMarkup(prompt)}
             <div class="essay-prompt"><span>Comando</span><p>${escapeHtml(prompt.instruction)}</p></div>
             <label class="essay-text-field">
               <span class="sr-only">Digite sua redação</span>
@@ -2119,7 +2216,7 @@
       feedbackRoot.innerHTML = '<p class="essay-message essay-message--error">Escreva pelo menos 40 palavras para receber uma avaliação útil.</p>';
       return;
     }
-    const prompt = ESSAY_PROMPTS.find((item) => item.id === state.essayPrompt) || ESSAY_PROMPTS[0];
+    const prompt = essayPromptOfToday();
     state.essayAnalyzing = true;
     const button = document.querySelector("[data-analyze-essay]");
     if (button) { button.disabled = true; button.textContent = "Analisando…"; }
@@ -2129,7 +2226,7 @@
       const response = await fetch("/api/analyze-essay", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: prompt.instruction, text: textValue }),
+        body: JSON.stringify({ prompt: essayEvaluationContext(prompt), text: textValue }),
       });
       if (!response.ok) throw new Error(`AI unavailable: ${response.status}`);
       const feedback = await response.json();
@@ -2795,11 +2892,6 @@
     if (target.matches("[data-santos-quantity]")) {
       state.santosQuantity = Number(target.value);
       if (state.activeTab === "santos-ibam") renderSantosIbamTab();
-    }
-    if (target.matches("[data-essay-prompt]")) {
-      state.essayPrompt = target.value;
-      state.essayFeedback = null;
-      renderEssayTab();
     }
     if (target.matches("[data-answer]") && state.activeQuiz) {
       state.activeQuiz.answers[target.dataset.answer] = target.value;
