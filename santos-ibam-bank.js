@@ -873,20 +873,41 @@
   const historicalExams = {
     inspetorArraial2025: {
       label: "IBAM — Prefeitura de Arraial do Cabo/RJ — Inspetor de Alunos — Edital nº 01/2025",
+      anoAplicacao: 2025,
       prova: officialLinks.provaInspetorArraial2025,
       gabarito: officialLinks.gabaritoInspetorArraial2025,
     },
     tecnicoParaiba2025: {
       label: "IBAM — Câmara Municipal de Paraíba do Sul/RJ — Técnico Administrativo — Edital nº 01/2025",
+      anoAplicacao: 2025,
       prova: officialLinks.provaTecnicoParaiba2025,
       gabarito: officialLinks.gabaritoTecnicoParaiba2025,
     },
     auxiliarArraial2026: {
       label: "IBAM — Prefeitura de Arraial do Cabo/RJ — Auxiliar Administrativo — Edital nº 02/2025, prova aplicada em 2026",
+      anoAplicacao: 2026,
       prova: officialLinks.provaAuxiliarArraial2026,
       gabarito: officialLinks.gabaritoAuxiliarArraial2026,
     },
   };
+
+  const difficultyCalibration = {
+    facil: "Cobrança direta de um conceito ou de uma única etapa de cálculo, com distratores baseados em erros comuns.",
+    medio: "Aplicação contextualizada que exige interpretação ou duas etapas de raciocínio, com distratores plausíveis.",
+    dificil: "Integração de conceitos ou de várias etapas de raciocínio, com alternativas próximas e sem ambiguidade.",
+  };
+
+  function referenceReasoning(spec) {
+    const reasoningByDiscipline = {
+      "Língua Portuguesa": "Mantém a habilidade linguística e o tipo de leitura do item de referência, com texto e alternativas inéditos.",
+      Matemática: "Mantém a operação e a quantidade de etapas do item de referência, alterando integralmente contexto, valores e alternativas.",
+      "Legislação Municipal e Serviço Público": "Mantém a forma de aplicação da norma usada no item de referência, com situação funcional inédita e legislação vigente.",
+      "Informática e Rotinas": "Mantém a habilidade prática e o nível de decisão do item de referência, com cenário e distratores inéditos.",
+      "Conhecimentos Específicos": "Mantém a competência profissional e a profundidade do item de referência, com caso administrativo inédito.",
+    };
+    return spec.tipoRaciocinioReferencia || reasoningByDiscipline[spec.disciplina]
+      || "Mantém a habilidade e a quantidade de etapas do item de referência, com formulação integralmente inédita.";
+  }
 
   function addHistoricalAdaptation(role, sequence, spec) {
     const exam = historicalExams[spec.exam];
@@ -922,8 +943,11 @@
       link: exam.prova,
       origem_tipo: "adaptacao-autoral-de-prova-anterior",
       prova_origem: exam.label,
+      ano_prova_origem: exam.anoAplicacao,
       questao_origem: spec.questaoOrigem,
       fonte_gabarito: exam.gabarito,
+      tipo_raciocinio_referencia: referenceReasoning(spec),
+      criterio_dificuldade: difficultyCalibration[spec.dificuldade],
       base_legal: spec.baseLegal,
       base_legal_url: spec.baseLegalUrl,
       tags: ["ibam", "santos", "prova-anterior", "questao-adaptada", normalize(role.cargo), normalize(spec.disciplina), normalize(spec.assunto)],

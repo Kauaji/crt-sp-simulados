@@ -43,6 +43,7 @@ const VALID_QUESTION_TYPES = new Set([
   "daxMeasure",
 ]);
 const VALID_DIFFICULTIES = new Set(["facil", "medio", "dificil"]);
+const SANTOS_RECENT_SOURCE_MIN_YEAR = 2024;
 const VALID_SUBJECT_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/u;
 const SANTOS_EXPECTED_POOLS = new Map([
   ["santos-agente-portaria", {
@@ -1097,8 +1098,28 @@ function auditSantosIbamQuality(extraBank, config) {
       if (!Number.isInteger(question.questao_origem) || question.questao_origem < 1) {
         addFailure("Proveniência de prova anterior", `${id}: questao_origem deve ser um inteiro positivo.`);
       }
+      if (!Number.isInteger(question.ano_prova_origem)
+        || question.ano_prova_origem < SANTOS_RECENT_SOURCE_MIN_YEAR
+        || question.ano_prova_origem > 2026) {
+        addFailure(
+          "Proveniência de prova anterior",
+          `${id}: ano_prova_origem deve identificar uma prova IBAM recente do ciclo 2024–2026.`,
+        );
+      }
       if (!new RegExp(`quest[aã]o\\s+${question.questao_origem}(?:\\D|$)`, "iu").test(text(question.fonte))) {
         addFailure("Proveniência de prova anterior", `${id}: fonte não registra a questão de inspiração.`);
+      }
+      if (text(question.tipo_raciocinio_referencia).length < 70) {
+        addFailure(
+          "Calibração por prova recente",
+          `${id}: tipo_raciocinio_referencia não explica como a habilidade do item original foi preservada.`,
+        );
+      }
+      if (text(question.criterio_dificuldade).length < 70) {
+        addFailure(
+          "Calibração por prova recente",
+          `${id}: criterio_dificuldade não justifica o nível pela quantidade de etapas e pelos distratores.`,
+        );
       }
       try {
         const answerKeyUrl = new URL(text(question.fonte_gabarito));

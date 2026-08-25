@@ -315,7 +315,17 @@ As questões de Santos ficam em `santos-ibam-bank.js`. Para adicionar uma quest�
 }
 ```
 
-Não copie literalmente questões de provas anteriores. Para uma adaptação, reescreva enunciado, dados e distratores e registre `origem_tipo`, `prova_origem`, `questao_origem` e `fonte_gabarito`, sempre com links oficiais verificáveis.
+Não copie literalmente questões de provas anteriores. Para uma adaptação, reescreva enunciado, dados e distratores e registre `origem_tipo`, `prova_origem`, `ano_prova_origem`, `questao_origem`, `fonte_gabarito`, `tipo_raciocinio_referencia` e `criterio_dificuldade`, sempre com links oficiais verificáveis.
+
+Para manter um nível próximo ao das provas mais recentes do IBAM:
+
+- priorize cadernos oficiais de 2024 a 2026 e substitua a referência quando houver prova mais nova e compatível com o cargo;
+- preserve a habilidade cobrada e o número de etapas de raciocínio do item de referência, sem copiar seu texto;
+- classifique como `facil` a cobrança direta ou de uma etapa, `medio` a aplicação contextualizada ou de duas etapas e `dificil` a integração de conceitos ou de várias etapas;
+- produza distratores plausíveis a partir de erros comuns, sem pegadinhas ambíguas;
+- confirme a questão de origem no gabarito oficial antes de incluir a adaptação.
+
+A auditoria bloqueia adaptações sem prova recente identificada, número da questão, gabarito oficial, descrição da habilidade preservada e justificativa verificável da dificuldade.
 
 Para adicionar novas questões em `questions-bank.js`, use campos como:
 
