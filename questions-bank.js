@@ -409,7 +409,7 @@
           } else if (variant === 2) {
             const architecturePrompt = scenarioOverride?.architecturePrompt || (cert.code === "DP-600" && topic.assunto === "cargas de trabalho integradas"
               ? "Considere a cadeia completa, e não um componente isolado. Qual necessidade de negócio ela atende?"
-              : `Qual necessidade é atendida pelo artefato completo no contexto de ${topic.assunto}?`);
+              : `Qual necessidade é atendida pelo artefato completo associado a ${topic.assunto}?`);
             const architectureOptions = scenarioOverride?.architectureOptions || (cert.code === "DP-600" && topic.assunto === "cargas de trabalho integradas"
               ? [
                 "Integrar ingestão, transformação, modelagem semântica e consumo analítico em um fluxo governável.",

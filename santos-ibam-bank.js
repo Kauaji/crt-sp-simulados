@@ -797,7 +797,7 @@
               ? `Substituir o registro do caso de ${topicLabel} por uma opinião pessoal sobre os envolvidos.`
               : `Relatar o caso de ${topicLabel} com suposições sobre os envolvidos, sem separar fatos de avaliações pessoais.`,
           ],
-          comentario: `O registro deve reproduzir fatos verificáveis, providências adotadas e resultado, permitindo continuidade e rastreabilidade. Ele não deve validar ${lowerAction(pitfall)} nem substituir dados objetivos por opinião pessoal.`,
+          comentario: `O registro deve reproduzir fatos verificáveis, providências adotadas e resultado, permitindo continuidade e rastreabilidade. Ele não deve validar a conduta de ${lowerAction(pitfall)} nem substituir dados objetivos por opinião pessoal.`,
           link: sourceLink,
         },
       ];

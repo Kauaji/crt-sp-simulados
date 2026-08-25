@@ -15,7 +15,7 @@ const context = { window: {} };
 vm.createContext(context);
 vm.runInContext(code, context, { filename: "simulados.js" });
 
-const { questoes } = context.window.STUDY_DATA;
+const { questoes, generatedAt, version } = context.window.STUDY_DATA;
 
 const files = [
   {
@@ -42,8 +42,8 @@ const files = [
 
 for (const item of files) {
   const payload = {
-    generatedAt: new Date().toISOString(),
-    schemaVersion: "2026.07.18",
+    generatedAt,
+    schemaVersion: version,
     total: questoes.filter(item.filter).length,
     questoes: questoes.filter(item.filter),
   };

@@ -34,6 +34,12 @@ function dayNumber(dateKey) {
   return Math.floor(Date.UTC(year, month - 1, day) / 86400000);
 }
 
+function isValidDateKey(dateKey) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateKey || "")) return false;
+  const [year, month, day] = dateKey.split("-").map(Number);
+  return new Date(Date.UTC(year, month - 1, day)).toISOString().slice(0, 10) === dateKey;
+}
+
 function hashSeed(text) {
   let hash = 2166136261;
   for (let index = 0; index < text.length; index += 1) {
@@ -110,10 +116,49 @@ function recentIdsForScope(history, dateKey, scopeKey) {
   return ids;
 }
 
-function pickFromPool(pool, count, seed, recentIds) {
+function questionDiversityKey(question) {
+  return `${question.materia_id || question.bloco || "geral"}::${question.subassunto || question.assunto_id || question.id}`;
+}
+
+function pickFromPool(pool, count, seed, recentIds, alreadySelected = []) {
   const freshPool = pool.filter((question) => !recentIds.has(question.id));
-  const usablePool = freshPool.length >= count ? freshPool : pool;
-  return shuffle(usablePool, seed).slice(0, count);
+  const usage = new Map();
+  const picked = [];
+
+  for (const question of alreadySelected) {
+    const key = questionDiversityKey(question);
+    usage.set(key, (usage.get(key) || 0) + 1);
+  }
+
+  function takeDiverse(items, limit, part) {
+    const remaining = shuffle(items, `${seed}-${part}`);
+    while (picked.length < limit && remaining.length) {
+      let bestIndex = 0;
+      let bestUsage = Number.POSITIVE_INFINITY;
+      for (let index = 0; index < remaining.length; index += 1) {
+        const currentUsage = usage.get(questionDiversityKey(remaining[index])) || 0;
+        if (currentUsage < bestUsage) {
+          bestUsage = currentUsage;
+          bestIndex = index;
+          if (currentUsage === 0) break;
+        }
+      }
+
+      const [question] = remaining.splice(bestIndex, 1);
+      picked.push(question);
+      const key = questionDiversityKey(question);
+      usage.set(key, (usage.get(key) || 0) + 1);
+    }
+  }
+
+  takeDiverse(freshPool, Math.min(count, freshPool.length), "fresh");
+  if (picked.length < count) {
+    const pickedIds = new Set(picked.map((question) => question.id));
+    const recentPool = pool.filter((question) => !pickedIds.has(question.id));
+    takeDiverse(recentPool, count, "recent");
+  }
+
+  return picked;
 }
 
 function buildSelections(data, history, dateKey) {
@@ -129,8 +174,10 @@ function buildSelections(data, history, dateKey) {
         item.kind === "bloco" ? question.bloco === item.id : question.materia_id === item.id
       ) && !selected.some((selectedQuestion) => selectedQuestion.id === question.id));
 
-      const count = Math.min(pool.length, item.count);
-      selected.push(...pickFromPool(pool, count, `${dateKey}-${key}-${item.kind}-${item.id}`, recentIds));
+      if (pool.length < item.count) {
+        throw new Error(`${key}: banco insuficiente em "${item.label}" (${pool.length}/${item.count}).`);
+      }
+      selected.push(...pickFromPool(pool, item.count, `${dateKey}-${key}-${item.kind}-${item.id}`, recentIds, selected));
     }
 
     if (selected.length < role.exam.totalQuestoes) {
@@ -139,7 +186,7 @@ function buildSelections(data, history, dateKey) {
       if (fillPool.length < remaining) {
         throw new Error(`${key}: banco insuficiente para completar a prova (${selected.length + fillPool.length}/${role.exam.totalQuestoes}).`);
       }
-      selected.push(...pickFromPool(fillPool, remaining, `${dateKey}-${key}-fill`, recentIds));
+      selected.push(...pickFromPool(fillPool, remaining, `${dateKey}-${key}-fill`, recentIds, selected));
     }
 
     if (selected.length !== role.exam.totalQuestoes) {
@@ -153,7 +200,12 @@ function buildSelections(data, history, dateKey) {
 }
 
 function validateSelection(data, selection) {
-  if (!selection || selection.timezone !== TIMEZONE || !selection.date || !selection.selections) {
+  if (
+    !selection
+    || selection.timezone !== TIMEZONE
+    || !isValidDateKey(selection.date)
+    || !selection.selections
+  ) {
     throw new Error("Seleção diária inválida: cabeçalho ausente.");
   }
 
@@ -181,20 +233,59 @@ function validateSelection(data, selection) {
       const availableInDistribution = available.filter((question) => (
         item.kind === "bloco" ? question.bloco === item.id : question.materia_id === item.id
       )).length;
-      const required = Math.min(item.count, availableInDistribution);
+      if (availableInDistribution < item.count) {
+        throw new Error(`${key}: banco insuficiente em "${item.label}" (${availableInDistribution}/${item.count}).`);
+      }
+      const required = item.count;
       const total = questions.filter((question) => (
         item.kind === "bloco" ? question.bloco === item.id : question.materia_id === item.id
       )).length;
-      if (total < required) throw new Error(`${key}: distribuição inválida em "${item.label}" (${total}/${required}).`);
+      if (total !== required) throw new Error(`${key}: distribuição inválida em "${item.label}" (${total}/${required}).`);
     }
   }
 }
 
+function validateRecentPriority(data, selection, history, dateKey) {
+  for (const { key, contest, role } of roleScopes(data)) {
+    const available = questionsFor(data, contest.id, role.id);
+    const byId = new Map(available.map((question) => [question.id, question]));
+    const selected = selection.selections[key].map((id) => byId.get(id));
+    const recentIds = recentIdsForScope(history, dateKey, key);
+
+    for (const item of role.exam.distribution) {
+      const belongs = (question) => (
+        item.kind === "bloco" ? question.bloco === item.id : question.materia_id === item.id
+      );
+      const freshAvailable = available.filter((question) => belongs(question) && !recentIds.has(question.id)).length;
+      const freshSelected = selected.filter((question) => belongs(question) && !recentIds.has(question.id)).length;
+      const expectedFresh = Math.min(item.count, freshAvailable);
+      if (freshSelected !== expectedFresh) {
+        throw new Error(`${key}: repetição evitável em "${item.label}" (${freshSelected}/${expectedFresh} questões novas).`);
+      }
+    }
+  }
+}
+
+function existingSelectionsForDate(data, existingSelection, dateKey) {
+  if (existingSelection?.date !== dateKey) return null;
+  try {
+    validateSelection(data, existingSelection);
+    return existingSelection.selections;
+  } catch (error) {
+    console.warn(`Seleção existente de ${dateKey} foi ignorada: ${error.message}`);
+    return null;
+  }
+}
+
 function pruneHistory(history, dateKey) {
+  const maxDay = dayNumber(dateKey);
   const minDay = dayNumber(dateKey) - HISTORY_DAYS + 1;
   return Object.fromEntries(
     Object.entries(history || {})
-      .filter(([historyDate]) => dayNumber(historyDate) >= minDay)
+      .filter(([historyDate]) => {
+        const historyDay = dayNumber(historyDate);
+        return isValidDateKey(historyDate) && historyDay >= minDay && historyDay <= maxDay;
+      })
       .sort(([a], [b]) => a.localeCompare(b)),
   );
 }
@@ -216,12 +307,15 @@ function assertDifferentDateChanges(data, history, dateKey) {
 
 const data = loadStudyData();
 const date = process.env.ROTATE_DAILY_DATE || saoPauloDateKey();
+if (!isValidDateKey(date)) throw new Error(`Data inválida para rotação: ${date}.`);
 const history = readJson(historyPath, {});
+const existingSelection = readJson(selectionPath, null);
+const preservedSelections = existingSelectionsForDate(data, existingSelection, date);
 
 assertSameDateIsStable(data, history, date);
 assertDifferentDateChanges(data, history, date);
 
-const selections = buildSelections(data, history, date);
+const selections = preservedSelections || buildSelections(data, history, date);
 const nextSelection = {
   date,
   timezone: TIMEZONE,
@@ -229,6 +323,7 @@ const nextSelection = {
 };
 
 validateSelection(data, nextSelection);
+if (!preservedSelections) validateRecentPriority(data, nextSelection, history, date);
 
 const nextHistory = pruneHistory({
   ...history,
@@ -236,10 +331,13 @@ const nextHistory = pruneHistory({
 }, date);
 
 mkdirSync(dataDir, { recursive: true });
-writeFileSync(selectionPath, `${JSON.stringify(nextSelection, null, 2)}\n`);
-writeFileSync(historyPath, `${JSON.stringify(nextHistory, null, 2)}\n`);
+if (process.env.ROTATE_DAILY_DRY_RUN !== "1") {
+  writeFileSync(selectionPath, `${JSON.stringify(nextSelection, null, 2)}\n`);
+  writeFileSync(historyPath, `${JSON.stringify(nextHistory, null, 2)}\n`);
+}
 
-console.log(`Rotação diária gerada para ${date} (${TIMEZONE}).`);
+console.log(`Rotação diária ${preservedSelections ? "preservada" : "gerada"} para ${date} (${TIMEZONE}).`);
+if (process.env.ROTATE_DAILY_DRY_RUN === "1") console.log("Modo de validação: nenhum arquivo foi alterado.");
 for (const [key, ids] of Object.entries(selections)) {
   console.log(`${key}: ${ids.length} questões`);
 }
