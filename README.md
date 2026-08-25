@@ -1,6 +1,6 @@
 # Plataforma de Estudos — CRT-SP, Santos IBAM, DP-600, Programação e Dados
 
-Site estático em HTML, CSS e JavaScript puro publicado no Vercel:
+Site em HTML, CSS e JavaScript puro publicado no Vercel, com uma função serverless opcional para correção de redação por IA:
 
 ```text
 https://crt-sp-simulados.vercel.app
@@ -361,13 +361,25 @@ http://localhost:8080
 
 ## Deploy no Vercel
 
-O projeto é estático:
+O front-end é estático; somente a correção opcional de redação usa uma função serverless:
 
 - Build Command: `npm run build`
 - Output Directory: `dist`
 - Production Branch: `main`
 
 Ao fazer push na `main`, o Vercel atualiza automaticamente o projeto conectado.
+
+### Correção de redação por IA
+
+A aba **Redação** funciona mesmo sem serviço externo, usando uma avaliação local de reserva. Para ativar a análise por IA na Vercel, cadastre estas variáveis em **Project Settings → Environment Variables**:
+
+```text
+ESSAY_AI_ENABLED=true
+OPENAI_API_KEY=sua-chave-do-projeto
+OPENAI_ESSAY_MODEL=gpt-5-mini
+```
+
+Marque pelo menos o ambiente **Production** e faça um novo deploy. A chave permanece somente na função `api/analyze-essay.mjs` e nunca é enviada ao navegador. O texto é enviado à API apenas quando o usuário clica em **Avaliar redação**.
 
 ## Limitações do localStorage
 

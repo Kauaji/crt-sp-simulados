@@ -46,6 +46,7 @@ const config = `window.CRTSP_SUPABASE_CONFIG = ${JSON.stringify(
     url: supabaseUrl,
     publishableKey: supabasePublishableKey,
     enabled: Boolean(supabaseUrl && supabasePublishableKey),
+    essayAiEnabled: process.env.ESSAY_AI_ENABLED === "true" && Boolean(process.env.OPENAI_API_KEY),
   },
   null,
   2,

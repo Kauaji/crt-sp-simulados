@@ -5,10 +5,31 @@
   const EXTRA_BANK = window.QUESTION_BANK || [];
   const SANTOS_IBAM_CONFIG = window.SANTOS_IBAM_CONFIG || { roles: [], officialLinks: {} };
   const CAREER_GUIDES = window.CAREER_GUIDES || {};
+  const APP_CONFIG = window.CRTSP_SUPABASE_CONFIG || {};
   const STORE_KEY = "crtsp-gamified-study-v1";
   const TIMEZONE = "America/Sao_Paulo";
   const BLANK = "__blank__";
   const MINIMOS_PROVA_REAL = { basicos: 10, complementares: 8, especificos: 17, total: 36 };
+  const ESSAY_PROMPTS = [
+    {
+      id: "memorando",
+      title: "Memorando sobre conferência patrimonial",
+      instruction: "Como Oficial de Administração, redija um memorando ao setor de patrimônio solicitando a conferência dos bens transferidos para uma nova unidade. Informe o motivo, a providência esperada e o prazo de cinco dias úteis.",
+      focus: ["impessoalidade", "clareza do pedido", "prazo", "identificação da providência"],
+    },
+    {
+      id: "comunicado",
+      title: "Comunicado de alteração no atendimento",
+      instruction: "Redija um comunicado ao público sobre a interrupção temporária do atendimento presencial para manutenção. Indique período, canal alternativo e orientação para reagendamentos, sem criar informações além das fornecidas.",
+      focus: ["objetividade", "ordem das informações", "linguagem cidadã", "orientação completa"],
+    },
+    {
+      id: "despacho",
+      title: "Despacho para regularização documental",
+      instruction: "Redija um despacho registrando que um requerimento não pode prosseguir por falta de documento obrigatório. Determine a ciência do interessado e o retorno do processo após a regularização.",
+      focus: ["motivação", "encaminhamento", "formalidade", "registro administrativo"],
+    },
+  ];
 
   const USERS = [
     { id: "kaua", nome: "Kauã", initial: "K", accent: "verde" },
@@ -18,7 +39,8 @@
   ];
 
   const TABS = [
-    ["santos-ibam", "Concursos Santos — IBAM"],
+    ["santos-ibam", "Concursos"],
+    ["redacao", "Redação"],
     ["programacao", "Trilhas"],
     ["certificacoes", "Certificações"],
     ["dados", "Dados"],
@@ -28,7 +50,7 @@
   ];
 
   const MODE_TABS = {
-    concursos: ["santos-ibam", "estudos", "historico"],
+    concursos: ["santos-ibam", "estudos", "redacao", "historico"],
     tech: ["programacao", "certificacoes", "dados", "academia-dados", "estudos", "historico"],
   };
 
@@ -56,6 +78,10 @@
     santosCargo: "santos-agente-portaria",
     santosQuantity: 20,
     santosAttempt: 0,
+    essayPrompt: "memorando",
+    essayText: "",
+    essayFeedback: null,
+    essayAnalyzing: false,
     activeQuiz: null,
   };
 
@@ -814,8 +840,9 @@
     $("#hero-eyebrow").textContent = concursosMode ? "Concursos públicos" : "Modo tech";
     $("#hero-title").textContent = concursosMode ? "Escolha seu concurso" : "Trilhas de tecnologia";
     $("#hero-copy").textContent = concursosMode
-      ? "Comece pelos concursos ativos, veja os cargos e gere simulados por banca com pontuação do edital."
+      ? ""
       : "Ative programação, dados, certificações e academia prática em um ambiente escuro para treino intensivo.";
+    $("#hero-copy").hidden = concursosMode;
     $("#hero-notice").hidden = true;
     $("#study-mode-switch")?.classList.toggle("is-tech", !concursosMode);
     document.querySelectorAll("[data-mode-switch]").forEach((button) => {
@@ -1659,32 +1686,22 @@
   function renderSantosIbamTab() {
     const roles = santosRoles();
     const selectedRole = getSantosRole();
-    const recommendation = getSantosRecommendation();
     const stats = loadUserStats();
     const accuracy = stats.totalQuestoesRespondidas ? Math.round((stats.totalAcertos / stats.totalQuestoesRespondidas) * 100) : 0;
-    const santosHistory = (stats.historicoUltimosResultados || []).filter((item) => item.area === "concursos-santos-ibam");
-    const bestSantos = [...santosHistory].sort((a, b) => (b.percentual || 0) - (a.percentual || 0))[0];
-    const adaptedQuestions = poolByArea("concursos-santos-ibam").filter((question) => question.origem_tipo === "adaptacao-autoral-de-prova-anterior").length;
     $("#tab-content").innerHTML = `
-      <section class="panel">
+      <section class="panel santos-command-center">
         <div class="section-heading">
-          <p class="eyebrow">Concursos Santos — IBAM</p>
+          <p class="eyebrow">Concursos</p>
           <h2>Prefeitura de Santos: Agente, Inspetor e Oficial</h2>
         </div>
-        <p>Área baseada nos editais oficiais 73/2026 e 71/2026. O banco combina questões autorais com ${adaptedQuestions} adaptações inéditas e identificadas de provas anteriores oficiais do IBAM.</p>
-        <div class="dashboard-grid">
+        <div class="santos-facts">
           ${metricCard("Inscrições", "22/07 a 20/08/2026", "boletos até 21/08/2026")}
           ${metricCard("Banca", "IBAM", "múltipla escolha")}
           ${metricCard("Pontuação", "por peso", "sem regra Quadrix")}
-          ${metricCard("Recomendação", recommendation.title, recommendation.detail)}
-        </div>
-        <div class="dashboard-grid compact-dashboard">
           ${metricCard("Simulados feitos", stats.questionariosSantosIbamFinalizados || 0, "Santos IBAM")}
-          ${metricCard("Melhor cargo", bestSantos?.trilha || "—", bestSantos ? `${bestSantos.percentual}%` : "sem histórico")}
           ${metricCard("Taxa geral", `${accuracy}%`, `${stats.totalAcertos}/${stats.totalQuestoesRespondidas}`)}
-          ${metricCard("Foguinho", `🔥 ${stats.streakAtual}`, `recorde: ${stats.maiorStreak}`)}
         </div>
-        <div class="form-grid">
+        <div class="form-grid santos-config">
           <label class="field">
             <span>Cargo para questões</span>
             <select data-santos-cargo>
@@ -1699,11 +1716,16 @@
             </select>
           </label>
         </div>
+        <div class="action-row santos-primary-actions">
+          <button class="primary-button" type="button" data-santos-action="custom" data-santos-role="${escapeHtml(selectedRole?.id || "")}">Gerar ${Number(state.santosQuantity) || 20} questões</button>
+          <button class="secondary-button" type="button" data-santos-action="full" data-santos-role="${escapeHtml(selectedRole?.id || "")}">Simulado completo</button>
+          <button class="secondary-button" type="button" data-santos-action="real" data-santos-role="${escapeHtml(selectedRole?.id || "")}">Modo prova</button>
+        </div>
       </section>
       <section class="panel">
         <div class="section-heading">
-          <p class="eyebrow">Visão geral</p>
-          <h2>Cards dos cargos</h2>
+          <p class="eyebrow">Cargos</p>
+          <h2>Escolha sua preparação</h2>
         </div>
         <div class="study-grid">
           ${roles.map(renderSantosRoleCard).join("")}
@@ -1732,48 +1754,18 @@
           </table>
         </div>
       </section>
-      <section class="panel">
-        <div class="section-heading">
-          <p class="eyebrow">Questões por cargo</p>
-          <h2>${escapeHtml(selectedRole?.cargo || "Selecione um cargo")}</h2>
-        </div>
-        <div class="action-row">
-          <button class="primary-button" type="button" data-santos-action="custom" data-santos-role="${escapeHtml(selectedRole?.id || "")}">Gerar questionário ${Number(state.santosQuantity) || 20} questões</button>
-          <button class="secondary-button" type="button" data-santos-action="full" data-santos-role="${escapeHtml(selectedRole?.id || "")}">Simulado completo</button>
-          <button class="secondary-button" type="button" data-santos-action="real" data-santos-role="${escapeHtml(selectedRole?.id || "")}">Modo prova cronometrado</button>
-        </div>
-      </section>
-      <section class="panel">
-        <div class="section-heading">
-          <p class="eyebrow">Estudos Santos IBAM</p>
-          <h2>Links e temas prioritários</h2>
-        </div>
-        <div class="study-grid">
-          ${studyCard("Português IBAM", ["Interpretação, finalidade e inferência.", "Reescrita com preservação de sentido.", "Pontuação, concordância e linguagem formal."], [["Manual de Redação", "https://www4.planalto.gov.br/centrodeestudos/assuntos/manual-de-redacao-da-presidencia-da-republica/manual-de-redacao.pdf"]])}
-          ${studyCard("Legislação e serviço público", ["Lei Orgânica e Estatuto municipal de Santos.", "Lei 13.460/2017, LAI, LGPD e Governo Digital.", "Atendimento prioritário, acessibilidade e ética."], [["Edital 73/2026", SANTOS_IBAM_CONFIG.officialLinks?.edital73], ["Edital 71/2026", SANTOS_IBAM_CONFIG.officialLinks?.edital71], ["LAI", SANTOS_IBAM_CONFIG.officialLinks?.lai], ["LGPD", SANTOS_IBAM_CONFIG.officialLinks?.lgpd]])}
-          ${studyCard("Estratégia por pesos", ["Agente: específicos, informática/rotinas e legislação/atendimento.", "Inspetor: específicos, legislação/atendimento escolar, ECA e segurança.", "Oficial: específicos, Português, redação administrativa, protocolo e arquivo."], [])}
-          ${studyCard("Videoaulas gratuitas", ["Busque aulas gratuitas de Português IBAM, Matemática básica, informática para concursos e redação oficial.", "Use os simulados daqui para descobrir o tema do vídeo do dia.", "Priorize lei seca e exercícios, não maratona passiva."], [["YouTube — Português IBAM", "https://www.youtube.com/results?search_query=portugu%C3%AAs+ibam+concursos"], ["YouTube — Informática concursos", "https://www.youtube.com/results?search_query=inform%C3%A1tica+para+concursos"]])}
-          ${studyCard("Provas anteriores oficiais", ["As questões do site são reescritas; o caderno original é usado como referência de tema e estilo.", "Cada adaptação informa a prova e o número da questão de inspiração.", "Consulte também o gabarito definitivo publicado pelo IBAM."], [["Inspetor de Alunos — IBAM 2025", SANTOS_IBAM_CONFIG.officialLinks?.provaInspetorArraial2025], ["Técnico Administrativo — IBAM 2025", SANTOS_IBAM_CONFIG.officialLinks?.provaTecnicoParaiba2025], ["Auxiliar Administrativo — IBAM 2026", SANTOS_IBAM_CONFIG.officialLinks?.provaAuxiliarArraial2026]])}
-        </div>
-      </section>
     `;
   }
 
   function renderSantosRoleCard(role) {
-    const totalQuestions = santosPool(role.id, { includeWriting: true }).length;
     return `
       <article class="study-card role-card">
         <p class="eyebrow">${escapeHtml(role.editalCompleto)}</p>
         <h3>${escapeHtml(role.cargo)}</h3>
-        <ul>
-          <li><strong>Código:</strong> ${escapeHtml(role.codigo)}</li>
-          <li><strong>Escolaridade:</strong> ${escapeHtml(role.escolaridade)}</li>
-          <li><strong>Remuneração:</strong> ${escapeHtml(role.remuneracao)}</li>
+        <ul class="role-facts">
           <li><strong>Carga horária:</strong> ${escapeHtml(role.cargaHoraria)}</li>
           <li><strong>Vagas:</strong> ${escapeHtml(role.vagas)}</li>
-          <li><strong>Inscrição:</strong> ${escapeHtml(role.inscricao)} · ${escapeHtml(role.taxa)}</li>
           <li><strong>Prova:</strong> ${escapeHtml(role.prova)} · ${escapeHtml(role.tipoProva)}</li>
-          <li><strong>Banco local:</strong> ${totalQuestions} questões/propostas</li>
         </ul>
         <div class="action-row">
           <button class="primary-button" type="button" data-santos-action="study" data-santos-role="${escapeHtml(role.id)}">Estudar</button>
@@ -1820,16 +1812,6 @@
         </div>
       </section>
     `;
-  }
-
-  function getSantosRecommendation() {
-    const stats = loadUserStats();
-    const weak = getSantosWeakSubject(stats);
-    if (weak.includes("Matemática")) return { title: "Treinar Matemática", detail: "porcentagem, regra de três e tabelas" };
-    if (weak.includes("Portugues") || weak.includes("Português")) return { title: "Treinar Português", detail: "interpretação e reescrita" };
-    if (weak.includes("Informática")) return { title: "Treinar Informática", detail: "planilhas, e-mail e segurança" };
-    if (weak.includes("Específicos")) return { title: "Treinar específicos", detail: "rotina do cargo escolhido" };
-    return { title: "Começar pelo peso", detail: "específicos + legislação/rotinas" };
   }
 
   function santosDistributionFor(role, count) {
@@ -1938,27 +1920,61 @@
 
   function renderStudyTab() {
     const isConcursos = state.studyMode === "concursos";
-    const title = isConcursos ? "Estudos para concursos" : "Estudos para tecnologia";
-    const cards = isConcursos
-      ? [
-        studyCard("Concursos Santos — IBAM", ["Edital 73/2026: Agente de Portaria e Inspetor de Alunos.", "Edital 71/2026: Oficial de Administração, objetiva + redação.", "Pontuação ponderada por pesos do edital.", "Treine Português, Matemática, Legislação, Informática e específicos do cargo."], [["Edital 73/2026 — IBAM", SANTOS_IBAM_CONFIG.officialLinks?.edital73], ["Edital 71/2026 — IBAM", SANTOS_IBAM_CONFIG.officialLinks?.edital71]]),
-        studyCard("Leis e atendimento público", ["Lei 13.460/2017: direitos do usuário.", "LAI e LGPD: transparência com proteção de dados.", "Atendimento prioritário, acessibilidade e postura do servidor."], [["Lei 13.460/2017", SANTOS_IBAM_CONFIG.officialLinks?.usuario], ["LAI", SANTOS_IBAM_CONFIG.officialLinks?.lai], ["LGPD", SANTOS_IBAM_CONFIG.officialLinks?.lgpd]]),
-        studyCard("Redação e rotina administrativa", ["Para Oficial, treine clareza, impessoalidade e objetividade.", "Faça textos curtos: memorando, despacho, e-mail e relatório.", "Revise protocolo, arquivo, controle de prazos e documentos."], [["Manual de Redação", "https://www4.planalto.gov.br/centrodeestudos/assuntos/manual-de-redacao-da-presidencia-da-republica/manual-de-redacao.pdf"]]),
-      ]
-      : [
+    const techCards = [
         studyCard("Certificações", ["Microsoft DP-600, PL-300, AZ-900, PL-900, DP-900 e DP-700.", "Treine por tema e depois faça simulado completo.", "Revise erros antes de subir dificuldade."], [["Microsoft Learn", "https://learn.microsoft.com/en-us/training/"]]),
         studyCard("Programação por profissão", ["Escolha uma trilha: Front-end, Back-end, Full Stack, Dados/BI, QA ou DevOps.", "Complete blocos de estudo e exercícios para subir o progresso.", "Faça projetos pequenos para consolidar."], [["MDN", "https://developer.mozilla.org/pt-BR/"], ["Python", "https://docs.python.org/pt-br/3/"]]),
         studyCard("Dados e Analytics", ["SQL forte, Python/Pandas e Power BI.", "Modele métricas antes de montar dashboard.", "Use projetos de portfólio para provar habilidade."], [["Power BI", "https://learn.microsoft.com/pt-br/power-bi/"], ["Pandas", "https://pandas.pydata.org/docs/"]]),
         studyCard("Academia de Dados", ["Fundamentos, SQL, Python, DAX, modelagem, engenharia e Fabric.", "Use modo entrevista para treinar explicação.", "Use modo portfólio para gerar projetos."], [["Microsoft Fabric", "https://learn.microsoft.com/en-us/fabric/"], ["dados.gov.br", "https://dados.gov.br/"]]),
       ];
+    if (!isConcursos) {
+      $("#tab-content").innerHTML = `
+        <section class="panel">
+          <div class="section-heading"><p class="eyebrow">Estudos</p><h2>Estudos para tecnologia</h2></div>
+          <div class="study-grid">${techCards.join("")}</div>
+        </section>
+      `;
+      return;
+    }
+
+    const priorityCards = [
+      studyCard("Português IBAM", ["Interpretação, finalidade e inferência.", "Reescrita com preservação de sentido.", "Pontuação, concordância e linguagem formal."], [["Manual de Redação", "https://www4.planalto.gov.br/centrodeestudos/assuntos/manual-de-redacao-da-presidencia-da-republica/manual-de-redacao.pdf"]]),
+      studyCard("Legislação e serviço público", ["Lei Orgânica e Estatuto municipal de Santos.", "Lei 13.460/2017, LAI, LGPD e Governo Digital.", "Atendimento prioritário, acessibilidade e ética."], [["Edital 73/2026", SANTOS_IBAM_CONFIG.officialLinks?.edital73], ["Edital 71/2026", SANTOS_IBAM_CONFIG.officialLinks?.edital71], ["LAI", SANTOS_IBAM_CONFIG.officialLinks?.lai], ["LGPD", SANTOS_IBAM_CONFIG.officialLinks?.lgpd]]),
+      studyCard("Estratégia por pesos", ["Agente: específicos, informática/rotinas e legislação/atendimento.", "Inspetor: específicos, legislação/atendimento escolar, ECA e segurança.", "Oficial: específicos, Português, redação administrativa, protocolo e arquivo."], []),
+      studyCard("Videoaulas gratuitas", ["Use os simulados para identificar o tema do vídeo do dia.", "Alterne teoria curta, lei seca e exercícios.", "Registre o erro que motivou cada revisão."], [["YouTube — Português IBAM", "https://www.youtube.com/results?search_query=portugu%C3%AAs+ibam+concursos"], ["YouTube — Informática", "https://www.youtube.com/results?search_query=inform%C3%A1tica+para+concursos"]]),
+      studyCard("Provas anteriores oficiais", ["Compare o estilo dos enunciados e a profundidade dos distratores.", "Confira cada item no gabarito definitivo.", "As adaptações do site identificam a prova e a questão de inspiração."], [["Inspetor — IBAM 2025", SANTOS_IBAM_CONFIG.officialLinks?.provaInspetorArraial2025], ["Técnico Administrativo — IBAM 2025", SANTOS_IBAM_CONFIG.officialLinks?.provaTecnicoParaiba2025], ["Auxiliar Administrativo — IBAM 2026", SANTOS_IBAM_CONFIG.officialLinks?.provaAuxiliarArraial2026]]),
+    ];
+    const summaries = [
+      studySummaryCard("Português", "Leia buscando finalidade, tese e relação entre trechos.", ["Inferência precisa estar sustentada pelo texto.", "Na reescrita, preserve sentido, concordância e regência.", "Revise pontuação ligada à estrutura sintática, não à pausa da fala."]),
+      studySummaryCard("Matemática", "Traduza o enunciado para operações antes de calcular.", ["Porcentagem é uma razão sobre 100.", "Regra de três exige grandezas proporcionais.", "Confira unidade, ordem de grandeza e arredondamento."]),
+      studySummaryCard("Legislação", "Associe cada norma à finalidade e ao agente responsável.", ["LAI: publicidade como regra e sigilo como exceção legal.", "LGPD: finalidade, necessidade e segurança no tratamento.", "Lei 13.460/2017: direitos do usuário e qualidade do serviço."]),
+      studySummaryCard("Informática e rotinas", "Pense no procedimento mais seguro, rastreável e reversível.", ["Planilhas: referências, filtros e funções básicas.", "Segurança: menor privilégio, autenticação e backup testado.", "Protocolo: recebimento, registro, tramitação e destinação."]),
+      studySummaryCard("Conhecimentos específicos", "A resposta correta costuma preservar competência, segurança e registro.", ["Agente: acesso, atendimento, ocorrências e patrimônio.", "Inspetor: convivência, proteção integral, inclusão e prevenção.", "Oficial: arquivo, materiais, atendimento e redação administrativa."]),
+    ];
     $("#tab-content").innerHTML = `
       <section class="panel">
         <div class="section-heading">
           <p class="eyebrow">Estudos</p>
-          <h2>${escapeHtml(title)}</h2>
+          <h2>Links e temas prioritários</h2>
         </div>
-        <div class="study-grid">${cards.join("")}</div>
+        <div class="study-grid">${priorityCards.join("")}</div>
       </section>
+      <section class="panel study-summaries">
+        <div class="section-heading">
+          <p class="eyebrow">Revisão rápida</p>
+          <h2>Resumos essenciais por tema</h2>
+        </div>
+        <div class="summary-grid">${summaries.join("")}</div>
+      </section>
+    `;
+  }
+
+  function studySummaryCard(title, lead, items) {
+    return `
+      <details class="summary-card">
+        <summary><span>${escapeHtml(title)}</span><small>Abrir resumo</small></summary>
+        <p>${escapeHtml(lead)}</p>
+        <ul>${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+      </details>
     `;
   }
 
@@ -1972,6 +1988,160 @@
         </div>
       </article>
     `;
+  }
+
+  function essayWordCount(value = state.essayText) {
+    return String(value).trim() ? String(value).trim().split(/\s+/u).length : 0;
+  }
+
+  function localEssayEvaluation(textValue) {
+    const cleanText = String(textValue).trim();
+    const words = essayWordCount(cleanText);
+    const paragraphs = cleanText.split(/\n\s*\n/u).filter(Boolean).length;
+    const sentences = cleanText.split(/[.!?]+/u).filter((item) => item.trim()).length || 1;
+    const averageSentence = words / sentences;
+    const informalMatches = cleanText.match(/\b(acho|tipo|pra|tá|né|beleza|valeu)\b/giu) || [];
+    const personalMatches = cleanText.match(/\b(eu|meu|minha|na minha opinião)\b/giu) || [];
+    const hasAdministrativeAction = /\b(solicita|solicito|encaminha|encaminho|determina|determino|comunica|informa|providência|prazo|processo|requerimento)\b/iu.test(cleanText);
+    const hasClosingPunctuation = /[.!?]$/u.test(cleanText);
+    const adequacy = Math.max(8, Math.min(25, 12 + (words >= 80 ? 6 : words >= 50 ? 3 : 0) + (hasAdministrativeAction ? 7 : 0)));
+    const structure = Math.max(8, Math.min(25, 11 + (paragraphs >= 2 ? 7 : 2) + (sentences >= 4 ? 7 : 3)));
+    const clarity = Math.max(8, Math.min(25, 18 + (averageSentence <= 30 ? 5 : averageSentence <= 38 ? 2 : -4) - Math.min(5, informalMatches.length)));
+    const language = Math.max(8, Math.min(25, 20 + (hasClosingPunctuation ? 3 : 0) - Math.min(5, personalMatches.length) - Math.min(4, informalMatches.length)));
+    const score = adequacy + structure + clarity + language;
+    const strengths = [];
+    const improvements = [];
+    if (hasAdministrativeAction) strengths.push("A providência administrativa aparece de forma reconhecível.");
+    if (averageSentence <= 30) strengths.push("Os períodos têm extensão favorável à leitura objetiva.");
+    if (paragraphs >= 2) strengths.push("A divisão em parágrafos ajuda a separar contexto e encaminhamento.");
+    if (!strengths.length) strengths.push("O texto apresenta uma base que pode ser organizada no formato administrativo.");
+    if (words < 80) improvements.push("Desenvolva melhor o motivo e a providência, sem repetir ideias.");
+    if (!hasAdministrativeAction) improvements.push("Declare com verbo claro o que deve ser comunicado, solicitado ou encaminhado.");
+    if (paragraphs < 2) improvements.push("Separe contexto, providência e fechamento em parágrafos distintos.");
+    if (averageSentence > 30) improvements.push("Divida períodos longos para reduzir ambiguidades.");
+    if (personalMatches.length) improvements.push("Troque marcas pessoais por linguagem impessoal e institucional.");
+    if (informalMatches.length) improvements.push("Substitua expressões informais por vocabulário administrativo simples.");
+    if (!improvements.length) improvements.push("Faça uma última revisão de concordância, regência e pontuação antes de entregar.");
+    return {
+      mode: "local",
+      score,
+      summary: "Avaliação automática baseada em estrutura, extensão e marcas linguísticas. Ela ajuda na revisão inicial, mas não substitui uma correção humana ou por IA.",
+      criteria: [
+        { name: "Adequação ao tema", score: adequacy, comment: hasAdministrativeAction ? "O texto explicita uma ação administrativa." : "A providência precisa ficar mais explícita." },
+        { name: "Estrutura", score: structure, comment: paragraphs >= 2 ? "A organização visual favorece a leitura." : "Divida o conteúdo em blocos funcionais." },
+        { name: "Clareza e objetividade", score: clarity, comment: averageSentence <= 30 ? "Os períodos estão em extensão adequada." : "Há períodos longos que podem ser simplificados." },
+        { name: "Linguagem formal", score: language, comment: informalMatches.length || personalMatches.length ? "Revise marcas pessoais ou informais." : "O registro é compatível com comunicação administrativa." },
+      ],
+      strengths: strengths.slice(0, 3),
+      improvements: improvements.slice(0, 4),
+      revision: "Releia o comando, destaque motivo, providência e prazo e elimine qualquer informação não solicitada.",
+    };
+  }
+
+  function essayFeedbackMarkup(feedback) {
+    if (!feedback) return "";
+    const modeLabel = feedback.mode === "ai" ? "Análise por IA" : "Avaliação local de reserva";
+    return `
+      <section class="essay-feedback" aria-live="polite">
+        <div class="essay-score">
+          <span>${escapeHtml(modeLabel)}</span>
+          <strong>${Number(feedback.score) || 0}<small>/100</small></strong>
+          <div class="progress"><span style="width:${Math.max(0, Math.min(100, Number(feedback.score) || 0))}%"></span></div>
+        </div>
+        <div class="essay-feedback__body">
+          <p>${escapeHtml(feedback.summary || "")}</p>
+          <div class="essay-criteria">
+            ${(feedback.criteria || []).map((criterion) => `
+              <article><strong>${escapeHtml(criterion.name)}</strong><span>${Number(criterion.score) || 0}/25</span><p>${escapeHtml(criterion.comment || "")}</p></article>
+            `).join("")}
+          </div>
+          <div class="essay-feedback__columns">
+            <div><h3>Pontos fortes</h3><ul>${(feedback.strengths || []).map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul></div>
+            <div><h3>Próximos ajustes</h3><ul>${(feedback.improvements || []).map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul></div>
+          </div>
+          <div class="essay-revision"><strong>Orientação de reescrita</strong><p>${escapeHtml(feedback.revision || "")}</p></div>
+        </div>
+      </section>
+    `;
+  }
+
+  function renderEssayTab() {
+    const prompt = ESSAY_PROMPTS.find((item) => item.id === state.essayPrompt) || ESSAY_PROMPTS[0];
+    $("#tab-content").innerHTML = `
+      <section class="panel essay-workspace">
+        <div class="section-heading">
+          <p class="eyebrow">Redação</p>
+          <h2>Treino de redação administrativa</h2>
+        </div>
+        <div class="essay-layout">
+          <div class="essay-editor">
+            <label class="field essay-prompt-select">
+              <span>Proposta</span>
+              <select data-essay-prompt>${ESSAY_PROMPTS.map((item) => `<option value="${escapeHtml(item.id)}" ${item.id === prompt.id ? "selected" : ""}>${escapeHtml(item.title)}</option>`).join("")}</select>
+            </label>
+            <div class="essay-prompt"><span>Comando</span><p>${escapeHtml(prompt.instruction)}</p></div>
+            <label class="essay-text-field">
+              <span class="sr-only">Digite sua redação</span>
+              <textarea data-essay-text rows="16" maxlength="8000" placeholder="Escreva sua resposta aqui...">${escapeHtml(state.essayText)}</textarea>
+            </label>
+            <div class="essay-editor__footer">
+              <span data-essay-count>${essayWordCount()} palavras</span>
+              <span>mínimo recomendado: 80 palavras</span>
+            </div>
+            <div class="action-row">
+              <button class="primary-button" type="button" data-analyze-essay ${state.essayAnalyzing ? "disabled" : ""}>${state.essayAnalyzing ? "Analisando…" : "Avaliar redação"}</button>
+              <button class="secondary-button" type="button" data-clear-essay>Limpar texto</button>
+            </div>
+          </div>
+          <aside class="essay-rubric">
+            <p class="eyebrow">O que será avaliado</p>
+            <h3>Rubrica de 100 pontos</h3>
+            <ol>
+              <li><strong>25</strong><span>Adequação ao tema</span></li>
+              <li><strong>25</strong><span>Estrutura administrativa</span></li>
+              <li><strong>25</strong><span>Clareza e objetividade</span></li>
+              <li><strong>25</strong><span>Linguagem formal</span></li>
+            </ol>
+            <div class="essay-focus"><strong>Nesta proposta</strong>${prompt.focus.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>
+            <p class="essay-privacy">O texto só é enviado ao serviço de IA ao clicar em avaliar. Não inclua dados pessoais ou sigilosos.</p>
+          </aside>
+        </div>
+        <div id="essay-feedback-root">${essayFeedbackMarkup(state.essayFeedback)}</div>
+      </section>
+    `;
+  }
+
+  async function analyzeEssay() {
+    const textValue = String(document.querySelector("[data-essay-text]")?.value || state.essayText).trim();
+    state.essayText = textValue;
+    const feedbackRoot = $("#essay-feedback-root");
+    if (essayWordCount(textValue) < 40) {
+      feedbackRoot.innerHTML = '<p class="essay-message essay-message--error">Escreva pelo menos 40 palavras para receber uma avaliação útil.</p>';
+      return;
+    }
+    const prompt = ESSAY_PROMPTS.find((item) => item.id === state.essayPrompt) || ESSAY_PROMPTS[0];
+    state.essayAnalyzing = true;
+    const button = document.querySelector("[data-analyze-essay]");
+    if (button) { button.disabled = true; button.textContent = "Analisando…"; }
+    feedbackRoot.innerHTML = '<p class="essay-message">Analisando estrutura, clareza e linguagem…</p>';
+    try {
+      if (!APP_CONFIG.essayAiEnabled) throw new Error("AI disabled");
+      const response = await fetch("/api/analyze-essay", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: prompt.instruction, text: textValue }),
+      });
+      if (!response.ok) throw new Error(`AI unavailable: ${response.status}`);
+      const feedback = await response.json();
+      state.essayFeedback = { ...feedback, mode: "ai" };
+    } catch {
+      state.essayFeedback = localEssayEvaluation(textValue);
+    } finally {
+      state.essayAnalyzing = false;
+      feedbackRoot.innerHTML = essayFeedbackMarkup(state.essayFeedback);
+      if (button) { button.disabled = false; button.textContent = "Avaliar novamente"; }
+      feedbackRoot.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+    }
   }
 
   function renderHistoryItem(item) {
@@ -2013,6 +2183,7 @@
       "academia-dados": renderDataAcademyTab,
       "santos-ibam": renderSantosIbamTab,
       estudos: renderStudyTab,
+      redacao: renderEssayTab,
       historico: renderHistory,
     };
     renderers[state.activeTab]?.();
@@ -2581,6 +2752,13 @@
       if (target.dataset.santosAction === "custom") startSantosQuiz(roleId, "custom");
       if (target.dataset.santosAction === "writing") startSantosWriting(roleId);
     }
+    if (target.dataset.analyzeEssay !== undefined) void analyzeEssay();
+    if (target.dataset.clearEssay !== undefined) {
+      state.essayText = "";
+      state.essayFeedback = null;
+      renderEssayTab();
+      requestAnimationFrame(() => document.querySelector("[data-essay-text]")?.focus());
+    }
     if (target.dataset.selfEval && state.activeQuiz) {
       state.activeQuiz.selfEvaluations[target.dataset.selfEval] = target.dataset.selfEvalValue;
       target.closest(".question-card")?.querySelectorAll(".self-eval-option").forEach((option) => option.classList.remove("selected"));
@@ -2618,6 +2796,11 @@
       state.santosQuantity = Number(target.value);
       if (state.activeTab === "santos-ibam") renderSantosIbamTab();
     }
+    if (target.matches("[data-essay-prompt]")) {
+      state.essayPrompt = target.value;
+      state.essayFeedback = null;
+      renderEssayTab();
+    }
     if (target.matches("[data-answer]") && state.activeQuiz) {
       state.activeQuiz.answers[target.dataset.answer] = target.value;
       target.closest(".question-card")?.querySelectorAll(".answer-option").forEach((option) => option.classList.remove("selected"));
@@ -2629,6 +2812,11 @@
     const target = event.target;
     if (target.matches("[data-open-answer]") && state.activeQuiz) {
       state.activeQuiz.answers[target.dataset.openAnswer] = target.value;
+    }
+    if (target.matches("[data-essay-text]")) {
+      state.essayText = target.value;
+      const counter = document.querySelector("[data-essay-count]");
+      if (counter) counter.textContent = `${essayWordCount(target.value)} palavras`;
     }
   });
 
