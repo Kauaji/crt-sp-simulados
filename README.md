@@ -167,14 +167,14 @@ Arquivos:
 - `questions-bank.js`: banco de certificações, Programação, Dados e Academia de Dados.
 - `santos-ibam-bank.js`: banco e metadados dos concursos Santos — IBAM.
 
-Quantidade atual usada pela plataforma (2.083 itens ativos):
+Quantidade atual usada pela plataforma (2.143 itens ativos):
 
 - Banco principal: 685 questões em `simulados.js`, incluindo 180 registros CRT-SP, 205 IBGE, 180 Santos e 120 PM-SP.
 - Certificações: 360 questões distribuídas entre DP-600, PL-300, AZ-900, PL-900, DP-900 e DP-700.
 - Programação: 192 questões.
 - Dados: 192 questões.
 - Academia de Dados: 384 questões, 48 em cada uma das oito trilhas.
-- Santos IBAM: 80 questões para Agente de Portaria, 80 para Inspetor de Alunos e 100 objetivas + 10 propostas de redação para Oficial de Administração.
+- Santos IBAM: 100 questões para Agente de Portaria, 100 para Inspetor de Alunos e 120 objetivas + 10 propostas de redação para Oficial de Administração.
 
 ## Auditoria de qualidade
 
@@ -240,10 +240,18 @@ A aba **Concursos Santos — IBAM** cobre três cargos da Prefeitura de Santos:
 - **Inspetor de Alunos** — Edital nº 73/2026 — SEPLA-RH — código 606.
 - **Oficial de Administração** — Edital nº 71/2026 — SEPLA-RH — código 1101.
 
+O banco dedicado combina questões autorais com **60 adaptações inéditas de provas anteriores oficiais do IBAM** — 20 por cargo. Cada adaptação registra o caderno, o número da questão usada como inspiração e o gabarito definitivo. Enunciados, dados e alternativas são reescritos; os cadernos de 2026 ainda não existem porque as provas estão previstas para setembro e outubro de 2026.
+
 Links oficiais usados para consulta:
 
 - Edital 73/2026: https://www.ibamsp-concursos.org.br/informacoes/178/
 - Edital 71/2026: https://www.ibamsp-concursos.org.br/informacoes/176/
+
+Cadernos anteriores de referência:
+
+- Inspetor de Alunos — Arraial do Cabo/RJ — IBAM — Edital nº 01/2025.
+- Técnico Administrativo — Câmara de Paraíba do Sul/RJ — IBAM — Edital nº 01/2025.
+- Auxiliar Administrativo — Arraial do Cabo/RJ — IBAM — Edital nº 02/2025, prova aplicada em 2026.
 
 ### Diferença entre CRT-SP/Quadrix e Santos/IBAM
 
@@ -281,7 +289,7 @@ As questões de Santos ficam em `santos-ibam-bank.js`. Para adicionar uma quest�
 
 ```js
 {
-  id: "IBAM-AGP-081",
+  id: "IBAM-AGP-101",
   area: "concursos-santos-ibam",
   concurso: "Prefeitura de Santos",
   concurso_id: "santos-ibam",
@@ -289,9 +297,11 @@ As questões de Santos ficam em `santos-ibam-bank.js`. Para adicionar uma quest�
   edital: "73/2026",
   cargo: "Agente de Portaria",
   cargo_id: "santos-agente-portaria",
+  cargos_compativeis: ["santos-agente-portaria"],
   bloco: "Conhecimentos Específicos",
   disciplina: "Conhecimentos Específicos",
   assunto: "Controle de acesso",
+  subassunto: "controle-de-acesso",
   tipo: "multipleChoice",
   dificuldade: "medio",
   peso: 5,
@@ -305,7 +315,7 @@ As questões de Santos ficam em `santos-ibam-bank.js`. Para adicionar uma quest�
 }
 ```
 
-Não copie questões reais protegidas. Use editais, legislação oficial e provas antigas apenas como inspiração de estilo.
+Não copie literalmente questões de provas anteriores. Para uma adaptação, reescreva enunciado, dados e distratores e registre `origem_tipo`, `prova_origem`, `questao_origem` e `fonte_gabarito`, sempre com links oficiais verificáveis.
 
 Para adicionar novas questões em `questions-bank.js`, use campos como:
 

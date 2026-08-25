@@ -46,39 +46,39 @@ const VALID_DIFFICULTIES = new Set(["facil", "medio", "dificil"]);
 const VALID_SUBJECT_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/u;
 const SANTOS_EXPECTED_POOLS = new Map([
   ["santos-agente-portaria", {
-    total: 80,
+    total: 100,
     prefix: "IBAM-AGP",
     edital: "73/2026",
     counts: new Map([
-      ["Língua Portuguesa", 12],
-      ["Matemática", 8],
-      ["Legislação Municipal e Serviço Público", 12],
-      ["Informática e Rotinas", 10],
-      ["Conhecimentos Específicos", 38],
+      ["Língua Portuguesa", 16],
+      ["Matemática", 12],
+      ["Legislação Municipal e Serviço Público", 16],
+      ["Informática e Rotinas", 14],
+      ["Conhecimentos Específicos", 42],
     ]),
   }],
   ["santos-inspetor-alunos", {
-    total: 80,
+    total: 100,
     prefix: "IBAM-INSP",
     edital: "73/2026",
     counts: new Map([
-      ["Língua Portuguesa", 12],
-      ["Matemática", 8],
-      ["Legislação Municipal e Serviço Público", 12],
-      ["Informática e Rotinas", 10],
-      ["Conhecimentos Específicos", 38],
+      ["Língua Portuguesa", 16],
+      ["Matemática", 12],
+      ["Legislação Municipal e Serviço Público", 16],
+      ["Informática e Rotinas", 14],
+      ["Conhecimentos Específicos", 42],
     ]),
   }],
   ["santos-oficial-administracao", {
-    total: 100,
+    total: 120,
     prefix: "IBAM-OFI",
     edital: "71/2026",
     counts: new Map([
-      ["Língua Portuguesa", 14],
-      ["Matemática", 10],
-      ["Legislação Municipal e Serviço Público", 14],
-      ["Informática e Rotinas", 12],
-      ["Conhecimentos Específicos", 50],
+      ["Língua Portuguesa", 18],
+      ["Matemática", 14],
+      ["Legislação Municipal e Serviço Público", 18],
+      ["Informática e Rotinas", 16],
+      ["Conhecimentos Específicos", 54],
     ]),
   }],
 ]);
@@ -1053,6 +1053,7 @@ function auditSantosIbamQuality(extraBank, config) {
   const knownRoleIds = new Set(SANTOS_EXPECTED_POOLS.keys());
   const allowedSourceHosts = new Set([
     "www.ibamsp-concursos.org.br",
+    "www.ibam-concursos.org.br",
     "www.planalto.gov.br",
     "www.egov.santos.sp.gov.br",
     "egov.santos.sp.gov.br",
@@ -1089,6 +1090,26 @@ function auditSantosIbamQuality(extraBank, config) {
       addFailure("Fontes Santos/IBAM", `${id}: link de fonte inválido.`);
     }
 
+    if (question.origem_tipo === "adaptacao-autoral-de-prova-anterior") {
+      if (!/^IBAM\s+[—-]/u.test(text(question.prova_origem))) {
+        addFailure("Proveniência de prova anterior", `${id}: prova_origem ausente ou sem identificação da banca IBAM.`);
+      }
+      if (!Number.isInteger(question.questao_origem) || question.questao_origem < 1) {
+        addFailure("Proveniência de prova anterior", `${id}: questao_origem deve ser um inteiro positivo.`);
+      }
+      if (!new RegExp(`quest[aã]o\\s+${question.questao_origem}(?:\\D|$)`, "iu").test(text(question.fonte))) {
+        addFailure("Proveniência de prova anterior", `${id}: fonte não registra a questão de inspiração.`);
+      }
+      try {
+        const answerKeyUrl = new URL(text(question.fonte_gabarito));
+        if (answerKeyUrl.hostname.toLocaleLowerCase("pt-BR") !== "www.ibam-concursos.org.br") {
+          addFailure("Proveniência de prova anterior", `${id}: gabarito não aponta para o domínio oficial do IBAM.`);
+        }
+      } catch {
+        addFailure("Proveniência de prova anterior", `${id}: fonte_gabarito ausente ou inválida.`);
+      }
+    }
+
     if (question.tipo === "administrativeWriting") {
       if (question.cargo_id !== "santos-oficial-administracao") {
         addFailure("Redação Oficial de Administração", `${id}: redação atribuída a cargo incompatível.`);
@@ -1112,6 +1133,10 @@ function auditSantosIbamQuality(extraBank, config) {
     const pool = santosQuestions.filter((question) => question.cargo_id === roleId && question.tipo === "multipleChoice");
     if (pool.length !== expected.total) {
       addFailure("Blueprint Santos/IBAM", `${roleId}: banco objetivo deve ter exatamente ${expected.total} itens; encontrado ${pool.length}.`);
+    }
+    const adaptedPool = pool.filter((question) => question.origem_tipo === "adaptacao-autoral-de-prova-anterior");
+    if (adaptedPool.length !== 20) {
+      addFailure("Proveniência de prova anterior", `${roleId}: esperado bloco curado de 20 adaptações; encontrado ${adaptedPool.length}.`);
     }
 
     const foundSequences = new Set();

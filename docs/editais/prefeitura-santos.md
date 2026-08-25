@@ -1,41 +1,47 @@
-# Prefeitura de Santos — Oficial de Administração
+# Prefeitura de Santos — IBAM — Editais 71/2026 e 73/2026
 
-## Fonte do edital
+## Fontes oficiais atuais
 
-- Página da banca IBAM: https://www.ibamsp-concursos.org.br/informacoes/176/
-- PDF do edital: https://anexos-r2.selecao.net.br/uploads/810/concursos/176/anexos/8f64e592-4e52-4aca-877c-f7e1179684e1.pdf
-- Notícia oficial da Prefeitura de Santos: https://www.santos.sp.gov.br/?q=noticia%2Fsantos-abre-concurso-com-226-vagas-para-niveis-fundamental-medio-e-superior
+- Edital 73/2026 — Agente de Portaria e Inspetor de Alunos: https://www.ibamsp-concursos.org.br/informacoes/178/
+- Edital 71/2026 — Oficial de Administração: https://www.ibamsp-concursos.org.br/informacoes/176/
 
-## Dados usados no sistema
+As provas de 2026 ainda não possuem caderno ou gabarito: Oficial de Administração está previsto para 27/09/2026; Agente de Portaria e Inspetor de Alunos, para 11/10/2026.
 
-- Órgão: Município de Santos.
-- Banca: IBAM.
-- Edital: nº 71/2026.
-- Publicação: 17/07/2026.
-- Cargo: Oficial de Administração.
-- Nível: ensino médio.
-- Formato implementado: múltipla escolha.
-- Redação: treino manual previsto no sistema, sem autocorreção.
+## Estrutura objetiva implementada
 
-## Estrutura aplicada ao simulado
+Os três cargos têm 40 questões de múltipla escolha com quatro alternativas:
 
-- Língua Portuguesa: 15 questões.
-- Matemática: 10 questões.
-- Legislação municipal e serviço público: 10 questões.
-- Conhecimentos específicos administrativos: 15 questões.
-- Total: 50 questões.
+| Disciplina | Questões |
+|---|---:|
+| Língua Portuguesa | 10 |
+| Matemática | 6 |
+| Legislação Municipal e Serviço Público | 8 |
+| Informática e Rotinas | 6 |
+| Conhecimentos Específicos | 10 |
 
-## Matérias cadastradas
+Pesos por cargo:
 
-- Língua Portuguesa.
-- Matemática.
-- Legislação municipal e serviço público.
-- Conhecimentos específicos administrativos.
+| Cargo | Português | Matemática | Legislação | Informática | Específicos |
+|---|---:|---:|---:|---:|---:|
+| Agente de Portaria | 1 | 1 | 2 | 3 | 5 |
+| Inspetor de Alunos | 1 | 1 | 4 | 2 | 4 |
+| Oficial de Administração | 2 | 2 | 2 | 2 | 4 |
 
-## Redação
+O Oficial também tem redação técnico-administrativa de 20 a 30 linhas, sem título, valendo 40 pontos.
 
-O sistema inclui propostas de treino manual para redação de 20 a 30 linhas e alerta que a correção não é automática.
+## Banco dedicado da interface
 
-## Banco inicial
+- Agente de Portaria: 100 questões objetivas.
+- Inspetor de Alunos: 100 questões objetivas.
+- Oficial de Administração: 120 questões objetivas e 10 propostas de redação.
+- Cada cargo possui 20 adaptações inéditas e identificadas de provas anteriores oficiais do IBAM.
 
-150 questões inéditas para Oficial de Administração, com foco em Português, Matemática, legislação/serviço público e rotinas administrativas.
+As adaptações preservam apenas tema, competência e estilo de cobrança. Enunciados, números e alternativas são reescritos. Cada item registra `prova_origem`, `questao_origem`, o caderno oficial e o gabarito definitivo.
+
+## Provas anteriores usadas como referência
+
+- IBAM — Prefeitura de Arraial do Cabo/RJ — Inspetor de Alunos — Edital nº 01/2025.
+- IBAM — Câmara Municipal de Paraíba do Sul/RJ — Técnico Administrativo — Edital nº 01/2025.
+- IBAM — Prefeitura de Arraial do Cabo/RJ — Auxiliar Administrativo — Edital nº 02/2025, prova aplicada em 2026.
+
+O arquivo usado pela aba Santos é `santos-ibam-bank.js`. O concurso legado `santos-oficial` de `simulados.js` é outro banco e não deve receber essas adaptações.

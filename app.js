@@ -1664,13 +1664,14 @@
     const accuracy = stats.totalQuestoesRespondidas ? Math.round((stats.totalAcertos / stats.totalQuestoesRespondidas) * 100) : 0;
     const santosHistory = (stats.historicoUltimosResultados || []).filter((item) => item.area === "concursos-santos-ibam");
     const bestSantos = [...santosHistory].sort((a, b) => (b.percentual || 0) - (a.percentual || 0))[0];
+    const adaptedQuestions = poolByArea("concursos-santos-ibam").filter((question) => question.origem_tipo === "adaptacao-autoral-de-prova-anterior").length;
     $("#tab-content").innerHTML = `
       <section class="panel">
         <div class="section-heading">
           <p class="eyebrow">Concursos Santos — IBAM</p>
           <h2>Prefeitura de Santos: Agente, Inspetor e Oficial</h2>
         </div>
-        <p>Área baseada nas páginas oficiais do IBAM para os editais 73/2026 e 71/2026. As questões são autorais, inéditas e em múltipla escolha com 4 alternativas.</p>
+        <p>Área baseada nos editais oficiais 73/2026 e 71/2026. O banco combina questões autorais com ${adaptedQuestions} adaptações inéditas e identificadas de provas anteriores oficiais do IBAM.</p>
         <div class="dashboard-grid">
           ${metricCard("Inscrições", "22/07 a 20/08/2026", "boletos até 21/08/2026")}
           ${metricCard("Banca", "IBAM", "múltipla escolha")}
@@ -1739,7 +1740,7 @@
         <div class="action-row">
           <button class="primary-button" type="button" data-santos-action="custom" data-santos-role="${escapeHtml(selectedRole?.id || "")}">Gerar questionário ${Number(state.santosQuantity) || 20} questões</button>
           <button class="secondary-button" type="button" data-santos-action="full" data-santos-role="${escapeHtml(selectedRole?.id || "")}">Simulado completo</button>
-          <button class="secondary-button" type="button" data-santos-action="real" data-santos-role="${escapeHtml(selectedRole?.id || "")}">Prova real</button>
+          <button class="secondary-button" type="button" data-santos-action="real" data-santos-role="${escapeHtml(selectedRole?.id || "")}">Modo prova cronometrado</button>
         </div>
       </section>
       <section class="panel">
@@ -1752,6 +1753,7 @@
           ${studyCard("Legislação e serviço público", ["Lei Orgânica e Estatuto municipal de Santos.", "Lei 13.460/2017, LAI, LGPD e Governo Digital.", "Atendimento prioritário, acessibilidade e ética."], [["Edital 73/2026", SANTOS_IBAM_CONFIG.officialLinks?.edital73], ["Edital 71/2026", SANTOS_IBAM_CONFIG.officialLinks?.edital71], ["LAI", SANTOS_IBAM_CONFIG.officialLinks?.lai], ["LGPD", SANTOS_IBAM_CONFIG.officialLinks?.lgpd]])}
           ${studyCard("Estratégia por pesos", ["Agente: específicos, informática/rotinas e legislação/atendimento.", "Inspetor: específicos, legislação/atendimento escolar, ECA e segurança.", "Oficial: específicos, Português, redação administrativa, protocolo e arquivo."], [])}
           ${studyCard("Videoaulas gratuitas", ["Busque aulas gratuitas de Português IBAM, Matemática básica, informática para concursos e redação oficial.", "Use os simulados daqui para descobrir o tema do vídeo do dia.", "Priorize lei seca e exercícios, não maratona passiva."], [["YouTube — Português IBAM", "https://www.youtube.com/results?search_query=portugu%C3%AAs+ibam+concursos"], ["YouTube — Informática concursos", "https://www.youtube.com/results?search_query=inform%C3%A1tica+para+concursos"]])}
+          ${studyCard("Provas anteriores oficiais", ["As questões do site são reescritas; o caderno original é usado como referência de tema e estilo.", "Cada adaptação informa a prova e o número da questão de inspiração.", "Consulte também o gabarito definitivo publicado pelo IBAM."], [["Inspetor de Alunos — IBAM 2025", SANTOS_IBAM_CONFIG.officialLinks?.provaInspetorArraial2025], ["Técnico Administrativo — IBAM 2025", SANTOS_IBAM_CONFIG.officialLinks?.provaTecnicoParaiba2025], ["Auxiliar Administrativo — IBAM 2026", SANTOS_IBAM_CONFIG.officialLinks?.provaAuxiliarArraial2026]])}
         </div>
       </section>
     `;
@@ -1776,7 +1778,7 @@
         <div class="action-row">
           <button class="primary-button" type="button" data-santos-action="study" data-santos-role="${escapeHtml(role.id)}">Estudar</button>
           <button class="secondary-button" type="button" data-santos-action="quick" data-santos-role="${escapeHtml(role.id)}">Simulado rápido</button>
-          <button class="secondary-button" type="button" data-santos-action="real" data-santos-role="${escapeHtml(role.id)}">Prova real</button>
+          <button class="secondary-button" type="button" data-santos-action="real" data-santos-role="${escapeHtml(role.id)}">Modo prova</button>
           <button class="secondary-button" type="button" data-santos-action="summary" data-santos-role="${escapeHtml(role.id)}">Resumo do edital</button>
           ${role.hasEssay ? `<button class="secondary-button" type="button" data-santos-action="writing" data-santos-role="${escapeHtml(role.id)}">Redação</button>` : ""}
         </div>
@@ -1868,7 +1870,7 @@
     state.santosAttempt += 1;
     const count = mode === "quick" ? 20 : mode === "custom" ? Number(state.santosQuantity) || 20 : 40;
     let questions = selectSantosByDistribution(role, count, mode);
-    const titleMode = mode === "real" ? "Prova real" : mode === "full" ? "Simulado completo" : mode === "custom" ? `Questionário ${count} questões` : "Simulado rápido";
+    const titleMode = mode === "real" ? "Modo prova cronometrado" : mode === "full" ? "Simulado completo" : mode === "custom" ? `Questionário ${count} questões` : "Simulado rápido";
     if (mode === "real" && role.hasEssay) {
       const writingPool = santosPool(role.id, { includeWriting: true }).filter((question) => question.tipo === "administrativeWriting");
       questions = [...questions, ...selectRotatingQuestions({
@@ -2291,7 +2293,12 @@
           <summary>Ver explicação e fonte</summary>
           ${OPEN_TYPES.has(question.tipo) && question.resposta_esperada ? `<p><strong>Resposta esperada:</strong> ${escapeHtml(question.resposta_esperada)}</p>` : ""}
           <p>${escapeHtml(question.comentario || "Revise o assunto indicado.")}</p>
-          ${question.link ? `<a href="${escapeHtml(question.link)}" target="_blank" rel="noreferrer">Link de estudo/fonte</a>` : ""}
+          ${question.fonte ? `<p><strong>Fonte:</strong> ${escapeHtml(question.fonte)}</p>` : ""}
+          <div class="link-list">
+            ${question.link ? `<a href="${escapeHtml(question.link)}" target="_blank" rel="noreferrer">Caderno ou fonte de estudo</a>` : ""}
+            ${question.fonte_gabarito ? `<a href="${escapeHtml(question.fonte_gabarito)}" target="_blank" rel="noreferrer">Gabarito oficial da prova de inspiração</a>` : ""}
+            ${question.base_legal_url ? `<a href="${escapeHtml(question.base_legal_url)}" target="_blank" rel="noreferrer">Base legal vigente</a>` : ""}
+          </div>
         </details>
       </article>
     `;
